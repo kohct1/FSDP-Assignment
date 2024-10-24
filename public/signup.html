@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SustainableMe</title>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width">
+</head>
+<body class="bg-white">
+  <!-- Logo -->
+  <div class="text-center mb-6">
+    <img src="/images/OCBC-Bank-Logo.png" alt="OCBC Logo" class="mx-auto h-28">
+  </div>
+  
+    <div class="max-w-4xl mx-auto mt-10 bg-white p-10 rounded-lg shadow-md">
+        <!-- ATM/Credit/Debit Card Details Section -->
+        <h2 class="text-lg font-semibold bg-red-600 text-white p-2 mb-4">1. Your ATM/credit/debit card details</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Last 8-digits of card no.</label>
+            <input type="text" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">6-digit PIN:</label>
+            <input type="password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
+          </div>
+        </div>
+    
+        <!-- Personal Details Section -->
+        <h2 class="text-lg font-semibold bg-red-600 text-white p-2 mb-4">2. Personal details</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Identification type:</label>
+            <select class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
+              <option>Please Select</option>
+              <option>NRIC</option>
+              <option>Passport</option>
+              <option>FIN</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Identification no.:</label>
+            <input type="text" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-6 mb-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Day</label>
+            <select class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
+              <option>Day</option>
+              <!-- Add days here -->
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Month</label>
+            <select class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
+              <option>Month</option>
+              <!-- Add months here -->
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Year</label>
+            <select class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500">
+              <option>Year</option>
+              <!-- Add years here -->
+            </select>
+          </div>
+        </div>
+    
+        <!-- Extra Security Check Section -->
+        <h2 class="text-lg font-semibold bg-red-600 text-white p-2 mb-4">3. Extra security check</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center mb-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Generated Captcha</label>
+            <img src="captcha-image.png" alt="Captcha" class="mt-2">
+            <a href="#" class="text-sm text-blue-600 hover:underline mt-1 inline-block">Get another code</a>
+          </div>
+          <div>
+            <input type="text" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500" placeholder="Enter the characters as seen">
+          </div>
+        </div>
+    
+        <!-- Submit Button -->
+        <div class="flex justify-end">
+          <button class="bg-red-600 text-white py-3 px-9 rounded-md shadow-md hover:bg-red-700">Next</button>
+        </div>
+      </div>
+      
+    <!-- This is the JavaScript-->
+    <script src="" type="module"></script>
+</body>
+</html>
