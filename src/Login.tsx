@@ -28,8 +28,8 @@ function Login() {
         <>
             <Navbar />
             <div className="w-full h-screen flex justify-center items-center">
-                <div className="w-1/4 h-2/3 flex flex-col justify-between rounded border-2 pt-8">
-                    <div className="flex flex-col px-12 pt-8 gap-8">
+                <div className="w-1/4 h-fit flex flex-col justify-between rounded border-2 pt-8">
+                    <div className="flex flex-col px-12 pt-8 py-20 gap-8">
                         <h1 className="text-3xl font-semibold">Online Banking</h1>
                         <input className="border-b-2 outline-0 px-4 py-2" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
                         <input className="border-b-2 outline-0 px-4 py-2" placeholder="PIN" value={pin} onChange={(e) => setPin(e.target.value)} />
