@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Navbar from "./components/Navbar";
 
 const BookingForm: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -9,7 +10,26 @@ const BookingForm: React.FC = () => {
     reason: '',
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  // Simulating fetching user data (replace with real data fetch)
+  useEffect(() => {
+    const fetchUserData = async () => {
+      // Replace this object with an actual data fetch
+      const userData = {
+        salutation: 'Mr',
+        name: 'John Doe',
+        phoneNumber: '1234567890',
+        email: 'johndoe@example.com',
+      };
+      
+      setFormData({
+        ...formData,
+        ...userData,
+      });
+    };
+    fetchUserData();
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -18,99 +38,67 @@ const BookingForm: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic
     console.log(formData);
   };
 
   return (
     <div className="bg-gray-100">
-      {/* Navigation Bar */}
-      <nav className="bg-white shadow p-4 flex justify-between items-center">
-        <img src="/images/OCBC-Bank-Logo.png" alt="OCBC Logo" className="h-16" />
-        <div className="space-x-8">
-          <a href="#" className="text-gray-600 hover:text-gray-800">Booking</a>
-          <a href="#" className="text-gray-600 hover:text-gray-800">Queue</a>
-          <a href="#" className="text-gray-600 hover:text-gray-800">Enquiry Portal</a>
-        </div>
-      </nav>
+      <Navbar />
 
-      {/* Form Section */}
       <div className="flex justify-center items-center py-12">
         <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-8">
-          {/* Title and Phone */}
           <h1 className="text-3xl font-semibold text-gray-800 mb-2">Make a Booking</h1>
           <p className="text-gray-600 text-sm mb-8">
             For urgent matters, please call us directly at <span className="font-semibold">6535 7677</span>
           </p>
 
-          {/* Form */}
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 gap-6">
-              {/* Salutation */}
+
               <div>
                 <label className="block text-left text-gray-700 text-sm mb-2">Salutation:</label>
-                <select
+                <input
+                  type="text"
                   name="salutation"
                   value={formData.salutation}
-                  onChange={handleChange}
-                  className="block w-full border border-gray-300 rounded p-2 focus:ring-red-500 focus:border-red-500"
-                >
-                  <option value="">Select</option>
-                  <option value="Mr">Mr</option>
-                  <option value="Ms">Ms</option>
-                  <option value="Mrs">Mrs</option>
-                </select>
+                  readOnly
+                  className="block w-full border border-gray-300 rounded p-2 bg-gray-200 cursor-not-allowed"
+                />
               </div>
 
-              {/* Name */}
               <div>
-                <label className="block text-left text-gray-700 text-sm mb-2">
-                  Name<span className="text-red-500">*</span>
-                </label>
+                <label className="block text-left text-gray-700 text-sm mb-2">Name:</label>
                 <input
                   type="text"
                   name="name"
                   value={formData.name}
-                  onChange={handleChange}
-                  required
-                  className="block w-full border border-gray-300 rounded p-2 focus:ring-red-500 focus:border-red-500"
-                  placeholder="Enter your name"
+                  readOnly
+                  className="block w-full border border-gray-300 rounded p-2 bg-gray-200 cursor-not-allowed"
                 />
               </div>
 
-              {/* Phone Number */}
               <div>
-                <label className="block text-left text-gray-700 text-sm mb-2">
-                  Phone Number<span className="text-red-500">*</span>
-                </label>
+                <label className="block text-left text-gray-700 text-sm mb-2">Phone Number:</label>
                 <input
                   type="tel"
                   name="phoneNumber"
                   value={formData.phoneNumber}
-                  onChange={handleChange}
-                  required
-                  className="block w-full border border-gray-300 rounded p-2 focus:ring-red-500 focus:border-red-500"
-                  placeholder="Enter your phone number"
+                  readOnly
+                  className="block w-full border border-gray-300 rounded p-2 bg-gray-200 cursor-not-allowed"
                 />
               </div>
 
-              {/* Email */}
               <div>
-                <label className="block text-left text-gray-700 text-sm mb-2">
-                  Email<span className="text-red-500">*</span>
-                </label>
+                <label className="block text-left text-gray-700 text-sm mb-2">Email:</label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="block w-full border border-gray-300 rounded p-2 focus:ring-red-500 focus:border-red-500"
-                  placeholder="Enter your email"
+                  readOnly
+                  className="block w-full border border-gray-300 rounded p-2 bg-gray-200 cursor-not-allowed"
                 />
               </div>
 
-              {/* Reason for Booking */}
               <div>
                 <label className="block text-left text-gray-700 text-sm mb-2">
                   Reason for booking<span className="text-red-500">*</span>
@@ -128,7 +116,6 @@ const BookingForm: React.FC = () => {
                 <p className="text-sm text-left text-gray-500 mt-1">Characters left: {500 - formData.reason.length}</p>
               </div>
 
-              {/* Continue Button */}
               <div className="mt-6">
                 <button
                   type="submit"

@@ -3,8 +3,8 @@ import './App.css'
 import Login from "./Login";
 import Booking from './Booking';
 import BookingDate from "./BookingDate";
-import OCBCsignup from './OCBCsignup.tsx'
-import BookingPage from './BookingPage.tsx'
+import BookingPage from './BookingPage';
+import OCBCsignup from './OCBCsignup';
 
 function App() {
   return (
@@ -12,6 +12,8 @@ function App() {
       <Route path="/" element={<Login />} />
       <Route path="booking" element={<Booking />} />
       <Route path="booking-date" element={<BookingDate />} />
+      <Route path="bookingpage" element={<BookingPage />} />
+      <Route path="signup" element={<OCBCsignup />} />
     </Routes>
   );
 }
