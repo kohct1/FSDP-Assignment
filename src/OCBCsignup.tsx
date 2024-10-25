@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
-const SustainableMe: React.FC = () => {
-  // Example state to handle form data (you can expand this as per your requirements)
+const OCBCSignUp: React.FC = () => {
   const [formData, setFormData] = useState({
     cardNumber: "",
     pin: "",
@@ -9,7 +8,7 @@ const SustainableMe: React.FC = () => {
     identificationNumber: "",
     day: "Day",
     month: "Month",
-    year: "Year",
+    year: "",
     captchaInput: ""
   });
 
@@ -22,7 +21,6 @@ const SustainableMe: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    // Handle the form submission logic here
     console.log(formData);
   };
 
@@ -94,6 +92,7 @@ const SustainableMe: React.FC = () => {
           </div>
         </div>
         
+        {/* Date of Birth Section */}
         <div className="grid grid-cols-3 gap-6 mb-6">
           <div>
             <label className="block text-left text-sm font-medium text-gray-700">Day</label>
@@ -104,7 +103,11 @@ const SustainableMe: React.FC = () => {
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
             >
               <option>Day</option>
-              {/* Add day options here */}
+              {Array.from({ length: 31 }, (_, i) => (
+                <option key={i + 1} value={i + 1}>
+                  {i + 1}
+                </option>
+              ))}
             </select>
           </div>
           <div>
@@ -116,25 +119,28 @@ const SustainableMe: React.FC = () => {
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
             >
               <option>Month</option>
-              {/* Add month options here */}
+              {["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].map((month, index) => (
+                <option key={index} value={month}>
+                  {month}
+                </option>
+              ))}
             </select>
           </div>
           <div>
             <label className="block text-left text-sm font-medium text-gray-700">Year</label>
-            <select
+            <input
+              type="text"
               name="year"
               value={formData.year}
               onChange={handleInputChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
-            >
-              <option>Year</option>
-              {/* Add year options here */}
-            </select>
+              placeholder="Enter year"
+            />
           </div>
         </div>
 
         {/* Extra Security Check Section */}
-        <div className="relative -mx-10"> {/* Wrapper div with negative margin */}
+        <div className="relative -mx-10">
           <h2 className="text-left pl-10 text-lg font-semibold bg-red-600 text-white p-2 mb-4">
             3. Extra security check
           </h2>
@@ -157,7 +163,6 @@ const SustainableMe: React.FC = () => {
           </div>
         </div>
 
-
         {/* Submit Button */}
         <div className="flex justify-end">
           <button
@@ -172,4 +177,4 @@ const SustainableMe: React.FC = () => {
   );
 };
 
-export default SustainableMe;
+export default OCBCSignUp;
