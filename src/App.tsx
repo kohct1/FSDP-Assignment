@@ -5,6 +5,7 @@ import Booking from './Booking';
 import BookingDate from "./BookingDate";
 import BookingPage from './BookingPage';
 import OCBCsignup from './OCBCsignup';
+import HomePage from './HomePage';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Route path="booking-date" element={<BookingDate />} />
       <Route path="bookingpage" element={<BookingPage />} />
       <Route path="signup" element={<OCBCsignup />} />
+      <Route path="homepage" element={<HomePage />} />
     </Routes>
   );
 }
