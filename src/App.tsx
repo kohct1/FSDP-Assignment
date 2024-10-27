@@ -3,6 +3,7 @@ import './App.css'
 import Login from "./Login";
 import Booking from './Booking';
 import BookingDate from "./BookingDate";
+import BookingTime from "./BookingTime";
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <Route path="/" element={<Login />} />
       <Route path="booking" element={<Booking />} />
       <Route path="booking-date" element={<BookingDate />} />
+      <Route path="booking-time" element={<BookingTime />} />
     </Routes>
   );
 }
