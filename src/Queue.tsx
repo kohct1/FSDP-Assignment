@@ -1,9 +1,8 @@
-import React from 'react';
 import Navbar from "./components/Navbar";
 
 const Queue = () => {
     // Dynamic data for queue status
-    const queueAhead = 100;
+    const queueAhead = 30;
     const waitingTime = 2; // in hours
     const lastUpdated = "9:17:46";
 
