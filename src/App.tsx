@@ -7,6 +7,7 @@ import BookingDate from "./BookingDate";
 import BookingPage from './BookingPage';
 import OCBCsignup from './OCBCsignup';
 import HomePage from './HomePage';
+import BookingTime from "./BookingTime";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
       <Route path="bookingpage" element={<BookingPage />} />
       <Route path="signup" element={<OCBCsignup />} />
       <Route path="homepage" element={<HomePage />} />
+      <Route path="booking-time" element={<BookingTime />} />
     </Routes>
   );
 }
