@@ -7,10 +7,10 @@ function Navbar() {
                         alt="OCBC Logo"
                         className="h-12"
                     />
-                    <div className="flex space-x-10">
-                        <a href="#booking" className="text-gray-600 font-semibold">Booking</a>
-                        <a href="#queue" className="text-gray-600 font-semibold">Queue</a>
-                        <a href="#enquiry" className="text-gray-600 font-semibold">Enquiry Portal</a>
+                    <div className="flex sm:space-x-16 space-x-4 sm:mr-10 mr-0">
+                        <a href="/bookingpage" className="text-gray-600 font-semibold text-xs sm:text-base">Booking</a>
+                        <a href="/ticketing" className="text-gray-600 font-semibold text-xs sm:text-base">Queue</a>
+                        <a href="#enquiries" className="text-gray-600 font-semibold text-xs sm:text-base">Enquiry Portal</a>
                     </div>
                 </div>
             </div>

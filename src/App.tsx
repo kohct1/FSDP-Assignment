@@ -9,12 +9,13 @@ import HomePage from './HomePage';
 import BookingTime from "./BookingTime";
 import Ticketing from "./Ticketing";
 import Queue from "./Queue";
+import MakeEnquiry from "./MakeEnquiry";
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
-      <Route path="enquiries" element={<Enquiry />} />
+      <Route path="staff/enquiries" element={<Enquiry />} />
       <Route path="booking-date" element={<BookingDate />} />
       <Route path="bookingpage" element={<BookingPage />} />
       <Route path="signup" element={<OCBCsignup />} />
@@ -22,6 +23,7 @@ function App() {
       <Route path="booking-time" element={<BookingTime />} />
       <Route path="ticketing" element={<Ticketing />} />
       <Route path="queue" element={<Queue />} />
+      <Route path="user/enquiries/make" element={<MakeEnquiry />} />
     </Routes>
   );
 }
