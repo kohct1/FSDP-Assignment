@@ -21,7 +21,10 @@ function Login() {
 
         const result = await response.json();
 
-        if (result.token) navigate("/home");
+        if (result.token)  {
+            localStorage.setItem("token", result.token);
+            navigate("/homepage");
+        }
     }
 
     return (

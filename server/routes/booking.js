@@ -17,11 +17,11 @@ router.get("/bookings/:date", async (req, res) => {
 });
 
 router.post("/bookings", async (req, res) => {
-    const { date, time, slot } = req.body;
+    const { date, time, slot, userId } = req.body;
 
     try {
         const bookingsCollection = db.collection("Bookings");
-        const bookings = await bookingsCollection.insertOne({ date, time, slot });
+        const bookings = await bookingsCollection.insertOne({ date, time, slot, userId });
 
         res.status(200).json({ bookings });
     } catch (err) {

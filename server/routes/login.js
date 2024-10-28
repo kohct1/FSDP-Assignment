@@ -22,4 +22,16 @@ router.post("/login", async (req, res) => {
     }
 });
 
+router.post("/decode", async (req, res) => {
+    const { token } = req.body;
+
+    try {
+        const decoded = jwt.decode(token, process.env.JWT_SECRET);
+
+        res.status(200).json({ userId: decoded.userId });
+    } catch (err) {
+        res.status(500).send(err);
+    }
+});
+
 export default router

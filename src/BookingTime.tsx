@@ -17,7 +17,7 @@ function BookingTime() {
         setBookings(result.bookings);
     }
 
-    async function createBooking(time: number, slot: number[]): Promise<void> {
+    async function createBooking(time: number, slot: number[], userId: string): Promise<void> {
         await fetch(`http://localhost:5050/bookings/`, {
             method: "POST",
             headers: {
@@ -26,11 +26,28 @@ function BookingTime() {
             body: JSON.stringify({
                 date: String(state.selectedDate),
                 time: time,
-                slot: slot
+                slot: slot,
+                userId: userId
             })
         });
 
-        navigate("/home");
+        navigate("/homepage");
+    }
+
+    async function getUser(time: number, slot: number): Promise<void> {
+        const response = await fetch(`http://localhost:5050/decode/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                token: localStorage.getItem("token")
+            })
+        });
+
+        const result = await response.json();
+
+        createBooking(time, [slot, slot + slotLength - 1], result.userId);
     }
 
     useEffect(() => {
@@ -49,6 +66,13 @@ function BookingTime() {
                     <div className="w-full flex flex-col items-center border-2 rounded-md">
                         {times.map((time: number) => {
                             const filteredBookings: any = Object.values(bookings).filter((booking: any) => booking.time === time);
+                            const slotsCopy: number[] = [...slots];
+
+                            filteredBookings.forEach((booking: any) => {
+                                booking.slot.forEach((slot: number) => {
+                                    slotsCopy.splice(slotsCopy.indexOf(slot), 1);
+                                });
+                            });
 
                             if (filteredBookings.length === 0) {
                                 const slotsCopy: number[] = [...slots];
@@ -59,7 +83,7 @@ function BookingTime() {
                                         {slotsCopy.map((slot: number) => {
                                             if (slotsCopy.includes(slot + slotLength - 1)) {
                                                 return (
-                                                    <button className="flex justify-center items-center bg-red-600 rounded text-white font-semibold m-6 px-3 py-2" onClick={() => createBooking(time, [slot, slot + slotLength - 1])}>{`${time}.${(slot - 1) * 10} - ${time}.${(slot + slotLength - 1) * 10}`}</button>
+                                                    <button className="flex justify-center items-center bg-red-600 rounded text-white font-semibold m-6 px-3 py-2" onClick={() => getUser(time, slot)}>{`${time}.${(slot - 1) * 10} - ${time}.${(slot + slotLength - 1) * 10}`}</button>
                                                 );
                                             }
                                         })}
@@ -68,28 +92,16 @@ function BookingTime() {
                             }
 
                             return (
-                                <>
-                                    {filteredBookings.map((booking: any) => {
-                                        const slotsCopy: number[] = [...slots];
-                                        
-                                        booking.slot.forEach((slot: number) => {
-                                            slotsCopy.splice(slotsCopy.indexOf(slot), 1);
-                                        });
-            
-                                        return (
-                                            <div className="w-full flex bg-slate-100 border-b-2">
-                                                <h1 className="min-w-24 border-r-2 text-xl text-center font-semibold p-8">{time}</h1>
-                                                {slotsCopy.map((slot: number) => {
-                                                    if (slotsCopy.includes(slot + slotLength - 1)) {
-                                                        return (
-                                                            <button className="flex justify-center items-center bg-red-600 rounded text-white font-semibold m-6 px-3 py-2" onClick={() => createBooking(time, [slot, slot + slotLength - 1])}>{`${booking.time}.${(slot - 1) * 10} - ${booking.time}.${(slot + slotLength - 1) * 10}`}</button>
-                                                        );
-                                                    }
-                                                })}
-                                            </div>
-                                        );
+                                <div className="w-full flex bg-slate-100 border-b-2">
+                                    <h1 className="min-w-24 border-r-2 text-xl text-center font-semibold p-8">{time}</h1>
+                                    {slotsCopy.map((slot: number) => {
+                                        if (slotsCopy.includes(slot + slotLength - 1)) {
+                                            return (
+                                                <button className="flex justify-center items-center bg-red-600 rounded text-white font-semibold m-6 px-3 py-2" onClick={() => getUser(time, slot)}>{`${time}.${(slot - 1) * 10} - ${time}.${(slot + slotLength - 1) * 10}`}</button>
+                                            );
+                                        }
                                     })}
-                                </>
+                                </div>
                             );
                         })}
                     </div>
