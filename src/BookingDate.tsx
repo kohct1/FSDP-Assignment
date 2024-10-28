@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import Navbar from "./components/Navbar";
 
 function BookingDate() {
@@ -22,7 +23,7 @@ function BookingDate() {
                     <div className="w-2/3 flex flex-col items-center bg-slate-100 border-2 rounded-md p-8 gap-8">
                         <h1 className="text-xl font-semibold">{`${months[currentDate.getMonth()]} ${currentDate.getFullYear()}`}</h1>
                         <div className="w-full h-full flex flex-col justify-center items-center gap-4">
-                            {Array(days).fill(0).map((day: number, index: number) => {
+                            {Array(days).fill(0).map((_: number, index: number) => {
                                 if (index !== 0 && index % 7 === 0) {
                                     return (
                                         <div className="w-full flex justify-center gap-8">
@@ -73,6 +74,7 @@ function BookingDate() {
                         </div>
                     </div>
                 </div>
+                <Link to="/booking-time" state={{ selectedDate: selectedDate }}>Next</Link>
             </div>
         </div>
     );
