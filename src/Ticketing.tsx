@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 
 const ticketing = () => {
@@ -6,6 +7,11 @@ const ticketing = () => {
     const queueCount = 30;
     const waitingTime = 3;  // in hours
     const lastUpdatedTime = "8:17:30";
+    let navigate = useNavigate();
+
+    const startQueue = () => {
+        navigate("/queue");
+    }
 
     return (
         <div className="relative flex flex-col min-h-screen bg-cover bg-center"
@@ -24,8 +30,9 @@ const ticketing = () => {
                     <h1 className="text-6xl font-bold my-4">{queueCount}</h1>
                     <p className="text-lg">People in the Queue</p>
 
-                    <form action="">
-                        <button className="bg-red-600 text-white text-lg font-semibold px-6 py-3 rounded mt-8">
+                    <form>
+                        <button className="bg-red-600 text-white text-lg font-semibold px-6 py-3 rounded mt-8"
+                        onClick={startQueue}>
                             Join the Queue
                         </button>
                     </form>
