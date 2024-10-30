@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Navbar from "./components/Navbar";
 
 const BookingForm: React.FC = () => {
@@ -54,51 +55,6 @@ const BookingForm: React.FC = () => {
 
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 gap-6">
-
-              <div>
-                <label className="block text-left text-gray-700 text-sm mb-2">Salutation:</label>
-                <input
-                  type="text"
-                  name="salutation"
-                  value={formData.salutation}
-                  readOnly
-                  className="block w-full border border-gray-300 rounded p-2 bg-gray-200 cursor-not-allowed"
-                />
-              </div>
-
-              <div>
-                <label className="block text-left text-gray-700 text-sm mb-2">Name:</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  readOnly
-                  className="block w-full border border-gray-300 rounded p-2 bg-gray-200 cursor-not-allowed"
-                />
-              </div>
-
-              <div>
-                <label className="block text-left text-gray-700 text-sm mb-2">Phone Number:</label>
-                <input
-                  type="tel"
-                  name="phoneNumber"
-                  value={formData.phoneNumber}
-                  readOnly
-                  className="block w-full border border-gray-300 rounded p-2 bg-gray-200 cursor-not-allowed"
-                />
-              </div>
-
-              <div>
-                <label className="block text-left text-gray-700 text-sm mb-2">Email:</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  readOnly
-                  className="block w-full border border-gray-300 rounded p-2 bg-gray-200 cursor-not-allowed"
-                />
-              </div>
-
               <div>
                 <label className="block text-left text-gray-700 text-sm mb-2">
                   Reason for booking<span className="text-red-500">*</span>
@@ -117,12 +73,14 @@ const BookingForm: React.FC = () => {
               </div>
 
               <div className="mt-6">
-                <button
+                <Link
                   type="submit"
-                  className="w-full bg-red-500 text-white py-3 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  className="w-full flex justify-center items-center bg-red-500 text-white py-3 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  to="/booking-date"
+                  state={{ reason: formData.reason }}
                 >
                   Continue
-                </button>
+                </Link>
               </div>
             </div>
           </form>

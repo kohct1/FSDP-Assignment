@@ -27,7 +27,8 @@ function BookingTime() {
                 date: String(state.selectedDate),
                 time: time,
                 slot: slot,
-                userId: userId
+                userId: userId,
+                reason: state.reason
             })
         });
 

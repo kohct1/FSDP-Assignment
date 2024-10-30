@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 
 function BookingDate() {
     const [selectedDate, setSelectedDate] = useState<number>(1);
+    const { state } = useLocation();
     const currentDate: Date = new Date();
     const days: number = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
     const months: string[] = [
@@ -74,7 +75,7 @@ function BookingDate() {
                         </div>
                     </div>
                 </div>
-                <Link to="/booking-time" state={{ selectedDate: selectedDate }}>Next</Link>
+                <Link to="/booking-time" state={{ selectedDate: selectedDate, reason: state.reason }}>Next</Link>
             </div>
         </div>
     );
