@@ -11,6 +11,7 @@ import Ticketing from "./Ticketing";
 import Queue from "./Queue";
 import MakeEnquiry from "./MakeEnquiry";
 import CustomerEnquiries from "./ActiveEnquiriesCustomer";
+import EnquiriesResponse from "./EnquiriesResponse";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
       <Route path="queue" element={<Queue />} />
       <Route path="user/enquiries/make" element={<MakeEnquiry />} />
       <Route path="user/enquiries/view" element={<CustomerEnquiries/>} />
+      <Route path="user/enquiries/response" element={<EnquiriesResponse />} />
     </Routes>
   );
 }
