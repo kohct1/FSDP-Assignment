@@ -10,6 +10,7 @@ import BookingTime from "./BookingTime";
 import Ticketing from "./Ticketing";
 import Queue from "./Queue";
 import MakeEnquiry from "./MakeEnquiry";
+import CustomerEnquiries from "./ActiveEnquiriesCustomer";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
       <Route path="ticketing" element={<Ticketing />} />
       <Route path="queue" element={<Queue />} />
       <Route path="user/enquiries/make" element={<MakeEnquiry />} />
+      <Route path="user/enquiries/view" element={<CustomerEnquiries/>} />
     </Routes>
   );
 }
