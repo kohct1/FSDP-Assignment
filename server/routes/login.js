@@ -14,7 +14,7 @@ router.post("/login", async (req, res) => {
         if (!user) return res.status(400).json({ message: "Invalid credentials" });
         if (pin !== user.pin) return res.status(400).json({ message: "Invalid pin" });
 
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+        const token = jwt.sign({ userId: user._id, role: "User" }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
         res.status(200).json({ token });
     } catch (err) {

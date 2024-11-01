@@ -10,6 +10,9 @@ const BookingForm: React.FC = () => {
     email: '',
     reason: '',
   });
+  const [userId, setUserId] = useState<string>("");
+  const [newReason, setNewReason] = useState<string>("");
+  const [hasBookings, setHasBookings] = useState<boolean>(false);
 
   // Simulating fetching user data (replace with real data fetch)
   useEffect(() => {
@@ -30,6 +33,61 @@ const BookingForm: React.FC = () => {
     fetchUserData();
   }, []);
 
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  useEffect(() => {
+    if (userId !== "") {
+        getUserBookings();
+    }
+  }, [userId]);
+
+  async function getUserBookings(): Promise<void> {
+    const response = await fetch(`http://localhost:5050/userBookings/${userId}/`);
+    const result = await response.json();
+
+    if (result.bookings.length > 0) {
+        setHasBookings(true);
+        setNewReason(result.bookings[0].reason);
+    }
+  }
+
+  async function getUser(): Promise<void> {
+    const response = await fetch(`http://localhost:5050/decode/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            token: localStorage.getItem("token")
+        })
+    });
+
+    const result = await response.json();
+
+    setUserId(result.userId);
+  }
+
+  async function deleteBooking(): Promise<void> {
+    await fetch(`http://localhost:5050/bookings/${userId}/`, {
+        method: "DELETE"
+    });
+  }
+
+  async function editBooking(): Promise<void> {
+    await fetch(`http://localhost:5050/bookings/`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            userId: userId,
+            reason: newReason
+        })
+    });
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
@@ -41,6 +99,27 @@ const BookingForm: React.FC = () => {
     e.preventDefault();
     console.log(formData);
   };
+
+  if (hasBookings) {
+    return (
+        <div className="w-full h-screen">
+            <Navbar />
+            <div className="w-full h-full flex flex-col justify-center items-center">
+                <div className="w-1/2 h-1/2 flex flex-col justify-center items-center bg-slate-100 border-2 rounded-md p-8 gap-8">
+                    <div className="w-full flex flex-col gap-4">
+                        <h1 className="w-full text-4xl text-start font-semibold">Booking description</h1>
+                        <h1 className="w-full text-xl text-start">Edit your booking description</h1>
+                    </div>
+                    <textarea className="w-full h-3/4 resize-none p-4" value={newReason} onChange={(e) => setNewReason(e.target.value)}></textarea>
+                    <div className="w-full flex justify-end gap-8">
+                        <button onClick={deleteBooking}>Change booking</button>
+                        <button className="bg-red-600 text-white rounded px-4 py-2" onClick={editBooking}>Edit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+  }
 
   return (
     <div className="bg-gray-100">

@@ -109,7 +109,7 @@ function BookingTime() {
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 export default BookingTime
