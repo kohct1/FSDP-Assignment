@@ -1,10 +1,46 @@
 import Navbar from "./components/Navbar";
+import { Link } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
 
 const Queue = () => {
-    // Dynamic data for queue status
-    const queueAhead = 30;
-    const waitingTime = 2; // in hours
-    const lastUpdated = "9:17:46";
+    const [queueCount, setQueueCount] = useState(0);
+    const [lastUpdatedTime, setLastUpdatedTime] = useState('');
+    const queueAhead = queueCount-1;
+
+    // Fetch queue data from the backend
+    const fetchQueueData = async () => {
+        try {
+            const response = await fetch('http://localhost:5050/queue');
+            if (response.ok) {
+                const data = await response.json();
+                setQueueCount(data.queueCount);
+    
+                // Format the timestamp if it exists
+                if (data.lastUpdatedTime && data.lastUpdatedTime.$timestamp) {
+                    const timestamp = data.lastUpdatedTime.$timestamp;
+                    // Assuming `timestamp` is in milliseconds
+                    const formattedTime = new Date(timestamp).toLocaleString();
+                    setLastUpdatedTime(formattedTime);
+                } else {
+                    setLastUpdatedTime(data.lastUpdatedTime);
+                }
+            } else {
+                console.error("Failed to fetch queue data");
+            }
+        } catch (error) {
+            console.error("Error fetching queue data", error);
+        }
+    };
+
+    // Calculate waiting time in hours
+    const waitingTime = ((queueAhead * 20) / 10) / 60;
+
+    useEffect(() => {
+        fetchQueueData();
+        const intervalId = setInterval(fetchQueueData, 30000); // Poll every 30 seconds
+        
+        return () => clearInterval(intervalId);
+    }, []);
 
     return (
         <div className="relative flex flex-col min-h-screen bg-cover bg-center"
@@ -29,11 +65,11 @@ const Queue = () => {
                         <div className="relative w-full h-2 bg-gray-300 rounded-full">
                             <div
                                 className="absolute top-0 h-2 bg-red-600 rounded-full"
-                                style={{ width: `${(queueAhead / 100) * 100}%` }} // Adjust the width based on the queue position
+                                style={{ width: `${(queueCount / 100) * 100}%` }} // Adjust the width based on the queue position
                             ></div>
                             <div
                                 className="absolute top-1 left-0 w-4 h-4 bg-red-600 rounded-full transform -translate-y-1/2"
-                                style={{ left: `${((queueAhead-3)/ 100) * 100}%` }}
+                                style={{ left: `${((queueCount-3)/ 100) * 100}%` }}
                             ></div>
                         </div>
                     </div>
@@ -45,13 +81,13 @@ const Queue = () => {
 
                     {/* Last Updated Time */}
                     <p className="text-sm text-black-500 mt-2">
-                        Status Last Updated: {lastUpdated}
+                        Status Last Updated: {lastUpdatedTime}
                     </p>
 
                     {/* Booking Suggestion */}
                     <p className="mt-4 text-sm text-black-700">
                         If it is not an urgent matter, please{' '}
-                        <a href="#book" className="text-blue-600 underline">book a slot</a> instead.
+                        <Link to="/bookingpage" className="text-blue-700 underline">book a slot</Link> instead.
                     </p>
                 </div>
             </main>
