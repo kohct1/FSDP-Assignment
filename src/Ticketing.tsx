@@ -11,11 +11,20 @@ const Ticketing = () => {
     // Fetch queue data from the backend
     const fetchQueueData = async () => {
         try {
-            const response = await fetch('https://localhost:5050/queue');
+            const response = await fetch('http://localhost:5050/queue');
             if (response.ok) {
                 const data = await response.json();
                 setQueueCount(data.queueCount);
-                setLastUpdatedTime(data.lastUpdatedTime);
+    
+                // Format the timestamp if it exists
+                if (data.lastUpdatedTime && data.lastUpdatedTime.$timestamp) {
+                    const timestamp = data.lastUpdatedTime.$timestamp;
+                    // Assuming `timestamp` is in milliseconds
+                    const formattedTime = new Date(timestamp).toLocaleString();
+                    setLastUpdatedTime(formattedTime);
+                } else {
+                    setLastUpdatedTime(data.lastUpdatedTime);
+                }
             } else {
                 console.error("Failed to fetch queue data");
             }
@@ -23,18 +32,17 @@ const Ticketing = () => {
             console.error("Error fetching queue data", error);
         }
     };
+    
 
     // Increment queue count by calling the backend
     const startQueue = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
         try {
-            const response = await fetch('https://localhost:5050/queue/increment', {
+            const response = await fetch('http://localhost:5050/queue', {
                 method: 'POST',
             });
             if (response.ok) {
                 const data = await response.json();
-                setQueueCount(data.queueCount);
-                setLastUpdatedTime(data.lastUpdatedTime);
                 navigate("/queue");
             } else {
                 console.error("Failed to increment queue count");
@@ -42,6 +50,7 @@ const Ticketing = () => {
         } catch (error) {
             console.error("Error incrementing queue count", error);
         }
+        navigate("/queue");
     };
 
     // Calculate waiting time in hours

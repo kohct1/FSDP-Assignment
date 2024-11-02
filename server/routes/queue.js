@@ -7,7 +7,7 @@ const router = express.Router();
 router.get("/queue", async (req, res) => {
     try {
         const queueCollection = db.collection("Queue");
-        const queueData = await queueCollection.findOne(); // assuming there's only one document
+        const queueData = await queueCollection.findOne();
 
         if (queueData) {
             res.status(200).json({
