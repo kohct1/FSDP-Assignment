@@ -22,6 +22,20 @@ router.post("/login", async (req, res) => {
     }
 });
 
+router.post("/register", async (req, res) => {
+    const { email, pin } = req.body;
+
+    try {
+        const users = db.collection("Users");
+
+        await users.insertOne({ email, pin });
+
+        res.status(200).json();
+    } catch (err) {
+        res.status(500).send(err);
+    }
+});
+
 router.post("/decode", async (req, res) => {
     const { token } = req.body;
 
