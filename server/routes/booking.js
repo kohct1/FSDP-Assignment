@@ -42,7 +42,20 @@ router.post("/bookings", async (req, res) => {
     }
 });
 
-router.put("/bookings", async(req, res) => {
+router.put("/bookings", async (req, res) => {
+    const { userId, date, time, slot } = req.body;
+
+    try {
+        const bookingsCollection = db.collection("Bookings");
+        await bookingsCollection.updateOne({ userId }, { $set: { date, time, slot } });
+
+        res.status(200).json();
+    } catch (err) {
+        res.status(500).send(err);
+    }
+});
+
+router.put("/bookingsReason", async(req, res) => {
     const { userId, reason } = req.body;
 
     try {

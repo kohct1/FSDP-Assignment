@@ -76,7 +76,7 @@ const BookingForm: React.FC = () => {
   }
 
   async function editBooking(): Promise<void> {
-    await fetch(`http://localhost:5050/bookings/`, {
+    await fetch(`http://localhost:5050/bookingsReason/`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json"
@@ -104,16 +104,21 @@ const BookingForm: React.FC = () => {
     return (
         <div className="w-full h-screen">
             <Navbar />
-            <div className="w-full h-full flex flex-col justify-center items-center">
-                <div className="w-1/2 h-1/2 flex flex-col justify-center items-center bg-slate-100 border-2 rounded-md p-8 gap-8">
-                    <div className="w-full flex flex-col gap-4">
-                        <h1 className="w-full text-4xl text-start font-semibold">Booking description</h1>
-                        <h1 className="w-full text-xl text-start">Edit your booking description</h1>
+            <div className="w-full h-full flex flex-col items-center">
+                <div className="w-1/2 h-1/2 flex flex-col items-center p-8 gap-8">
+                    <div className="w-full border-b-2 py-8">
+                        <h1 className="w-full text-2xl text-start font-semibold">Bookings</h1>
                     </div>
-                    <textarea className="w-full h-3/4 resize-none p-4" value={newReason} onChange={(e) => setNewReason(e.target.value)}></textarea>
-                    <div className="w-full flex justify-end gap-8">
-                        <button onClick={deleteBooking}>Change booking</button>
-                        <button className="bg-red-600 text-white rounded px-4 py-2" onClick={editBooking}>Edit</button>
+                    <div className="w-full flex flex-col justify-center border-2 rounded p-4 gap-4">
+                      <h1 className="text-lg font-semibold">Wed, Nov 5 2025, 10:20 - 10:40</h1>
+                      <div className="flex flex-col gap-2">
+                        <h1 className="font-semibold">Booking description</h1>
+                        <textarea className="w-full h-3/4 border-2 rounded resize-none p-2" value={newReason} onChange={(e) => setNewReason(e.target.value)}></textarea>
+                      </div>
+                      <div className="flex justify-end items-center gap-8">
+                        <Link className="text-sm" to="/booking-date">Reschedule booking</Link>
+                        <button className="bg-red-600 text-sm text-white rounded px-4 py-2" onClick={editBooking}>Edit</button>
+                      </div>
                     </div>
                 </div>
             </div>
