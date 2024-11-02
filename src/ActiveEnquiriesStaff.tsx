@@ -11,7 +11,7 @@ function Enquiries(){
     let enquiryElements = [];
     for(const [key, value] of Object.entries(enquiries)) {
         enquiryElements.push(<div className="bg-red-600 w-1/5 p-2 shadow-lg rounded ml-12 mt-10 mb-7 enquiry-category">
-                            <p className="font-sans text-white text-lg text-center font-medium">{key}</p>
+                            <p className="font-sans text-white text-xs text-center font-medium md:text-lg sm:text-md">{key}</p>
                            </div>)  
         value.forEach(function (enquiry) {
             let status = enquiry[1];
@@ -30,13 +30,13 @@ function Enquiries(){
             else {
                 status = "";
             }
-            let classes = "bg-white w-11/12 p-3 shadow-lg rounded ml-12 mt-5 mb-6 enquiry flex last:mb-14"
+            let classes = "bg-white w-9/12 p-3 shadow-lg rounded ml-12 mt-5 mb-6 enquiry flex last:mb-14 sm:w-11/12"
             classes += " " + hover + " " + opacity + " " + cursor;
 
             enquiryElements.push(<div className = {classes}>
-                                    <p className="font-sans text-black font-medium pl-2">{key}   -</p>
-                                    <p className="font-sans text-black pl-2">{enquiry[0]}</p>
-                                    <p className="font-sans text-black pl-2 font-medium ml-auto mr-8">{status}</p>
+                                    <p className="font-sans text-black font-medium pl-2 text-xs sm:text-sm md:text-base">{key}   -</p>
+                                    <p className="font-sans text-black pl-2 text-xs sm:text-sm md:text-base">{enquiry[0]}</p>
+                                    <p className="font-sans text-black pl-2 font-medium ml-auto mr-8 text-xs sm:text-small md:text-base">{status}</p>
                                 </div>)
         });
     }
@@ -48,7 +48,7 @@ function ActiveEnquiriesStaff() {
         <>
             <Navbar />
             <div className="w-full h-screen">
-                <h1 className="text-3xl font-semibold ml-40 mt-8">Open Enquiries</h1>
+                <h1 className="lg:text-3xl md:text-xl sm:text-base font-semibold md:ml-40 mt-8 ml-40">Open Enquiries</h1>
                 <div className="drop-shadow-lg w-4/5 bg-slate-100 h-3/4 m-auto mt-8 rounded-lg flex-col justify-around overflow-auto" id="enquiries-container">
                     <div className="w-1/5 text-gray-200 h-0">2</div>
                     <Enquiries/>

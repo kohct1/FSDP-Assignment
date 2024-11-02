@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from "./components/Navbar";
 
 const BookingForm: React.FC = () => {
@@ -13,6 +13,9 @@ const BookingForm: React.FC = () => {
   const [userId, setUserId] = useState<string>("");
   const [newReason, setNewReason] = useState<string>("");
   const [hasBookings, setHasBookings] = useState<boolean>(false);
+
+  const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
 
   // Simulating fetching user data (replace with real data fetch)
   useEffect(() => {
@@ -98,6 +101,16 @@ const BookingForm: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log(formData);
+    setShowModal(true);
+  };
+
+  const handleConfirm = () => {
+    setShowModal(false);
+    navigate('/homepage'); // Redirect to the homepage
+  };
+
+  const handleCancel = () => {
+    setShowModal(false); // Close the modal and allow editing
   };
 
   if (hasBookings) {
@@ -170,7 +183,30 @@ const BookingForm: React.FC = () => {
           </form>
         </div>
       </div>
-    </div>
+    {/* Confirmation Modal */}
+    {showModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+            <h2 className="text-xl font-semibold mb-4">Confirm Your Details</h2>
+            <p className="text-gray-700 mb-6">Are you sure you want to submit this information?</p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={handleCancel}
+                className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400"
+              >
+                No
+              </button>
+              <button
+                onClick={handleConfirm}
+                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+              >
+                Yes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div> 
   );
 };
 
