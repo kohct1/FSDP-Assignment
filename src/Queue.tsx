@@ -1,4 +1,5 @@
 import Navbar from "./components/Navbar";
+import { Link } from "react-router-dom";
 
 const Queue = () => {
     // Dynamic data for queue status
@@ -51,7 +52,7 @@ const Queue = () => {
                     {/* Booking Suggestion */}
                     <p className="mt-4 text-sm text-black-700">
                         If it is not an urgent matter, please{' '}
-                        <a href="#book" className="text-blue-600 underline">book a slot</a> instead.
+                        <Link to="/bookingpage" className="text-blue-700 underline">book a slot</Link> instead.
                     </p>
                 </div>
             </main>
