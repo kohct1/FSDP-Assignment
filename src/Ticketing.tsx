@@ -1,15 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 
 const ticketing = () => {
     // Dynamic data - You can change these values as needed
-    const queueCount = 30;
+    const [queueCount, setQueueCount] = useState(30);
     const waitingTime = 3;  // in hours
     const lastUpdatedTime = "8:17:30";
     let navigate = useNavigate();
 
     const startQueue = () => {
+        //queueCount += 1;
         navigate("/queue");
     }
 
