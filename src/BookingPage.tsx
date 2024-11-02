@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from "./components/Navbar";
 
 const BookingForm: React.FC = () => {
@@ -10,6 +10,9 @@ const BookingForm: React.FC = () => {
     email: '',
     reason: '',
   });
+  const [userId, setUserId] = useState<string>("");
+  const [newReason, setNewReason] = useState<string>("");
+  const [hasBookings, setHasBookings] = useState<boolean>(false);
 
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
@@ -33,6 +36,61 @@ const BookingForm: React.FC = () => {
     fetchUserData();
   }, []);
 
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  useEffect(() => {
+    if (userId !== "") {
+        getUserBookings();
+    }
+  }, [userId]);
+
+  async function getUserBookings(): Promise<void> {
+    const response = await fetch(`http://localhost:5050/userBookings/${userId}/`);
+    const result = await response.json();
+
+    if (result.bookings.length > 0) {
+        setHasBookings(true);
+        setNewReason(result.bookings[0].reason);
+    }
+  }
+
+  async function getUser(): Promise<void> {
+    const response = await fetch(`http://localhost:5050/decode/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            token: localStorage.getItem("token")
+        })
+    });
+
+    const result = await response.json();
+
+    setUserId(result.userId);
+  }
+
+  async function deleteBooking(): Promise<void> {
+    await fetch(`http://localhost:5050/bookings/${userId}/`, {
+        method: "DELETE"
+    });
+  }
+
+  async function editBooking(): Promise<void> {
+    await fetch(`http://localhost:5050/bookingsReason/`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            userId: userId,
+            reason: newReason
+        })
+    });
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
@@ -55,6 +113,32 @@ const BookingForm: React.FC = () => {
     setShowModal(false); // Close the modal and allow editing
   };
 
+  if (hasBookings) {
+    return (
+        <div className="w-full h-screen">
+            <Navbar />
+            <div className="w-full h-full flex flex-col items-center">
+                <div className="w-1/2 h-1/2 flex flex-col items-center p-8 gap-8">
+                    <div className="w-full border-b-2 py-8">
+                        <h1 className="w-full text-2xl text-start font-semibold">Bookings</h1>
+                    </div>
+                    <div className="w-full flex flex-col justify-center border-2 rounded p-4 gap-4">
+                      <h1 className="text-lg font-semibold">Wed, Nov 5 2025, 10:20 - 10:40</h1>
+                      <div className="flex flex-col gap-2">
+                        <h1 className="font-semibold">Booking description</h1>
+                        <textarea className="w-full h-3/4 border-2 rounded resize-none p-2" value={newReason} onChange={(e) => setNewReason(e.target.value)}></textarea>
+                      </div>
+                      <div className="flex justify-end items-center gap-8">
+                        <Link className="text-sm" to="/booking-date">Reschedule booking</Link>
+                        <button className="bg-red-600 text-sm text-white rounded px-4 py-2" onClick={editBooking}>Edit</button>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+  }
+
   return (
     <div className="bg-gray-100">
       <Navbar />
@@ -68,51 +152,6 @@ const BookingForm: React.FC = () => {
 
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 gap-6">
-
-              <div>
-                <label className="block text-left text-gray-700 text-sm mb-2">Salutation:</label>
-                <input
-                  type="text"
-                  name="salutation"
-                  value={formData.salutation}
-                  readOnly
-                  className="block w-full border border-gray-300 rounded p-2 bg-gray-200 cursor-not-allowed"
-                />
-              </div>
-
-              <div>
-                <label className="block text-left text-gray-700 text-sm mb-2">Name:</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  readOnly
-                  className="block w-full border border-gray-300 rounded p-2 bg-gray-200 cursor-not-allowed"
-                />
-              </div>
-
-              <div>
-                <label className="block text-left text-gray-700 text-sm mb-2">Phone Number:</label>
-                <input
-                  type="tel"
-                  name="phoneNumber"
-                  value={formData.phoneNumber}
-                  readOnly
-                  className="block w-full border border-gray-300 rounded p-2 bg-gray-200 cursor-not-allowed"
-                />
-              </div>
-
-              <div>
-                <label className="block text-left text-gray-700 text-sm mb-2">Email:</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  readOnly
-                  className="block w-full border border-gray-300 rounded p-2 bg-gray-200 cursor-not-allowed"
-                />
-              </div>
-
               <div>
                 <label className="block text-left text-gray-700 text-sm mb-2">
                   Reason for booking<span className="text-red-500">*</span>
@@ -131,12 +170,14 @@ const BookingForm: React.FC = () => {
               </div>
 
               <div className="mt-6">
-                <button
+                <Link
                   type="submit"
-                  className="w-full bg-red-500 text-white py-3 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  className="w-full flex justify-center items-center bg-red-500 text-white py-3 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  to="/booking-date"
+                  state={{ reason: formData.reason }}
                 >
                   Continue
-                </button>
+                </Link>
               </div>
             </div>
           </form>
