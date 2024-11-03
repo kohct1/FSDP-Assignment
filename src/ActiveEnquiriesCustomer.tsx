@@ -1,16 +1,16 @@
 import Navbar from "./components/Navbar";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 function Enquiries({ type }) {
-    // hardcoded data for now 
+    const navigate = useNavigate(); // Initialize navigate
+
     const enquiries = {
         "OCBC Mobile App": [
             ["Issues logging into app, forgot password and would like to reset", "Active"],
             ["Cannot transfer money", "Past"]
         ],
-        "Credit Card": [
-        ],
-        "Loans": [
-        ]
+        "Credit Card": [],
+        "Loans": []
     };
 
     let enquiryElements = [];
@@ -23,7 +23,8 @@ function Enquiries({ type }) {
                         return (
                             <div
                                 key={index}
-                                className="bg-white w-full p-3 shadow-md rounded mt-1 flex items-center"  
+                                className="bg-white w-full p-3 shadow-md rounded mt-1 flex items-center cursor-pointer"
+                                onClick={() => navigate("/user/enquiries/response")} // Add onClick for redirection
                             >
                                 <p className="font-sans text-gray-800 text-sm flex-grow">
                                     {`${key} - ${enquiry[0]}`}
@@ -39,6 +40,8 @@ function Enquiries({ type }) {
 }
 
 function ActiveEnquiriesCustomer() {
+    const navigate = useNavigate(); // Initialize navigate for this component
+
     return (
         <>
             <Navbar />
@@ -49,7 +52,10 @@ function ActiveEnquiriesCustomer() {
                         <h2 className="text-xl font-semibold text-gray-700 mb-4">Active Enquiries</h2>
                         <Enquiries type="Active" />
                         <div className="flex justify-center mt-6">
-                            <button className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500">
+                            <button
+                                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500"
+                                onClick={() => navigate("/user/enquiries/make")} // Redirect on button click
+                            >
                                 Make a New Enquiry
                             </button>
                         </div>
