@@ -12,6 +12,7 @@ router.get("/queue", async (req, res) => {
         if (queueData) {
             res.status(200).json({
                 queueCount: queueData.queueCount,
+                leftQueue: queueData.leftQueue, // Include leftQueue in response
                 lastUpdatedTime: queueData.lastUpdatedTime,
             });
         } else {
