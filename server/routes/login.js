@@ -6,6 +6,8 @@ const router = express.Router();
 
 router.post("/login", async (req, res) => {
     const { email, pin } = req.body;
+    console.log(email);
+    console.log(pin);
 
     try {
         const users = db.collection("Users");
@@ -15,7 +17,7 @@ router.post("/login", async (req, res) => {
         if (pin !== user.pin) return res.status(400).json({ message: "Invalid pin" });
 
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
-
+        
         res.status(200).json({ token });
     } catch (err) {
         res.status(500).send(err);

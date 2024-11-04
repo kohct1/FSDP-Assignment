@@ -8,7 +8,7 @@ function Login() {
     const navigate = useNavigate();
 
     async function login(): Promise<void> {
-        const response = await fetch("http://localhost:5050/login/", {
+        const response = await fetch("http://localhost:5050/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -20,8 +20,12 @@ function Login() {
         });
 
         const result = await response.json();
+        console.log(result);
 
-        if (result.token) navigate("/home");
+        if (result.token) {
+            localStorage.setItem("token", result.token);
+            navigate("/home");
+        } 
     }
 
     return (
