@@ -13,6 +13,7 @@ import MakeEnquiry from "./MakeEnquiry";
 import CustomerEnquiries from "./ActiveEnquiriesCustomer";
 import EnquiriesResponse from "./EnquiriesResponse";
 import CallPage from "./CallPage";
+import WebCall from "./WebCall";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
       <Route path="user/enquiries/view" element={<CustomerEnquiries/>} />
       <Route path="user/enquiries/response" element={<EnquiriesResponse />} />
       <Route path="callpage" element={<CallPage />} />
+      <Route path="webcall" element={<WebCall />} />
     </Routes>
   );
 }

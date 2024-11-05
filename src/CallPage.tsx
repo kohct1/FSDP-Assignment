@@ -7,22 +7,21 @@ const CallPage: React.FC = () => {
   const [isCallingEnabled, setIsCallingEnabled] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const [loading, setLoading] = useState<boolean>(true);
+  const [countdown, setCountdown] = useState<number>(5);
   const navigate = useNavigate();
 
-  // Fake booking details for testing
   const fakeBookingDetails = {
     reason: 'Consultation regarding your account',
-    dateTime: new Date(new Date().getTime() + 10 * 60 * 1000).toISOString(), // 10 minutes from now
-    queue: 1 // Change this to 1 or more to test the waiting message
+    dateTime: new Date(new Date().getTime() + 10 * 60 * 1000).toISOString(),
+    queue: 0
   };
 
   const fetchBookingDetails = async () => {
-    // Simulating API response with fake data
     setTimeout(() => {
       setBookingDetails(fakeBookingDetails);
       checkIfBookingReady(fakeBookingDetails);
       setLoading(false);
-    }, 1000); // Simulate a delay of 1 second
+    }, 1000); 
   };
 
   const checkIfBookingReady = (details: any) => {
@@ -45,6 +44,27 @@ const CallPage: React.FC = () => {
 
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (bookingDetails) {
+      const countdownInterval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev === 1) {
+            if (bookingDetails.queue === 0) {
+              navigate('/webcall');
+            } else {
+              navigate('/bookingpage');
+            }
+            clearInterval(countdownInterval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(countdownInterval); 
+    }
+  }, [bookingDetails, navigate]);
 
   const handleCall = () => {
     alert(`Calling staff for your booking: ${bookingDetails.reason}`);
@@ -76,6 +96,10 @@ const CallPage: React.FC = () => {
           ) : (
             <p className="mt-6 text-red-500">You cannot call staff yet. Please wait for your turn or the scheduled time.</p>
           )}
+
+          <p className="mt-4 text-blue-500">
+            Redirecting in {countdown} second{countdown > 1 ? 's' : ''}...
+          </p>
         </div>
       </div>
     </div>
