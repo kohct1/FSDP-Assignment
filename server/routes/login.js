@@ -16,9 +16,34 @@ router.post("/login", async (req, res) => {
         if (!user) return res.status(400).json({ message: "Invalid credentials" });
         if (pin !== user.pin) return res.status(400).json({ message: "Invalid pin" });
 
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
-        
+        const token = jwt.sign({ userId: user._id, role: "User" }, process.env.JWT_SECRET, { expiresIn: "1h" });
         res.status(200).json({ token });
+    } catch (err) {
+        res.status(500).send(err);
+    }
+});
+
+router.post("/register", async (req, res) => {
+    const { email, pin } = req.body;
+
+    try {
+        const users = db.collection("Users");
+
+        await users.insertOne({ email, pin });
+
+        res.status(200).json();
+    } catch (err) {
+        res.status(500).send(err);
+    }
+});
+
+router.post("/decode", async (req, res) => {
+    const { token } = req.body;
+
+    try {
+        const decoded = jwt.decode(token, process.env.JWT_SECRET);
+
+        res.status(200).json({ userId: decoded.userId });
     } catch (err) {
         res.status(500).send(err);
     }
