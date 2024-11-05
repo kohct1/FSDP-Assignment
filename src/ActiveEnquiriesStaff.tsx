@@ -2,12 +2,29 @@ import Navbar from "./components/Navbar";
 /*Will develop backend later so using dummy data first
 Data structured: Category : [Enquiry : Status]
 */
+
+
+
+
+async function GetEnquiries() {
+    const response = await fetch("https://localhost:5050/enquiries/staff");
+    if (!response.ok) {
+        console.error('Error:', response.statusText);
+    } else {
+        const data = await response.json();
+        console.log(data);
+    }
+}
 function Enquiries(){
+
+
     const enquiries = 
     {   "OCBC Mobile App" : [["Issues logging into app, forgot password and would like to reset", "None"], ["Cannot transfer money", "Other"]], 
         "Credit Card" : [["Information for benefits about OCBC INFINITY cashback card", "Responding"], ["How to apply for credit card with OCBC?", "None"]],
         "Loans" : [["Interest rate on housing mortgage information", "None"], ["More info on Cash-on-Instalments"]]
     };
+    
+
     let enquiryElements = [];
     for(const [key, value] of Object.entries(enquiries)) {
         enquiryElements.push(<div className="bg-red-600 w-1/5 p-2 shadow-lg rounded ml-12 mt-10 mb-7 enquiry-category">
