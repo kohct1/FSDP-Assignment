@@ -2,8 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 
 const WebRTCAudioPage: React.FC = () => {
   const [isCallStarted, setIsCallStarted] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [callDuration, setCallDuration] = useState(0); // Timer for call duration
+  const [isUserSpeaking, setIsUserSpeaking] = useState(false);
+  const [isRemoteSpeaking, setIsRemoteSpeaking] = useState(false);
+  const [callDuration, setCallDuration] = useState(0);
   const localAudioRef = useRef<HTMLAudioElement>(null);
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
@@ -13,10 +14,7 @@ const WebRTCAudioPage: React.FC = () => {
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const SIGNALING_SERVER_URL = 'ws://localhost:8080';
-
-  const iceServers = {
-    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
-  };
+  const iceServers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
   useEffect(() => {
     const startLocalStream = async () => {
@@ -93,6 +91,7 @@ const WebRTCAudioPage: React.FC = () => {
       peerConnectionRef.current.ontrack = (event) => {
         if (remoteAudioRef.current) {
           remoteAudioRef.current.srcObject = event.streams[0];
+          monitorSpeaking(event.streams[0], setIsRemoteSpeaking);
         }
       };
 
@@ -101,7 +100,7 @@ const WebRTCAudioPage: React.FC = () => {
       signalingSocketRef.current?.send(JSON.stringify(offer));
 
       setIsCallStarted(true);
-      monitorSpeaking();
+      monitorSpeaking(localStream!, setIsUserSpeaking);
       startTimer();
     } catch (error) {
       console.error('Error starting call:', error);
@@ -112,16 +111,17 @@ const WebRTCAudioPage: React.FC = () => {
     peerConnectionRef.current?.close();
     signalingSocketRef.current?.close();
     setIsCallStarted(false);
-    setIsSpeaking(false);
+    setIsUserSpeaking(false);
+    setIsRemoteSpeaking(false);
     setCallDuration(0);
     clearInterval(timerIntervalRef.current!);
     localStream?.getTracks().forEach(track => track.stop());
   };
 
-  const monitorSpeaking = () => {
+  const monitorSpeaking = (stream: MediaStream, setSpeaking: React.Dispatch<React.SetStateAction<boolean>>) => {
     const audioContext = new (window.AudioContext || window.AudioContext)();
     const analyser = audioContext.createAnalyser();
-    const source = audioContext.createMediaStreamSource(localStream!);
+    const source = audioContext.createMediaStreamSource(stream);
     source.connect(analyser);
     analyser.fftSize = 2048;
     const bufferLength = analyser.frequencyBinCount;
@@ -129,11 +129,11 @@ const WebRTCAudioPage: React.FC = () => {
 
     const checkSpeaking = () => {
       analyser.getByteFrequencyData(dataArray);
-      const isSpeakingNow = dataArray.some(value => value > 128); 
-      setIsSpeaking(isSpeakingNow);
+      const isSpeakingNow = dataArray.some(value => value > 128);
+      setSpeaking(isSpeakingNow);
       if (isSpeakingNow) {
         clearTimeout(speakingTimeoutRef.current!);
-        speakingTimeoutRef.current = setTimeout(() => setIsSpeaking(false), 1000);
+        speakingTimeoutRef.current = setTimeout(() => setSpeaking(false), 1000);
       }
       requestAnimationFrame(checkSpeaking);
     };
@@ -169,50 +169,54 @@ const WebRTCAudioPage: React.FC = () => {
   return (
     <div className="flex flex-col items-center justify-center bg-gray-200 min-h-screen text-gray">
       <div className="flex flex-row gap-8 items-center">
-        {/* user */}
         <div className="flex flex-col items-center">
-          <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center">
+          <div
+            className="rounded-full p-1 transition-shadow duration-300"
+            style={{
+              boxShadow: isUserSpeaking ? '0 0 15px #3B82F6' : 'none',
+            }}
+          >
             <img
-              src="images\User_PFP.png"
+              src="images/User_PFP.png"
               alt="User"
-              className="w-16 h-16"
+              className="w-24 h-24 rounded-full"
             />
           </div>
           <p className="mt-2 text-lg font-semibold">You</p>
         </div>
-  
-        {/* ocbc rep */}
+
         <div className="flex flex-col items-center">
-          <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center">
+          <div
+            className="rounded-full p-1 transition-shadow duration-300"
+            style={{
+              boxShadow: isRemoteSpeaking ? '0 0 15px #3B82F6' : 'none',
+            }}
+          >
             <img
-              src="images\OCBC_Rep_PFP.png" 
+              src="images/OCBC_Rep_PFP.png"
               alt="OCBC Representative"
-              className="w-16 h-16"
+              className="w-24 h-24 rounded-full"
             />
           </div>
           <p className="mt-2 text-lg font-semibold">OCBC rep</p>
         </div>
       </div>
-  
-      {/* Call Duration */}
+
       <p className="text-sm text-gray-600 mt-4">{formatTime(callDuration)}</p>
-  
+
       <audio ref={localAudioRef} autoPlay muted className="hidden" />
       <audio ref={remoteAudioRef} autoPlay className="hidden" />
-  
+
       <div className="flex gap-4 mt-8">
         <img
-          src="images\End_Call.webp" 
+          src="images/End_Call.webp"
           alt="End Call"
           onClick={endCall}
           className="w-12 h-12 cursor-pointer transition-opacity duration-300 ease-in-out"
         />
       </div>
-  
-      {isSpeaking && <p className="text-blue-500 mt-4">noise detected</p>}
     </div>
   );
-  
 };
 
 export default WebRTCAudioPage;
