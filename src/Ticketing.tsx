@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 
 const Ticketing = () => {
     const [queueCount, setQueueCount] = useState(0);
+    const [leftQueue, setLeftQueue] = useState(0); // New state for leftQueue
     const [lastUpdatedTime, setLastUpdatedTime] = useState('');
     const navigate = useNavigate();
 
@@ -15,11 +16,11 @@ const Ticketing = () => {
             if (response.ok) {
                 const data = await response.json();
                 setQueueCount(data.queueCount);
-    
+                setLeftQueue(data.leftQueue); // Set leftQueue
+
                 // Format the timestamp if it exists
                 if (data.lastUpdatedTime && data.lastUpdatedTime.$timestamp) {
                     const timestamp = data.lastUpdatedTime.$timestamp;
-                    // Assuming `timestamp` is in milliseconds
                     const formattedTime = new Date(timestamp).toLocaleString();
                     setLastUpdatedTime(formattedTime);
                 } else {
@@ -32,7 +33,6 @@ const Ticketing = () => {
             console.error("Error fetching queue data", error);
         }
     };
-    
 
     // Increment queue count by calling the backend
     const startQueue = async (e: { preventDefault: () => void; }) => {
@@ -54,12 +54,12 @@ const Ticketing = () => {
     };
 
     // Calculate waiting time in hours
-    const waitingTime = ((queueCount * 20) / 10) / 60;
+    const peopleInQueue = queueCount - leftQueue; // New calculation for people in queue
+    const waitingTime = ((peopleInQueue * 20) / 10) / 60;
 
     useEffect(() => {
         fetchQueueData();
         const intervalId = setInterval(fetchQueueData, 30000); // Poll every 30 seconds
-        
         return () => clearInterval(intervalId);
     }, []);
 
@@ -74,7 +74,7 @@ const Ticketing = () => {
             <div className="relative z-10 flex justify-center items-center flex-grow">
                 <div className="bg-white shadow-lg rounded-lg p-10 text-center max-w-md opacity-100">
                     <h2 className="text-lg font-medium">There are currently</h2>
-                    <h1 className="text-6xl font-bold my-4">{queueCount}</h1>
+                    <h1 className="text-6xl font-bold my-4">{peopleInQueue}</h1>
                     <p className="text-lg">People in the Queue</p>
 
                     <form onSubmit={startQueue}>

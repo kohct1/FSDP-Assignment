@@ -12,11 +12,11 @@ function Navbar() {
                     <div className="flex space-x-10">
                         <Link to="/bookingpage" className="text-gray-600 font-semibold">Booking</Link>
                         <Link to="/ticketing" className="text-gray-600 font-semibold">Queue</Link>
-                        <Link to="/enquiries" className="text-gray-600 font-semibold">Enquiry Portal</Link>
+                        <Link to="/user/enquiries/view" className="text-gray-600 font-semibold">Enquiry Portal</Link>
                     </div>
                 </div>
             </div>
-    )
+    ) 
 }
 
 export default Navbar

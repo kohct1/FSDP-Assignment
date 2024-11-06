@@ -43,6 +43,7 @@ function BookingDate() {
     }
     
     async function updateBooking(time: number, slot: number[]): Promise<void> {
+        console.log("Here");
         await fetch(`http://localhost:5050/bookings/`, {
             method: "PUT",
             headers: {
@@ -50,11 +51,13 @@ function BookingDate() {
             },
             body: JSON.stringify({
                 userId: userId,
-                date: selectedDate,
+                date: String(selectedDate),
                 time: time,
                 slot: slot,
             })
         });
+
+        navigate("/homepage");
     }
 
     async function getUser(): Promise<void> {
