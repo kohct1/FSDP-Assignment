@@ -6,6 +6,8 @@ const WebRTCAudioPage: React.FC = () => {
   const [isUserSpeaking, setIsUserSpeaking] = useState(false);
   const [isRemoteSpeaking, setIsRemoteSpeaking] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
+  const [isMuted, setIsMuted] = useState(false); 
+
   const localAudioRef = useRef<HTMLAudioElement>(null);
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
@@ -18,7 +20,7 @@ const WebRTCAudioPage: React.FC = () => {
   const SIGNALING_SERVER_URL = 'ws://localhost:8080';
   const iceServers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
-  const iceCandidateQueue: RTCIceCandidate[] = []; 
+  const iceCandidateQueue: RTCIceCandidate[] = [];
 
   useEffect(() => {
     const startLocalStream = async () => {
@@ -62,7 +64,7 @@ const WebRTCAudioPage: React.FC = () => {
           signalingSocketRef.current?.send(JSON.stringify(answer));
 
           iceCandidateQueue.forEach(candidate => peerConnectionRef.current?.addIceCandidate(candidate));
-          iceCandidateQueue.length = 0; 
+          iceCandidateQueue.length = 0;
         }
 
         if (parsedData.type === 'answer' && peerConnectionRef.current) {
@@ -75,7 +77,6 @@ const WebRTCAudioPage: React.FC = () => {
           if (peerConnectionRef.current.remoteDescription) {
             await peerConnectionRef.current.addIceCandidate(candidate);
           } else {
-            
             iceCandidateQueue.push(candidate);
           }
         }
@@ -174,9 +175,19 @@ const WebRTCAudioPage: React.FC = () => {
     return `${mins}:${secs}`;
   };
 
+  const toggleMute = () => {
+    if (localStream) {
+      const audioTrack = localStream.getAudioTracks()[0];
+      if (audioTrack) {
+        audioTrack.enabled = !audioTrack.enabled; 
+        setIsMuted(!isMuted); 
+      }
+    }
+  };
+
   if (!isCallStarted) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-200 text-gray">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 text-gray">
         <button
           onClick={startCall}
           className="bg-green-500 text-white p-4 rounded-lg hover:bg-green-600 text-lg"
@@ -188,7 +199,7 @@ const WebRTCAudioPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center bg-gray-200 min-h-screen text-gray">
+    <div className="flex flex-col items-center justify-center bg-gray-100 min-h-screen text-gray">
       <div className="flex flex-row gap-8 items-center">
         <div className="flex flex-col items-center">
           <div
@@ -228,13 +239,28 @@ const WebRTCAudioPage: React.FC = () => {
       <audio ref={localAudioRef} autoPlay muted className="hidden" />
       <audio ref={remoteAudioRef} autoPlay className="hidden" />
 
-      <div className="flex gap-4 mt-8">
-        <img
-          src="images/End_Call.webp"
-          alt="End Call"
-          onClick={endCall}
-          className="w-12 h-12 cursor-pointer transition-opacity duration-300 ease-in-out"
-        />
+      <div className="flex gap-8 mt-6">
+        <button
+          onClick={toggleMute}
+          className={`w-16 h-16 flex items-center justify-center rounded-full ${
+            isMuted ? 'bg-red-500' : 'bg-green-500'
+          } transition-colors duration-300`}
+        >
+          <img
+            src={isMuted ? '/images/mute.png' : '/images/unmute.png'}
+            alt={isMuted ? 'Mute' : 'Unmute'}
+            className="w-10 h-10"
+          />
+        </button>
+
+        <div className="flex gap-4 mt-8">
+          <img
+            src="images/End_Call.webp"
+            alt="End Call"
+            onClick={endCall}
+            className="w-12 h-12 cursor-pointer transition-opacity duration-300 ease-in-out"
+          />
+        </div>
       </div>
     </div>
   );
