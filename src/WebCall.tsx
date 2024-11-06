@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const WebRTCAudioPage: React.FC = () => {
   const [isCallStarted, setIsCallStarted] = useState(false);
@@ -12,9 +13,12 @@ const WebRTCAudioPage: React.FC = () => {
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const speakingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const navigate = useNavigate();
 
   const SIGNALING_SERVER_URL = 'ws://localhost:8080';
   const iceServers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+
+  const iceCandidateQueue: RTCIceCandidate[] = []; 
 
   useEffect(() => {
     const startLocalStream = async () => {
@@ -45,22 +49,38 @@ const WebRTCAudioPage: React.FC = () => {
     };
 
     signalingSocketRef.current.onmessage = async (message) => {
-      const data = JSON.parse(message.data);
-      console.log('Received message:', data);
+      try {
+        const data = message.data instanceof Blob ? await message.data.text() : message.data;
+        const parsedData = JSON.parse(data);
 
-      if (data.type === 'offer' && peerConnectionRef.current) {
-        await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(data));
-        const answer = await peerConnectionRef.current.createAnswer();
-        await peerConnectionRef.current.setLocalDescription(answer);
-        signalingSocketRef.current?.send(JSON.stringify(answer));
-      }
+        console.log('Received message:', parsedData);
 
-      if (data.type === 'answer' && peerConnectionRef.current) {
-        await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(data));
-      }
+        if (parsedData.type === 'offer' && peerConnectionRef.current) {
+          await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(parsedData));
+          const answer = await peerConnectionRef.current.createAnswer();
+          await peerConnectionRef.current.setLocalDescription(answer);
+          signalingSocketRef.current?.send(JSON.stringify(answer));
 
-      if (data.type === 'ice-candidate' && peerConnectionRef.current) {
-        await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(data.candidate));
+          iceCandidateQueue.forEach(candidate => peerConnectionRef.current?.addIceCandidate(candidate));
+          iceCandidateQueue.length = 0; 
+        }
+
+        if (parsedData.type === 'answer' && peerConnectionRef.current) {
+          await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(parsedData));
+        }
+
+        if (parsedData.type === 'ice-candidate' && peerConnectionRef.current) {
+          const candidate = new RTCIceCandidate(parsedData.candidate);
+          
+          if (peerConnectionRef.current.remoteDescription) {
+            await peerConnectionRef.current.addIceCandidate(candidate);
+          } else {
+            
+            iceCandidateQueue.push(candidate);
+          }
+        }
+      } catch (error) {
+        console.error('Error handling message:', error);
       }
     };
 
@@ -116,6 +136,7 @@ const WebRTCAudioPage: React.FC = () => {
     setCallDuration(0);
     clearInterval(timerIntervalRef.current!);
     localStream?.getTracks().forEach(track => track.stop());
+    navigate('/homepage');
   };
 
   const monitorSpeaking = (stream: MediaStream, setSpeaking: React.Dispatch<React.SetStateAction<boolean>>) => {
