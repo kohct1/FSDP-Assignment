@@ -13,9 +13,15 @@ const BookingForm: React.FC = () => {
   const [userId, setUserId] = useState<string>("");
   const [newReason, setNewReason] = useState<string>("");
   const [hasBookings, setHasBookings] = useState<boolean>(false);
+  const [userBookings, setUserBookings] = useState<any>({});
 
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
+  const currentDate: Date = new Date();
+  const months: string[] = [
+    "January", "February", "March", "April", "May", "June", 
+    "July", "August", "September", "October", "November", "December"
+  ];
 
   // Simulating fetching user data (replace with real data fetch)
   useEffect(() => {
@@ -52,6 +58,7 @@ const BookingForm: React.FC = () => {
 
     if (result.bookings.length > 0) {
         setHasBookings(true);
+        setUserBookings(result.bookings);
         setNewReason(result.bookings[0].reason);
     }
   }
@@ -114,6 +121,22 @@ const BookingForm: React.FC = () => {
   };
 
   if (hasBookings) {
+    let time1: number = userBookings[0].time;
+    let time2: number = userBookings[0].time;
+    let slot1: string = String((userBookings[0].slot[0] - 1) * 10);
+    let slot2: string = String((userBookings[0].slot[1]) * 10);
+
+    if (slot1 === "0" || slot1 === "60") slot1 = "00";
+    if (slot2 === "0" || slot2 === "60") {
+        slot2 = "00";
+        
+        if (time2 === 12) {
+            time2 = 1;
+        } else {
+            time2 += 1;
+        }
+    }
+
     return (
         <div className="w-full h-screen">
             <Navbar />
@@ -123,7 +146,7 @@ const BookingForm: React.FC = () => {
                         <h1 className="w-full text-2xl text-start font-semibold">Bookings</h1>
                     </div>
                     <div className="w-full flex flex-col justify-center border-2 rounded p-4 gap-4">
-                      <h1 className="text-lg font-semibold">Wed, Nov 5 2025, 10:20 - 10:40</h1>
+                      <h1 className="text-lg font-semibold">{months[currentDate.getMonth()]} {userBookings[0].date} {currentDate.getFullYear()}, {`${time1}.${slot1} - ${time2}.${slot2}`}</h1>
                       <div className="flex flex-col gap-2">
                         <h1 className="font-semibold">Booking description</h1>
                         <textarea className="w-full h-3/4 border-2 rounded resize-none p-2" value={newReason} onChange={(e) => setNewReason(e.target.value)}></textarea>

@@ -152,7 +152,10 @@ function BookingDate() {
                     </div>
                     </div>
                 <div className="w-2/5 h-full bg-slate-100 overflow-scroll">
-                    <div className="w-full h-1/6 flex items-center text-xl font-semibold px-8">Available time slots</div>
+                    <div className="w-full h-1/6 flex flex-col justify-center items-start px-8">
+                        <h1 className="text-2xl font-semibold">Available time slots for:</h1>
+                        <h1 className="text-xl">{months[currentDate.getMonth()]} {selectedDate}</h1>
+                    </div>
                     <div className="flex flex-col bg-white border-y-2 p-8 gap-8">
                         {times.map((time: number) => {
                             const filteredBookings: any = Object.values(bookings).filter((bookings: any) => bookings.time === time);
@@ -172,7 +175,7 @@ function BookingDate() {
                                             let time1: number = time;
                                             let time2: number = time;
                                             let slot1: string = String((slot - 1) * 10);
-                                            let slot2: string = String((slot + 2 - 1) * 10)
+                                            let slot2: string = String((slot + 2 - 1) * 10);
 
                                             if (slot1 === "0" || slot1 === "60") slot1 = "00";
                                             if (slot2 === "0" || slot2 === "60") {
