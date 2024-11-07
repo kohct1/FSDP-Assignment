@@ -209,9 +209,9 @@ const WebRTCAudioPage: React.FC = () => {
             }}
           >
             <img
-              src="images/User_PFP.png"
+              src="images\UserIcon.png"
               alt="User"
-              className="w-24 h-24 rounded-full"
+              className="w-24 h-24 object-contain"
             />
           </div>
           <p className="mt-2 text-lg font-semibold">You</p>
@@ -225,9 +225,9 @@ const WebRTCAudioPage: React.FC = () => {
             }}
           >
             <img
-              src="images/OCBC_Rep_PFP.png"
+              src="images\OCBCIcon.png"
               alt="OCBC Representative"
-              className="w-24 h-24 rounded-full"
+              className="w-24 h-24 object-contain" 
             />
           </div>
           <p className="mt-2 text-lg font-semibold">OCBC rep</p>
@@ -239,7 +239,7 @@ const WebRTCAudioPage: React.FC = () => {
       <audio ref={localAudioRef} autoPlay muted className="hidden" />
       <audio ref={remoteAudioRef} autoPlay className="hidden" />
 
-      <div className="flex gap-8 mt-6">
+      <div className="flex gap-8 items-center mt-6">
         <button
           onClick={toggleMute}
           className={`w-16 h-16 flex items-center justify-center rounded-full ${
@@ -247,21 +247,24 @@ const WebRTCAudioPage: React.FC = () => {
           } transition-colors duration-300`}
         >
           <img
-            src={isMuted ? '/images/mute.png' : '/images/unmute.png'}
+            src={isMuted ? '/images/microphone-mute.250x256.png' : '/images/mic.178x256.png'}
             alt={isMuted ? 'Mute' : 'Unmute'}
             className="w-10 h-10"
           />
         </button>
 
-        <div className="flex gap-4 mt-8">
+        <button
+          onClick={endCall}
+          className="w-16 h-16 flex items-center justify-center bg-red-600 rounded-full transition-opacity duration-300 ease-in-out"
+        >
           <img
-            src="images/End_Call.webp"
+            src="/images/End_Call.webp"
             alt="End Call"
-            onClick={endCall}
-            className="w-12 h-12 cursor-pointer transition-opacity duration-300 ease-in-out"
+            className="w-10 h-10"
           />
-        </div>
+        </button>
       </div>
+
     </div>
   );
 };
