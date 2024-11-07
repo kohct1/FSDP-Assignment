@@ -1,5 +1,5 @@
 import Navbar from "./components/Navbar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from 'react';
 
 const Queue = () => {
@@ -8,7 +8,8 @@ const Queue = () => {
     const [lastUpdatedTime, setLastUpdatedTime] = useState('');
     const [initialQueueCount, setInitialQueueCount] = useState<number | null>(null);
     const [initialLeftQueue, setInitialLeftQueue] = useState<number | null>(null);
-
+    
+    const navigate = useNavigate();
     const queueAhead = queueCount - leftQueue - 1;
     const waitingTime = ((queueAhead * 2) / 60).toFixed(2); // Assume each person takes 2 mins
 
@@ -57,15 +58,12 @@ const Queue = () => {
         ? Math.min((newDeparturesSinceJoining / initialQueueCount) * 100, 100) // Cap at 100%
         : 0;
 
-    // Log values to debug why progress might be zero
+    // Redirect if queueAhead is 0
     useEffect(() => {
-        console.log("Initial Queue Count:", initialQueueCount);
-        console.log("Initial Left Queue:", initialLeftQueue);
-        console.log("Current Queue Count:", queueCount);
-        console.log("Current Left Queue:", leftQueue);
-        console.log("New Departures Since Joining:", newDeparturesSinceJoining);
-        console.log("Calculated Progress:", progress);
-    }, [queueCount, leftQueue, initialQueueCount, initialLeftQueue, progress]);
+        if (queueAhead === 0) {
+            navigate('/callpage'); 
+        }
+    }, [queueAhead, navigate]);
 
     useEffect(() => {
         fetchQueueData();
