@@ -2,6 +2,28 @@ import React, { useState, useRef, useEffect } from 'react';
 import Navbar from "./components/Navbar";
 
 function EnquiryDetail() {
+    const [userId, setUserId] = useState(null);
+
+    useEffect(() => {
+        getUser();
+      }, []);
+
+      async function getUser(): Promise<void> {
+        const response = await fetch(`http://localhost:5050/decode/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                token: localStorage.getItem("token")
+            })
+        });
+    
+        const result = await response.json();
+    
+        setUserId(result.userId);
+        console.log(result.userId);
+      }
     // hardcoded data for testing
     const initialMessages = [
         {
