@@ -14,6 +14,8 @@ const BookingForm: React.FC = () => {
   const [newReason, setNewReason] = useState<string>("");
   const [hasBookings, setHasBookings] = useState<boolean>(false);
   const [userBookings, setUserBookings] = useState<any>({});
+  const [isStaff, setIsStaff] = useState<boolean>(false);
+  const [bookings, setBookings] = useState<any>({});
 
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
@@ -44,6 +46,8 @@ const BookingForm: React.FC = () => {
 
   useEffect(() => {
     getUser();
+    getAllBookings();
+    getRole();
   }, []);
 
   useEffect(() => {
@@ -79,6 +83,13 @@ const BookingForm: React.FC = () => {
     setUserId(result.userId);
   }
 
+  async function getAllBookings(): Promise<void> {
+    const response = await fetch(`http://localhost:5050/allBookings/`);
+    const result = await response.json();
+
+    setBookings(result.bookings);
+  }
+
   async function deleteBooking(): Promise<void> {
     await fetch(`http://localhost:5050/bookings/${userId}/`, {
         method: "DELETE"
@@ -96,6 +107,24 @@ const BookingForm: React.FC = () => {
             reason: newReason
         })
     });
+  }
+
+  async function getRole(): Promise<void> {
+    const response = await fetch(`http://localhost:5050/role/`, {
+      method: "POST",
+      headers: {
+          "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+          token: localStorage.getItem("token")
+      })
+    });
+    
+    const result = await response.json();
+
+    if (result.role === "Staff") {
+      setIsStaff(true);
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -119,6 +148,52 @@ const BookingForm: React.FC = () => {
   const handleCancel = () => {
     setShowModal(false); // Close the modal and allow editing
   };
+
+  if (isStaff) {
+    console.log(bookings);
+
+    return (
+        <div className="w-full h-screen">
+            <Navbar />
+            <div className="w-full h-full flex flex-col items-center">
+                <div className="w-1/2 h-1/2 flex flex-col items-center p-8 gap-8">
+                    <div className="w-full border-b-2 py-8">
+                        <h1 className="w-full text-2xl text-start font-semibold">Bookings</h1>
+                    </div>
+                    {Object.values(bookings).map((booking: any) => {
+                      if (Number(booking.date) === currentDate.getDate()) {
+                        let time1: number = booking.time;
+                        let time2: number = booking.time;
+                        let slot1: string = String((booking.slot[0] - 1) * 10);
+                        let slot2: string = String((booking.slot[1]) * 10);
+                    
+                        if (slot1 === "0" || slot1 === "60") slot1 = "00";
+                        if (slot2 === "0" || slot2 === "60") {
+                            slot2 = "00";
+                            
+                            if (time2 === 12) {
+                                time2 = 1;
+                            } else {
+                                time2 += 1;
+                            }
+                        }
+
+                        return (
+                          <div className="w-full flex flex-col justify-center border-2 rounded p-4 gap-4">
+                            <h1 className="text-lg font-semibold">{months[currentDate.getMonth()]} {userBookings[0].date} {currentDate.getFullYear()}, {`${time1}.${slot1} - ${time2}.${slot2}`}</h1>
+                            <h1>{booking.reason}</h1>
+                            <div className="flex justify-end items-center gap-8">
+                              <button className="bg-red-600 text-sm text-white rounded px-4 py-2">Call</button>
+                            </div>
+                          </div>
+                        );
+                      }
+                    })}
+                </div>
+            </div>
+        </div>
+    );
+  }
 
   if (hasBookings) {
     let time1: number = userBookings[0].time;
