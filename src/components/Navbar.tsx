@@ -5,7 +5,7 @@ function Navbar() {
         <div className="relative z-20 w-full border-b border-gray-300 p-4 bg-white bg-opacity-100 pl-20 pr-20">
                 <div className="flex justify-between items-center w-full">
                     <img
-                        src='/src/OCBC_Bank_logo.png' // OCBC logo link
+                        src='/images/OCBC-Bank-Logo.png' // OCBC logo link
                         alt="OCBC Logo"
                         className="h-12"
                     />

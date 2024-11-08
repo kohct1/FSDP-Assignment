@@ -8,9 +8,14 @@ const Queue = () => {
     const [lastUpdatedTime, setLastUpdatedTime] = useState('');
     const [initialQueueCount, setInitialQueueCount] = useState<number | null>(null);
     const [initialLeftQueue, setInitialLeftQueue] = useState<number | null>(null);
+<<<<<<< HEAD
     
     const navigate = useNavigate();
     const queueAhead = queueCount - leftQueue - 1;
+=======
+
+    const queueAhead = Math.max(queueCount - leftQueue - 1, 0);
+>>>>>>> 84e06fa2e9b8b6aa9728809814ca64679001719e
     const waitingTime = ((queueAhead * 2) / 60).toFixed(2); // Assume each person takes 2 mins
 
     // Function to format the current time as hh:mm:ss AM/PM
@@ -72,8 +77,7 @@ const Queue = () => {
     }, []);
 
     return (
-        <div className="relative flex flex-col min-h-screen bg-cover bg-center"
-            style={{ backgroundImage: "url('/src/ticketing_bg.jpg')" }}>
+        <div className="relative flex flex-col min-h-screen bg-cover bg-center bg-[url('ticketing_bg.jpg')]">
             
             {/* Overlay for background fade */}
             <div className="absolute inset-0 bg-white opacity-50"></div>

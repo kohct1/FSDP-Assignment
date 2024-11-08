@@ -3,6 +3,17 @@ import db from "../db/connection.js";
 
 const router = express.Router();
 
+router.get("/allBookings", async (req, res) => {
+    try {
+        const bookingsCollection = db.collection("Bookings");
+        const bookings = await bookingsCollection.find().toArray();
+
+        res.status(200).json({ bookings });
+    } catch (err) {
+        res.status(500).send(err);
+    }
+});
+
 router.get("/bookings/:date", async (req, res) => {
     const date = req.params.date;
 
