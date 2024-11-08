@@ -21,6 +21,7 @@ function Login() {
         });
 
         const result = await response.json();
+        console.log(result);
 
         if (result.token)  {
             localStorage.setItem("token", result.token);
@@ -62,6 +63,7 @@ function Login() {
                 </div>
             </>
         );
+
     }
 
     return (

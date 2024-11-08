@@ -6,6 +6,8 @@ const router = express.Router();
 
 router.post("/login", async (req, res) => {
     const { email, pin } = req.body;
+    console.log(email);
+    console.log(pin);
 
     try {
         const users = db.collection("Users");
