@@ -4,7 +4,7 @@ import Navbar from "./components/Navbar";
 
 function EnquiryDetail() {
     const location = useLocation();
-    const enquiry = location.state?.enquiry; 
+    const enquiry = location.state?.enquiry;
     const [userId, setUserId] = useState(null);
 
     useEffect(() => {
@@ -37,23 +37,47 @@ function EnquiryDetail() {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
-    const handleSendMessage = (e) => {
+    const handleSendMessage = async (e) => {
         e.preventDefault();
+    
         if (inputMessage.trim()) {
             const newMessage = {
-                sender: "Jason Tan",
-                id: userId,
-                message: inputMessage,
-                isStaff: false
+                chatMessage: inputMessage,
+                postedByID: userId,
+                respondedByID: null, 
+                timestamp: new Date().toISOString()
             };
-            // Update the messages state
-            setMessages(prevMessages => {
-                const updatedMessages = [...prevMessages, newMessage];
-                // log for testing
-                console.log("Updated messages array:", updatedMessages); 
-                return updatedMessages;
-            });
-            setInputMessage(""); // Clear input field
+    
+            // Send the message to the backend
+            const messageData = {
+                enquiryId: enquiry._id,  
+                senderId: userId,        
+                message: inputMessage,   
+                isStaff: false           
+            };
+    
+            try {
+                const response = await fetch("http://localhost:5050/enquiries/sendMessage", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(messageData)
+                });
+    
+                if (!response.ok) {
+                    const textResponse = await response.text();  // Get the response as text
+                    console.error("Error sending message:", textResponse);
+                } else {
+                    const data = await response.json();  // Parse the response as JSON
+                    console.log("Message sent:", data);
+    
+                    setMessages(prevMessages => [...prevMessages, newMessage]);
+                    setInputMessage(""); 
+                }
+            } catch (error) {
+                console.error("Error sending message:", error);
+            }
         }
     };
 
