@@ -10,7 +10,7 @@ function Enquiries({ type }) {
     useEffect(() => {
         getUser();
         fetchEnquiries();
-      }, []);
+    }, []);
 
     async function getUser(): Promise<void> {
         const response = await fetch(`http://localhost:5050/decode/`, {
@@ -24,13 +24,12 @@ function Enquiries({ type }) {
         });
     
         const result = await response.json();
-    
         setUserId(result.userId);
         console.log(result.userId);
-      }
+    }
 
-      async function fetchEnquiries() { //Fetching enquiries from the server
-        const response = await fetch("http://localhost:5050/Enquiries");
+    async function fetchEnquiries() { //Fetching enquiries from the server
+        const response = await fetch("http://localhost:5050/enquiries/staff");
         const data = await response.json();
         setEnquiries(data);
     }
@@ -46,10 +45,12 @@ function Enquiries({ type }) {
                             <div
                                 key={index}
                                 className="bg-white w-full p-3 shadow-md rounded mt-1 flex items-center cursor-pointer z-10 opacity-100"
-                                onClick={() => navigate("/user/enquiries/response")} // Add onClick for redirection
+                                onClick={() => {
+                                    navigate("/user/enquiries/response", { state: { enquiry } });
+                                }}
                             >
                                 <p className="font-sans text-gray-800 text-sm flex-grow">
-                                {`${enquiry.type || "Enquiry"} - ${enquiry.message || "Undefined"}`}
+                                    {`${enquiry.type || "Enquiry"} - ${enquiry.message || "Undefined"}`}
                                 </p>
                             </div>
                         );
