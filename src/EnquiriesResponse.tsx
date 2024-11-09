@@ -1,14 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Navbar from "./components/Navbar";
 
 function EnquiryDetail() {
+    const location = useLocation();
+    const enquiry = location.state?.enquiry; 
     const [userId, setUserId] = useState(null);
 
     useEffect(() => {
+        // log for testing
+        console.log("Enquiry data received:", enquiry); 
         getUser();
-      }, []);
+    }, []);
 
-      async function getUser(): Promise<void> {
+    async function getUser() {
         const response = await fetch(`http://localhost:5050/decode/`, {
             method: "POST",
             headers: {
@@ -20,33 +25,11 @@ function EnquiryDetail() {
         });
     
         const result = await response.json();
-    
         setUserId(result.userId);
-        console.log(result.userId);
-      }
-    // hardcoded data for testing
-    const initialMessages = [
-        {
-            sender: "Jason Tan",
-            id: "9876",
-            message: "Hello, I am having issues logging in. Could you provide me with some assistance?",
-            isStaff: false
-        },
-        {
-            sender: "Marie Li",
-            id: "2347",
-            message: "Sure thing, can you describe your issue in greater detail?",
-            isStaff: true
-        },
-        {
-            sender: "Jason Tan",
-            id: "9876",
-            message: "Well, this morning I was drinking coffee when my dog got hungry. I tried to feed it, but then I realised my salary just came in. So I tried to log in to your app to withdraw my salary, but then right I cannot remember my password! I key in once, key in twice, key in THRICE! Still cannot! Then how? Please help! I think my password starts with L and ends with L.",
-            isStaff: false
-        }
-    ];
+        console.log("User ID:", result.userId); 
+    }
 
-    const [messages, setMessages] = useState(initialMessages);
+    const [messages, setMessages] = useState(enquiry?.messages || []); 
     const [inputMessage, setInputMessage] = useState("");
     const messagesEndRef = useRef(null);
 
@@ -58,13 +41,19 @@ function EnquiryDetail() {
         e.preventDefault();
         if (inputMessage.trim()) {
             const newMessage = {
-                sender: "Jason Tan", 
-                id: "9876", 
+                sender: "Jason Tan",
+                id: userId,
                 message: inputMessage,
                 isStaff: false
             };
-            setMessages(prevMessages => [...prevMessages, newMessage]);
-            setInputMessage(""); 
+            // Update the messages state
+            setMessages(prevMessages => {
+                const updatedMessages = [...prevMessages, newMessage];
+                // log for testing
+                console.log("Updated messages array:", updatedMessages); 
+                return updatedMessages;
+            });
+            setInputMessage(""); // Clear input field
         }
     };
 
@@ -73,7 +62,7 @@ function EnquiryDetail() {
             <Navbar />
 
             <h1 className="text-2xl font-semibold text-gray-800 py-4 p-12">
-                OCBC Mobile App - Issues logging in app, forgot password and would like to reset
+                {enquiry?.type} - {enquiry?.message}
             </h1>
 
             <div className="bg-gray-100 p-6 rounded-lg shadow-md h-76 overflow-y-auto mx-12">
@@ -81,12 +70,12 @@ function EnquiryDetail() {
                     A staff member has approved your enquiry. Create a message to begin the conversation.
                 </p>
                 {messages.map((msg, index) => (
-                    <div key={index} className={`flex items-start mb-4 ${msg.isStaff ? 'justify-end' : 'justify-start'}`}>
+                    <div key={index} className={`flex items-start mb-4 ${msg.respondedByID ? 'justify-end' : 'justify-start'}`}>
                         <div className="inline-flex max-w-full p-4 rounded-lg shadow-md bg-white items-center">
                             <p className="text-gray-800 font-medium whitespace-nowrap mr-5">
-                                {msg.sender} {msg.isStaff ? `Staff-${msg.id}` : `ID-${msg.id}`}
+                                {msg.respondedByID ? "Staff" : "User"} - {msg.postedByID}
                             </p>
-                            <p className="text-gray-700">{msg.message}</p>
+                            <p className="text-gray-700">{msg.chatMessage}</p>
                         </div>
                     </div>
                 ))}
