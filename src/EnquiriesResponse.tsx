@@ -94,10 +94,10 @@ function EnquiryDetail() {
                     A staff member has approved your enquiry. Create a message to begin the conversation.
                 </p>
                 {messages.map((msg, index) => (
-                    <div key={index} className={`flex items-start mb-4 ${msg.respondedByID ? 'justify-end' : 'justify-start'}`}>
+                    <div key={index} className={`flex items-start mb-4 ${msg.postedByID === userId ? 'justify-start' : 'justify-end'}`}>
                         <div className="inline-flex max-w-full p-4 rounded-lg shadow-md bg-white items-center">
                             <p className="text-gray-800 font-medium whitespace-nowrap mr-5">
-                                {msg.respondedByID ? "Staff" : "User"} - {msg.postedByID}
+                                {msg.postedByID === userId ? "You" : "Staff"} - {msg.postedByID}
                             </p>
                             <p className="text-gray-700">{msg.chatMessage}</p>
                         </div>

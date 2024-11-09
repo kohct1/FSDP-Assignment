@@ -29,7 +29,7 @@ function Enquiries({ type }) {
     }
 
     async function fetchEnquiries() { //Fetching enquiries from the server
-        const response = await fetch("http://localhost:5050/Enquiries");
+        const response = await fetch("http://localhost:5050/enquiries/staff");
         const data = await response.json();
         setEnquiries(data);
     }

@@ -11,7 +11,6 @@ router.get("/staff", async (req, res) => {
     try {
         const enquiriesCollection = db.collection("Enquiries");
         const enquiries = await enquiriesCollection.find().toArray();
-        console.log(enquiries);
         res.status(200).json({enquiries});
     } catch (err) {
         res.status(500).json({error : "Internal Server Error"});
