@@ -57,7 +57,7 @@ router.put("/staff/update", async (req, res) => {
 
 
 router.post("/sendMessage", async (req, res) => {
-    const { enquiryId, senderId, message, isStaff } = req.body;
+    const { enquiryId, senderId, message } = req.body;
 
     // Validate ObjectId
     if (!ObjectId.isValid(enquiryId)) {
@@ -72,10 +72,11 @@ router.post("/sendMessage", async (req, res) => {
             return res.status(404).json({ error: "Enquiry not found" });
         }
 
+        // Check if current user is a user or staff using postedBy and set accordingly
         const newMessage = {
             chatMessage: message,
-            postedByID: senderId,
-            respondedByID: isStaff ? senderId : null,
+            postedByID: senderId === enquiry.postedBy ? senderId : null,
+            respondedByID: senderId !== enquiry.postedBy ? senderId : null,
             timestamp: new Date().toISOString()
         };
 
@@ -95,7 +96,6 @@ router.post("/sendMessage", async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
-
 
 
 export default router

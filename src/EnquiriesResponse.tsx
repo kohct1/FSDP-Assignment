@@ -8,8 +8,8 @@ function EnquiryDetail() {
     const [userId, setUserId] = useState(null);
 
     useEffect(() => {
-        // log for testing
-        console.log("Enquiry data received:", enquiry); 
+        /* log for testing
+        console.log("Enquiry data received:", enquiry); */
         getUser();
     }, []);
 
@@ -39,33 +39,33 @@ function EnquiryDetail() {
 
     const handleSendMessage = async (e) => {
         e.preventDefault();
-
-        const isStaff = userId === enquiry.responseBy;
+    
+        // Determine if the user is the poster or the responder
         const isUser = userId === enquiry.postedBy;
-
+        const isStaff = userId === enquiry.responseBy;
+    
         if (!isStaff && !isUser) {
             console.error("You do not have permission to send messages for this enquiry.");
             return;
         }
     
         if (inputMessage.trim()) {
+            // Set postedByID if the user is the poster, otherwise set respondedByID
             const newMessage = {
                 chatMessage: inputMessage,
-                postedByID: isUser ? userId : null,       
-                respondedByID: isStaff ? userId : null,     
+                postedByID: isUser ? userId : null,
+                respondedByID: isStaff ? userId : null,
                 timestamp: new Date().toISOString()
             };
-
     
-            // Send the message to the backend
+            // Data to send to the backend
             const messageData = {
                 enquiryId: enquiry._id,
                 message: inputMessage,
                 senderId: userId,
-                postedByID: isUser ? userId : null,       
-                respondedByID: isStaff ? userId : null        
+                postedByID: isUser ? userId : null,
+                respondedByID: isStaff ? userId : null
             };
-
     
             try {
                 const response = await fetch("http://localhost:5050/enquiries/sendMessage", {
@@ -77,20 +77,21 @@ function EnquiryDetail() {
                 });
     
                 if (!response.ok) {
-                    const textResponse = await response.text();  // Get the response as text
+                    const textResponse = await response.text();
                     console.error("Error sending message:", textResponse);
                 } else {
-                    const data = await response.json();  // Parse the response as JSON
+                    const data = await response.json();
                     console.log("Message sent:", data);
     
+                    // Update the messages state to include the new message
                     setMessages(prevMessages => [...prevMessages, newMessage]);
-                    setInputMessage(""); 
+                    setInputMessage("");
                 }
             } catch (error) {
                 console.error("Error sending message:", error);
             }
         }
-    };
+    };   
 
     return (
         <div className="w-full min-h-screen bg-gray-50">
