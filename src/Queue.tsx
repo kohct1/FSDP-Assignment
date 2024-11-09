@@ -8,10 +8,10 @@ const Queue = () => {
     const [lastUpdatedTime, setLastUpdatedTime] = useState('');
     const [initialQueueCount, setInitialQueueCount] = useState<number | null>(null);
     const [initialLeftQueue, setInitialLeftQueue] = useState<number | null>(null);
-    
+
     const navigate = useNavigate();
     const queueAhead = Math.max(queueCount - leftQueue - 1, 0);
-    const waitingTime = ((queueAhead * 2) / 60).toFixed(2); 
+    const waitingTime = ((queueAhead * 2) / 60).toFixed(2); // Assume each person takes 2 mins
 
     // Function to format the current time as hh:mm:ss AM/PM
     const getCurrentTime = () => {

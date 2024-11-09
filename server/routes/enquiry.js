@@ -2,27 +2,16 @@ import express from "express";
 import db from "../db/connection.js";
 
 const router = express.Router();
-/* For testing purposes only
-router.get("/", async (req, res) => {
-   
+import mongoose from "mongoose";
+const {ObjectId} = mongoose.Types;
 
-    try {
-        const enquiriesCollection = db.collection("Enquiries");
-        const enquiries = await enquiriesCollection.find().toArray();
-        console.log("getting");
-        res.status(200).json({enquiries});
-    } catch (err) {
-        res.status(500).json({error : "Internal Server Error"});
-    }
-});
-*/
 
 //Gets all enquiry data
-router.get("/", async (req, res) => {
+router.get("/staff", async (req, res) => {
     try {
         const enquiriesCollection = db.collection("Enquiries");
         const enquiries = await enquiriesCollection.find().toArray();
-        console.log("getting");
+        console.log(enquiries);
         res.status(200).json({enquiries});
     } catch (err) {
         res.status(500).json({error : "Internal Server Error"});
@@ -32,16 +21,16 @@ router.get("/", async (req, res) => {
 //Posts new enquiry from user
 router.post("/make", async (req, res) => {
     const {id, type, message} = req.body;
-    console.log(id + " " + type + " " + message);
 
     try{
         const enquiriesCollection = db.collection("Enquiries");
+        
         const doc = {
-            "_id": id + " " + message,
+
             "type": type,
             "message" : message,
             "status" : "Open",
-            "postedBy": id,
+            "postedBy": id, 
             "responseBy" : "None",
         }
         const enquiries = await enquiriesCollection.insertOne(doc);
@@ -49,6 +38,21 @@ router.post("/make", async (req, res) => {
         res.status(200).json({enquiries});
     } catch (err) {
         res.status(500).json({error : "Internal Server Errors"});
+    }
+});
+
+//Updates responseBy for a staff member
+router.put("/staff/update", async (req, res) => {
+
+    const { id, responseBy } = req.body;
+    let _id =  new ObjectId(id);
+    try {
+        const enquiriesCollection = db.collection("Enquiries");
+        const enquiries = await enquiriesCollection.updateOne({ _id  }, { $set: { responseBy : responseBy, status : "Responding"}});
+
+        res.status(200).json({enquiries});
+    } catch (err) {
+        res.status(500).send(err);
     }
 });
 

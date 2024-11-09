@@ -7,7 +7,7 @@ import {decodeToken} from "react-jwt";
 async function PostEnquiry(event : any) {
     event.preventDefault();
     const form = event.target;
-    const re = /[^0-9a-zA-Z,.]/;
+    const re = /[^0-9a-zA-Z,.\s!?]/;
     if (re.test(form.subject.value)) {
         alert("You may only use characters or digits in your enquiry subject.");
     }
