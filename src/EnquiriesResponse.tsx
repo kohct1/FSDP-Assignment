@@ -8,8 +8,8 @@ function EnquiryDetail() {
     const [userId, setUserId] = useState(null);
 
     useEffect(() => {
-        // log for testing
-        console.log("Enquiry data received:", enquiry); 
+        /* log for testing
+        console.log("Enquiry data received:", enquiry); */
         getUser();
     }, []);
 
@@ -40,20 +40,31 @@ function EnquiryDetail() {
     const handleSendMessage = async (e) => {
         e.preventDefault();
     
+        // Determine if the user is the poster or the responder
+        const isUser = userId === enquiry.postedBy;
+        const isStaff = userId === enquiry.responseBy;
+    
+        if (!isStaff && !isUser) {
+            console.error("You do not have permission to send messages for this enquiry.");
+            return;
+        }
+    
         if (inputMessage.trim()) {
+            // Set postedByID if the user is the poster, otherwise set respondedByID
             const newMessage = {
                 chatMessage: inputMessage,
-                postedByID: userId,
-                respondedByID: null, 
+                postedByID: isUser ? userId : null,
+                respondedByID: isStaff ? userId : null,
                 timestamp: new Date().toISOString()
             };
     
-            // Send the message to the backend
+            // Data to send to the backend
             const messageData = {
-                enquiryId: enquiry._id,  
-                senderId: userId,        
-                message: inputMessage,   
-                isStaff: false           
+                enquiryId: enquiry._id,
+                message: inputMessage,
+                senderId: userId,
+                postedByID: isUser ? userId : null,
+                respondedByID: isStaff ? userId : null
             };
     
             try {
@@ -66,20 +77,21 @@ function EnquiryDetail() {
                 });
     
                 if (!response.ok) {
-                    const textResponse = await response.text();  // Get the response as text
+                    const textResponse = await response.text();
                     console.error("Error sending message:", textResponse);
                 } else {
-                    const data = await response.json();  // Parse the response as JSON
+                    const data = await response.json();
                     console.log("Message sent:", data);
     
+                    // Update the messages state to include the new message
                     setMessages(prevMessages => [...prevMessages, newMessage]);
-                    setInputMessage(""); 
+                    setInputMessage("");
                 }
             } catch (error) {
                 console.error("Error sending message:", error);
             }
         }
-    };
+    };   
 
     return (
         <div className="w-full min-h-screen bg-gray-50">
@@ -94,10 +106,13 @@ function EnquiryDetail() {
                     A staff member has approved your enquiry. Create a message to begin the conversation.
                 </p>
                 {messages.map((msg, index) => (
-                    <div key={index} className={`flex items-start mb-4 ${msg.postedByID === userId ? 'justify-start' : 'justify-end'}`}>
+                    <div 
+                        key={index} 
+                        className={`flex items-start mb-4 ${msg.postedByID ? 'justify-start' : 'justify-end'}`}
+                    >
                         <div className="inline-flex max-w-full p-4 rounded-lg shadow-md bg-white items-center">
                             <p className="text-gray-800 font-medium whitespace-nowrap mr-5">
-                                {msg.postedByID === userId ? "You" : "Staff"} - {msg.postedByID}
+                                {msg.postedByID ? "You" : "Staff"} - {msg.postedByID || msg.respondedByID}
                             </p>
                             <p className="text-gray-700">{msg.chatMessage}</p>
                         </div>
