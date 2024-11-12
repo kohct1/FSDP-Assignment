@@ -5,67 +5,62 @@ import Navbar from "./components/Navbar";
 const CallPage: React.FC = () => {
   const [bookingDetails, setBookingDetails] = useState<any>(null);
   const [isCallingEnabled, setIsCallingEnabled] = useState<boolean>(false);
-  const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const [loading, setLoading] = useState<boolean>(true);
   const [countdown, setCountdown] = useState<number>(5);
   const navigate = useNavigate();
+  const [userId, setUserId] = useState(null);
 
-  const fakeBookingDetails = {
-    reason: 'Consultation regarding your account',
-    date: 15,
-    time: 10,
-    slot: [1, 2],
-    queue: 0
-  };
+  useEffect(() => {
+    getUser();
+}, []);
 
-  const fetchBookingDetails = async () => {
-    setTimeout(() => {
-      setBookingDetails(fakeBookingDetails);
-      checkIfBookingReady(fakeBookingDetails);
+async function getUser() {
+    const response = await fetch(`http://localhost:5050/decode/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            token: localStorage.getItem("token")
+        })
+    });
+
+    const result = await response.json();
+    setUserId(result.userId);
+    console.log("User ID:", result.userId); 
+}
+
+  async function fetchBookingDetails(): Promise<void> {
+      const response = await fetch(`http://localhost:5050/userBookings/${userId}/`);
+      const result = await response.json();
+      setBookingDetails(result);
+      console.log(result);
       setLoading(false);
-    }, 1000); 
-  };
-
-  const checkIfBookingReady = (details: any) => {
-    if (details.queue === 0) {
-      setIsCallingEnabled(true);
-    } else {
-      const bookingTime = new Date(details.dateTime);
-      if (bookingTime <= currentTime) {
-        setIsCallingEnabled(true);
-      }
-    }
   };
 
   useEffect(() => {
     fetchBookingDetails();
-
-    const interval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 60000);
-
-    return () => clearInterval(interval);
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
-    if (bookingDetails) {
-      const countdownInterval = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev === 1) {
-            if (bookingDetails.queue === 0) {
-              navigate('/webcall');
-            } else {
-              navigate('/bookingpage');
-            }
-            clearInterval(countdownInterval);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+    // if (bookingDetails) {
+    //   const countdownInterval = setInterval(() => {
+    //     setCountdown((prev) => {
+    //       if (prev === 1) {
+    //         if (bookingDetails.queue === 0) {
+    //           navigate('/webcall');
+    //         } else {
+    //           navigate('/bookingpage');
+    //         }
+    //         clearInterval(countdownInterval);
+    //         return 0;
+    //       }
+    //       return prev - 1;
+    //     });
+    //   }, 1000);
 
-      return () => clearInterval(countdownInterval); 
-    }
+    //   return () => clearInterval(countdownInterval); 
+    // }
   }, [bookingDetails, navigate]);
 
   const handleCall = () => {
@@ -74,20 +69,25 @@ const CallPage: React.FC = () => {
   };
 
   const formatBookingTime = () => {
+    if (!bookingDetails || !bookingDetails.slot || bookingDetails.slot.length < 2) {
+      return "Invalid booking time";  
+    }
+  
     let { time: time1 } = bookingDetails;
     let time2 = time1;
     let slot1 = String((bookingDetails.slot[0] - 1) * 10);
     let slot2 = String(bookingDetails.slot[1] * 10);
-
+  
     if (slot1 === "0" || slot1 === "60") slot1 = "00";
     if (slot2 === "0" || slot2 === "60") {
       slot2 = "00";
       time2 = time2 === 12 ? 1 : time2 + 1;
     }
-
+  
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     return `${months[new Date().getMonth()]} ${bookingDetails.date}, ${time1}.${slot1} - ${time2}.${slot2}`;
   };
+  
 
   if (loading) {
     return <div className="flex justify-center items-center h-screen">Loading booking details...</div>;
