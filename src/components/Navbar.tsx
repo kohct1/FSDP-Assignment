@@ -143,8 +143,50 @@ function Navbar() {
                                 Cancel
                             </button>
                         </div>
+                        {userId ? (
+                            <button 
+                                onClick={handleShowLogoutPrompt}
+                                className="text-gray-600 font-semibold"
+                            >
+                                Logged In
+                            </button>
+                        ) : (
+                            <Link to="/" className="text-gray-600 font-semibold">
+                                Login
+                            </Link>
+                        )}
                     </div>
                 </div>
+
+                {/* Logout confirmation modal */}
+            {showLogoutPrompt && (
+                <>
+                <div className="fixed inset-0 bg-gray-800 bg-opacity-70 z-40"></div>
+
+                <div className="absolute inset-40 flex justify-center items-center z-40 mt-[-80px]">
+                    <div className="bg-white p-6 rounded-md shadow-lg text-center">
+                        <h3 className="text-xl font-semibold mb-4">Are you sure you want to log out?</h3>
+                        <div className="space-x-4">
+                            <button 
+                                onClick={handleLogout} 
+                                className="bg-red-500 text-white px-4 py-2 rounded-md"
+                            >
+                                Yes, Log Out
+                            </button>
+                            <button 
+                                onClick={handleCloseLogoutPrompt} 
+                                className="bg-gray-500 text-white px-4 py-2 rounded-md"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                </>
+            )}
+
+
+        
                 </>
             )}
         </div>
