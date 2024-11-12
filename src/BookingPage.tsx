@@ -341,14 +341,20 @@ const BookingForm: React.FC = () => {
 
               <div className="mt-6">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Link
+                  {formData.reason !== "" ? <Link
                     type="submit"
                     className="w-full flex justify-center items-center bg-red-500 text-white py-3 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                     to="/booking-date"
                     state={{ reason: formData.reason, category: category }}
                   >
                     Continue
-                  </Link>
+                  </Link> :
+                  <button
+                    type="submit"
+                    className="w-full flex justify-center items-center bg-red-500 text-white py-3 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  >
+                    Continue
+                  </button>}
                 </motion.div>
               </div>
             </div>
