@@ -1,8 +1,7 @@
 import Navbar from "./components/Navbar";
+import { motion } from "framer-motion";
 import {useState} from 'react';
 import {decodeToken} from "react-jwt";
-
-
 
 async function PostEnquiry(event : any) {
     event.preventDefault();
@@ -59,7 +58,7 @@ function MakeEnquiry() {
                         </div>
                         <form  onSubmit={PostEnquiry} className="drop-shadow-2xl bg-white w-3/5 h-4/6 rounded-lg flex flex-col justify-center items-center" id="enquiries-container">
                             <label htmlFor="types" className="w-7/12">Enquiry Type:</label>
-                            <select id="types" name="types" className="pt-1 pb-1 pl-1.5 border-2 mb-4 w-7/12 mt-2" required>
+                            <select id="types" name="types" className="p-2 border mb-4 w-7/12 rounded mt-2" required>
                                 <option value="OCBC Mobile App">OCBC Mobile App</option>
                                 <option value="Loans">Loans/Collections</option>
                                 <option value="Banking Card">Credit/Debit Card</option>
@@ -69,9 +68,9 @@ function MakeEnquiry() {
                                 <option value="Other">Other</option>
                             </select>
                             <label htmlFor="subject" className="w-7/12 mt-2">Enquiry Subject:</label>
-                            <textarea id="subject" name="subject" className= "h-32 border-2 mt-2 w-7/12" required maxLength={80}  onChange={e => {setSubjectLength(e.target.value.length)}}></textarea>
+                            <textarea id="subject" name="subject" className= "h-32 border mt-2 w-7/12 rounded resize-none p-2" required maxLength={80}  onChange={e => {setSubjectLength(e.target.value.length)}}></textarea>
                             <p className="font-light mt-2 w-7/12">Characters Left: {80-subjectLength}</p>
-                            <button className="bg-red-600 w-3/12 text-white p-1.5 rounded-md mt-10 mb-8 hover:bg-red-800" type="submit">Send</button>
+                            <motion.button className="bg-red-600 w-3/12 text-white p-1.5 rounded mt-10 mb-8 hover:bg-red-800" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} type="submit">Send</motion.button>
                         </form>
                 </div>
             </div>

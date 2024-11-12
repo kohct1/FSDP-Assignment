@@ -311,10 +311,10 @@ const BookingForm: React.FC = () => {
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 gap-6">
               <div>
-                <label className="block text-left text-gray-700 text-sm mb-2">
-                  Booking category<span className="text-red-500">*</span>
+                <label className="block text-left mb-2">
+                  Booking category <span className="text-red-500">*</span>
                 </label>
-                <select id="types" name="types" className="pt-1 pb-1 pl-1.5 border-2 mb-4 w-full" required onChange={(e) => setCategory(e.target.value)}>
+                <select id="types" name="types" className="p-2 border mb-4 w-full rounded" required onChange={(e) => setCategory(e.target.value)}>
                     <option value="OCBC Mobile App">OCBC Mobile App</option>
                     <option value="Loans">Loans/Collections</option>
                     <option value="Banking Card">Credit/Debit Card</option>
@@ -323,20 +323,20 @@ const BookingForm: React.FC = () => {
                     <option value="Account">Bank Account</option>
                     <option value="Other">Other</option>
                 </select>
-                <label className="block text-left text-gray-700 text-sm mb-2">
-                  Reason for booking<span className="text-red-500">*</span>
+                <label className="block text-left mb-2">
+                  Reason for booking <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   name="reason"
                   value={formData.reason}
                   onChange={handleChange}
                   required
-                  className="block w-full border border-gray-300 rounded p-2 focus:ring-red-500 focus:border-red-500"
+                  className="block w-full border border-gray-300 rounded p-2 focus:ring-red-500 focus:border-red-500 resize-none"
                   placeholder="Enter the reason for your booking"
                   maxLength={500}
                   rows={5}
                 />
-                <p className="text-sm text-left text-gray-500 mt-1">Characters left: {500 - formData.reason.length}</p>
+                <p className="text-sm text-left mt-1">Characters left: {500 - formData.reason.length}</p>
               </div>
 
               <div className="mt-6">

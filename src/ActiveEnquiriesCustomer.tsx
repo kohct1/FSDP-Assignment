@@ -1,6 +1,7 @@
 import Navbar from "./components/Navbar";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 
 function Enquiries({ type }) {
     const navigate = useNavigate(); // Initialize navigate
@@ -81,12 +82,13 @@ function ActiveEnquiriesCustomer() {
                         <h2 className="text-xl font-semibold text-gray-700 mb-4">Active Enquiries</h2>
                         <Enquiries type="Active" />
                         <div className="flex justify-center mt-6">
-                            <button
+                            <motion.button
+                                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
                                 className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500"
                                 onClick={() => navigate("/user/enquiries/make")} // Redirect on button click
                             >
                                 Make a New Enquiry
-                            </button>
+                            </motion.button>
                         </div>
                     </div>
 
