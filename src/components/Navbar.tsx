@@ -13,7 +13,6 @@ function PopulateLinks({role}) {
         </div>);
     }
     else if (role == "Staff") {
-        console.log("Is staff");
         return (
             <div className="flex space-x-10">
                 <Link to="/bookingpage" className="text-gray-600 font-semibold">Booking</Link>
