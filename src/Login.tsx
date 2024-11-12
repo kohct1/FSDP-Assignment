@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import Navbar from "./components/Navbar";
 
 function Login() {
@@ -52,7 +53,7 @@ function Login() {
                             <h1 className="text-3xl font-semibold">Online Banking</h1>
                             <input className="border-b-2 outline-0 px-4 py-2" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
                             <input className="border-b-2 outline-0 px-4 py-2" placeholder="PIN" value={pin} onChange={(e) => setPin(e.target.value)} />
-                            <button className="bg-red-600 rounded text-white font-semibold py-2" onClick={login}>Login</button>
+                            <motion.button className="bg-red-600 rounded text-white font-semibold py-2" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={login}>Login</motion.button>
                             <h1 className="w-full text-blue-600 text-sm text-center">No Email/PIN? Click here.</h1>
                         </div>
                         <div className="w-full flex bg-slate-100 text-xs px-12 py-4 gap-2">

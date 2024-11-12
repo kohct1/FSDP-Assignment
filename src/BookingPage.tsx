@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import Navbar from "./components/Navbar";
 
 const BookingForm: React.FC = () => {
@@ -183,7 +184,7 @@ const BookingForm: React.FC = () => {
                             <h1 className="text-lg font-semibold">{months[currentDate.getMonth()]} {userBookings[0].date} {currentDate.getFullYear()}, {`${time1}.${slot1} - ${time2}.${slot2}`}</h1>
                             <h1>{booking.reason}</h1>
                             <div className="flex justify-end items-center gap-8">
-                              <button className="bg-red-600 text-sm text-white rounded px-4 py-2">Call</button>
+                              <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>Call</motion.button>
                             </div>
                           </div>
                         );
@@ -228,7 +229,7 @@ const BookingForm: React.FC = () => {
                       </div>
                       <div className="flex justify-end items-center gap-8">
                         <Link className="text-sm" to="/booking-date">Reschedule booking</Link>
-                        <button className="bg-red-600 text-sm text-white rounded px-4 py-2" onClick={editBooking}>Edit</button>
+                        <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={editBooking}>Edit</motion.button>
                       </div>
                     </div>
                 </div>
@@ -268,14 +269,16 @@ const BookingForm: React.FC = () => {
               </div>
 
               <div className="mt-6">
-                <Link
-                  type="submit"
-                  className="w-full flex justify-center items-center bg-red-500 text-white py-3 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                  to="/booking-date"
-                  state={{ reason: formData.reason }}
-                >
-                  Continue
-                </Link>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Link
+                    type="submit"
+                    className="w-full flex justify-center items-center bg-red-500 text-white py-3 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                    to="/booking-date"
+                    state={{ reason: formData.reason }}
+                  >
+                    Continue
+                  </Link>
+                </motion.div>
               </div>
             </div>
           </form>
@@ -288,18 +291,20 @@ const BookingForm: React.FC = () => {
             <h2 className="text-xl font-semibold mb-4">Confirm Your Details</h2>
             <p className="text-gray-700 mb-6">Are you sure you want to submit this information?</p>
             <div className="flex justify-end space-x-4">
-              <button
+              <motion.button
                 onClick={handleCancel}
                 className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400"
+                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
               >
                 No
-              </button>
-              <button
+              </motion.button>
+              <motion.button
                 onClick={handleConfirm}
                 className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
               >
                 Yes
-              </button>
+              </motion.button>
             </div>
           </div>
         </div>
