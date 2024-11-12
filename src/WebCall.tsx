@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 const WebRTCAudioPage: React.FC = () => {
   const [isCallStarted, setIsCallStarted] = useState(false);
+  const [isSignalingReady, setIsSignalingReady] = useState(false);  
   const [isUserSpeaking, setIsUserSpeaking] = useState(false);
   const [isRemoteSpeaking, setIsRemoteSpeaking] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
@@ -48,6 +49,7 @@ const WebRTCAudioPage: React.FC = () => {
 
     signalingSocketRef.current.onopen = () => {
       console.log('WebSocket connection established');
+      setIsSignalingReady(true);  // Set signaling as ready
     };
 
     signalingSocketRef.current.onmessage = async (message) => {
@@ -97,7 +99,10 @@ const WebRTCAudioPage: React.FC = () => {
   const startCall = async () => {
     try {
       peerConnectionRef.current = new RTCPeerConnection(iceServers);
-      setupSignaling();
+
+      if (!signalingSocketRef.current) {
+        setupSignaling();
+      }
 
       localStream?.getTracks().forEach(track => peerConnectionRef.current?.addTrack(track, localStream));
 
@@ -118,7 +123,10 @@ const WebRTCAudioPage: React.FC = () => {
 
       const offer = await peerConnectionRef.current.createOffer();
       await peerConnectionRef.current.setLocalDescription(offer);
-      signalingSocketRef.current?.send(JSON.stringify(offer));
+
+      if (isSignalingReady) {
+        signalingSocketRef.current?.send(JSON.stringify(offer));
+      }
 
       setIsCallStarted(true);
       monitorSpeaking(localStream!, setIsUserSpeaking);
@@ -247,7 +255,7 @@ const WebRTCAudioPage: React.FC = () => {
           } transition-colors duration-300`}
         >
           <img
-            src={isMuted ? '/images/microphone-mute.250x256.png' : '/images/mic.178x256.png'}
+            src={isMuted ? '/images/Muted.png' : '/images/Unmuted.png'}
             alt={isMuted ? 'Mute' : 'Unmute'}
             className="w-10 h-10"
           />
@@ -255,10 +263,10 @@ const WebRTCAudioPage: React.FC = () => {
 
         <button
           onClick={endCall}
-          className="w-16 h-16 flex items-center justify-center bg-red-600 rounded-full transition-opacity duration-300 ease-in-out"
+          className="w-16 h-16 flex items-center justify-center bg-red-500 rounded-full transition-opacity duration-300 ease-in-out"
         >
           <img
-            src="/images/End_Call.webp"
+            src="/images/EndCall.png"
             alt="End Call"
             className="w-10 h-10"
           />
