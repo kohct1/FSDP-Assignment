@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import Navbar from "./components/Navbar";
 import BookingDateHeader from "./components/BookingDateHeader";
 
@@ -194,7 +195,7 @@ function BookingDate() {
 
                                             if (slots.includes(slot + 2 - 1)) {
                                                 return (
-                                                    <button className="w-1/4 bg-red-600 rounded text-white font-semibold m-4 px-3 py-2" onClick={() => createUserBooking(time, [slot, slot + 2 - 1])}>{`${time1}.${slot1} - ${time2}.${slot2}`}</button>
+                                                    <motion.button className="w-1/4 bg-red-600 rounded text-white font-semibold m-4 px-3 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => createUserBooking(time, [slot, slot + 2 - 1])}>{`${time1}.${slot1} - ${time2}.${slot2}`}</motion.button>
                                                 );
                                             }
                                         })}

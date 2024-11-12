@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import { Link } from "react-router-dom";
+import { motion } from 'framer-motion';
 
 const Ticketing = () => {
     const [queueCount, setQueueCount] = useState(0);
@@ -78,9 +79,9 @@ const Ticketing = () => {
                     <p className="text-lg">People in the Queue</p>
 
                     <form onSubmit={startQueue}>
-                        <button className="bg-red-600 text-white text-lg font-semibold px-6 py-3 rounded mt-8">
+                        <motion.button className="bg-red-600 text-white text-lg font-semibold px-6 py-3 rounded mt-8" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                             Join the Queue
-                        </button>
+                        </motion.button>
                     </form>
 
                     <p className="mt-4 text-lg">
