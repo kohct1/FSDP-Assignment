@@ -173,7 +173,7 @@ function BookingDate() {
 
                             return (
                                 <>
-                                    <div className="border-b-2 text-xl font-semibold pb-2">{time}am</div>
+                                    <div className="border-b-2 text-xl font-semibold pb-2">{time < 10 || time === 12 ? `${time}pm` : `${time}am`}</div>
                                     <div>
                                         {slots.map((slot: number) => {
                                             let time1: number = time;
