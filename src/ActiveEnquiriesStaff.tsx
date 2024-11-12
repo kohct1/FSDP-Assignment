@@ -1,22 +1,21 @@
 import { ObjectId } from "mongoose";
 import Navbar from "./components/Navbar";
-import {useState, useEffect} from 'react';
-import {decodeToken} from "react-jwt";
-import {useNavigate, redirect} from "react-router-dom";
+import { useState, useEffect } from 'react';
+import { decodeToken } from "react-jwt";
+import { useNavigate } from "react-router-dom";
 
 
 function ActiveEnquiriesStaff() {
     const navigate = useNavigate();
     const [enquiryData, setData] = useState<any>([]);
-    //const [clickedEnquiry, setEnquiry] = useState<any>(String);
-   
+
     async function getEnquiries() {
         const response = await fetch("http://localhost:5050/enquiries/staff");
         const enquiryData = await response.json();
-        setData(enquiryData["enquiries"]);   
+        setData(enquiryData["enquiries"]);
     }
 
-    async function updateResponding(enquiryId : string, staffId : string) {
+    async function updateResponding(enquiryId: string, staffId: string) {
         console.log("Attempting update");
         await fetch("http://localhost:5050/enquiries/staff/update", {
             method: "PUT",
@@ -28,88 +27,80 @@ function ActiveEnquiriesStaff() {
                 responseBy: staffId
             })
         });
-        //Access enquiry conversation here
+        // Store responseId in localStorage to use in the response page
         localStorage.setItem("responseId", enquiryId);
+        // Navigate to the response page
         navigate("/user/enquiries/response", { replace: true });
-
-
     }
-   
-   
-    useEffect(()=> {   
-        getEnquiries();   
+
+    useEffect(() => {
+        getEnquiries();
     }, []);
 
-    
-    let token : string;
+    let token: string;
     let enquiryTypes: any[] = [];
-    //compiler will complain if i dont parse as string                            
     token = localStorage.getItem("token")?.toString()!;
-    const decodedObject =  decodeToken(token);
-    //This line may show an error, but it works as intended
+    const decodedObject = decodeToken(token);
     const decodedId = decodedObject["userId"];
-  
 
-    //Checks all enquiry types and stores one of each type of enquiry for later
-    for(let enquiry in enquiryData) {
-        if(!enquiryTypes.includes(enquiryData[enquiry]["type"])) {
+    // Check all enquiry types and store one of each type
+    for (let enquiry in enquiryData) {
+        if (!enquiryTypes.includes(enquiryData[enquiry]["type"])) {
             enquiryTypes.push(enquiryData[enquiry]["type"]);
         }
     }
 
-
-    //Creates and pushes jsx for each section of enquiry 
+    // Create and push JSX for each section of enquiry
     let count = 0;
     let enquiryElements: any[] = [];
-    for(let enquiryType in enquiryTypes) {
-        let enquiryCategory = <div className="bg-red-600 w-1/5 p-2 shadow-lg rounded ml-12 mt-10 mb-7 enquiry-category">
-                                <p className="font-sans text-white text-xs text-center font-medium md:text-lg sm:text-md">{enquiryTypes[enquiryType]}</p>
-                              </div>;
+    for (let enquiryType in enquiryTypes) {
+        let enquiryCategory = (
+            <div className="bg-red-600 w-1/5 p-2 shadow-lg rounded ml-12 mt-10 mb-7 enquiry-category">
+                <p className="font-sans text-white text-xs text-center font-medium md:text-lg sm:text-md">{enquiryTypes[enquiryType]}</p>
+            </div>
+        );
         enquiryElements.push(enquiryCategory);
 
         let enquiryTypedData = enquiryData.filter((enquiry: { type: any; }) => enquiry.type == enquiryTypes[count]);
-        let enquiryElement = enquiryTypedData.map((enquiry: {status: String; message: String; type: String, postedBy: String, _id: ObjectId}) => {
-        let status = enquiry.status;
-        let opacity = "";
-        let hover = "hover:bg-gray-200";
-        let cursor = "hover:cursor-pointer";
-    
+        let enquiryElement = enquiryTypedData.map((enquiry: { status: String; message: String; type: String, postedBy: String, _id: ObjectId }) => {
+            let status = enquiry.status;
+            let opacity = "";
+            let hover = "hover:bg-gray-200";
+            let cursor = "hover:cursor-pointer";
+
             if (status == "Responding") {
-                if(decodedId == enquiry.postedBy) {
+                if (decodedId == enquiry.postedBy) {
                     status = "Currently Responding";
-                }
-                else {
+                } else {
                     opacity = "opacity-50";
                     cursor = "hover:cursor-default";
                     hover = "";
                     status = "Other Staff Responding";
                 }
-            }
-            else if (status = "Open") {
+            } else if (status === "Open") {
                 status = "";
-            }
-            else {
+            } else {
                 return null;
             }
             let classes = "bg-white w-9/12 p-3 shadow-lg rounded ml-12 mt-5 mb-6 enquiry flex last:mb-14 sm:w-11/12"
             classes += " " + hover + " " + opacity + " " + cursor;
             let enquiryId = enquiry._id.toString();
+
             return (
-                <>
-                    <div className = {classes} onClick={() => updateResponding(enquiryId, decodedId)}>
-                        <p className="font-sans text-black font-medium pl-2 text-xs sm:text-sm md:text-base" >{enquiry.type}   -</p>
-                        <p className="font-sans text-black pl-2 text-xs sm:text-sm md:text-base">{enquiry.message}</p>
-                        <p className="font-sans text-black pl-2 font-medium ml-auto mr-8 text-xs sm:text-small md:text-base">{status}</p>
-                    </div>
-                </>
+                <div className={classes} onClick={() => {
+                    updateResponding(enquiryId, decodedId);
+                    navigate("/user/enquiries/response", { state: { enquiry } });
+                }}>
+                    <p className="font-sans text-black font-medium pl-2 text-xs sm:text-sm md:text-base">{enquiry.type} -</p>
+                    <p className="font-sans text-black pl-2 text-xs sm:text-sm md:text-base">{enquiry.message}</p>
+                    <p className="font-sans text-black pl-2 font-medium ml-auto mr-8 text-xs sm:text-small md:text-base">{status}</p>
+                </div>
             );
         });
         enquiryElements.push(enquiryElement);
         count++;
     }
 
-    
-    
     return (
         <>
             <Navbar />
