@@ -47,28 +47,49 @@ const CallPage: React.FC = () => {
 
   useEffect(() => {
     if (bookingDetails && bookingDetails.bookings) {
-      console.log('Booking Details:', bookingDetails);
       const formattedTime = formatBookingTime(bookingDetails);
       setFormattedBookingTime(formattedTime);
-
-      // checkBookingTimeStatus();
+      checkBookingTimeStatus();
     }
   }, [bookingDetails]);
 
-
-  // const checkBookingTimeStatus = () => {
-  //   const booking = bookingDetails.bookings[0];
-  //   const bookingDateTime = new Date(`${booking.date}T${booking.time}:00`);
-  //   const now = new Date();
-
-  //   const diffInMinutes = (bookingDateTime.getTime() - now.getTime()) / (1000 * 60);
-
-  //   if (diffInMinutes <= 5 && diffInMinutes >= 0) {
-  //     setIsCallingEnabled(true);
-  //   } else if (diffInMinutes < -10) {
-  //     setMissedTimeSlot(true);
-  //   }
-  // };
+  const checkBookingTimeStatus = () => {
+    const booking = bookingDetails.bookings[0];
+    const { time, slot } = booking;
+  
+    let bookingDateTime = new Date();
+    let adjustedHour = time;
+  
+    if (time <= 10 || time === 12) {
+      adjustedHour = time + 12; 
+    }
+  
+    const startMinutes = (slot[0] - 1) * 10;  
+    const endMinutes = slot[0] * 10;          
+  
+    bookingDateTime.setHours(adjustedHour);
+    bookingDateTime.setMinutes(startMinutes); 
+    bookingDateTime.setSeconds(0);
+  
+    const now = new Date();
+    const diffInMinutes = (bookingDateTime.getTime() - now.getTime()) / (1000 * 60);
+  
+    // log for testing
+    // console.log(`Booking DateTime: ${bookingDateTime}`);
+    // console.log(`Current DateTime: ${now}`);
+    // console.log(`Time Difference (in minutes): ${diffInMinutes}`);
+  
+    if (diffInMinutes <= 10 && diffInMinutes >= 0) {
+      setIsCallingEnabled(true);
+      setMissedTimeSlot(false);
+    } else if (diffInMinutes < 0 && Math.abs(diffInMinutes) <= 10) {
+      setIsCallingEnabled(false);
+      setMissedTimeSlot(true);
+    } else {
+      setIsCallingEnabled(false);
+      setMissedTimeSlot(false);
+    }
+  };
 
   useEffect(() => {
     if (bookingDetails) {
@@ -77,7 +98,6 @@ const CallPage: React.FC = () => {
           if (prev === 1) {
             clearInterval(countdownInterval);
 
-            // Redirect after countdown finishes based on eligibility or missed slot
             if (missedTimeSlot) {
               alert("You missed your time slot. Redirecting to the booking page.");
               navigate('/bookingpage');
