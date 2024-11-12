@@ -2,6 +2,8 @@ import Navbar from "./components/Navbar";
 import { motion } from "framer-motion";
 import {useState} from 'react';
 import {decodeToken} from "react-jwt";
+import {createPortal} from 'react-dom';
+import ModalContent from "./components/EnquiryModalContent.tsx";
 
 async function PostEnquiry(event : any) {
     event.preventDefault();
@@ -44,6 +46,46 @@ async function PostEnquiry(event : any) {
 
 function MakeEnquiry() {
     const [subjectLength, setSubjectLength] = useState(0);
+    const [showModal, setShowModal] = useState(false);
+
+    async function PostEnquiry(event : any) {
+        event.preventDefault();
+        const form = event.target;
+        const re = /[^0-9a-zA-Z,.\s!?]/;
+        if (re.test(form.subject.value)) {
+            alert("You may only use characters or digits in your enquiry subject.");
+        }
+        else {
+            let token : string;
+            //compiler will complain if i dont parse as string
+            token = localStorage.getItem("token")?.toString()!;
+            const decodedObject =  decodeToken(token);
+            //This line may show an error, but it works as intended
+            const decodedId = decodedObject["userId"];
+          
+            const response = await fetch("http://localhost:5050/enquiries/make", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            id: decodedId,
+                            type: form.types.value,
+                            message: form.subject.value
+                        })
+            });
+            if (!response.ok) {
+                console.error('Error:', response.statusText);
+            } else {
+                const data = await response.json();
+                console.log(data); // Check the response from the server
+            }
+            setShowModal(true);
+        }
+         
+    }
+   
+
     return (
         <>
             <Navbar />
@@ -71,6 +113,10 @@ function MakeEnquiry() {
                             <textarea id="subject" name="subject" className= "h-32 border mt-2 w-7/12 rounded resize-none p-2" required maxLength={80}  onChange={e => {setSubjectLength(e.target.value.length)}}></textarea>
                             <p className="font-light mt-2 w-7/12">Characters Left: {80-subjectLength}</p>
                             <motion.button className="bg-red-600 w-3/12 text-white p-1.5 rounded mt-10 mb-8 hover:bg-red-800" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} type="submit">Send</motion.button>
+                            {showModal && createPortal(
+                                <ModalContent onClose={() => setShowModal(false)}/>,
+                                document.body     
+                            )}
                         </form>
                 </div>
             </div>

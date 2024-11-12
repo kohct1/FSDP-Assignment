@@ -17,6 +17,16 @@ router.get("/staff", async (req, res) => {
     }
 });
 
+router.get("/user", async (req, res) => {
+    try {
+        const enquiriesCollection = db.collection("Enquiries");
+        const enquiries = await enquiriesCollection.find().toArray();
+        res.status(200).json({enquiries});
+    } catch (err) {
+        res.status(500).json({error : "Internal Server Error"});
+    }
+});
+
 //Posts new enquiry from user
 router.post("/make", async (req, res) => {
     const {id, type, message} = req.body;

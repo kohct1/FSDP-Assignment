@@ -76,31 +76,35 @@ const CallPage: React.FC = () => {
   }
 
   return (
-    <div className="bg-gray-100">
-      <Navbar />
-      <div className="flex justify-center items-center py-12">
-        <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-8">
-          <h1 className="text-3xl font-semibold text-gray-800 mb-2">Your Booking Details</h1>
-          <p className="text-gray-600 text-sm mb-4">Reason for Booking: {bookingDetails.reason}</p>
-          <p className="text-gray-600 text-sm mb-4">Date & Time: {new Date(bookingDetails.dateTime).toLocaleString()}</p>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-8">
+        <Navbar />
+        {bookingDetails ? (
+          <>
+            <h1 className="text-3xl font-semibold text-gray-800 mb-2">Your Booking Details</h1>
+            <p className="text-gray-600 text-sm mb-4">Reason for Booking: {bookingDetails.reason}</p>
+            <p className="text-gray-600 text-sm mb-4">Date & Time: {new Date(bookingDetails.dateTime).toLocaleString()}</p>
 
-          {bookingDetails.queue === 0 ? (
-            <p className="mt-6 text-green-500">Thank you for waiting! A customer service representative will be connected with you shortly!</p>
-          ) : isCallingEnabled ? (
-            <button
-              onClick={handleCall}
-              className="mt-6 w-full flex justify-center items-center bg-red-500 text-white py-3 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-            >
-              Call Staff
-            </button>
-          ) : (
-            <p className="mt-6 text-red-500">You cannot call staff yet. Please wait for your turn or the scheduled time.</p>
-          )}
+            {bookingDetails.queue === 0 ? (
+              <p className="mt-6 text-green-500">Thank you for waiting! A customer service representative will be connected with you shortly!</p>
+            ) : isCallingEnabled ? (
+              <button
+                onClick={handleCall}
+                className="mt-6 w-full flex justify-center items-center bg-red-500 text-white py-3 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+              >
+                Call Staff
+              </button>
+            ) : (
+              <p className="mt-6 text-red-500">You cannot call staff yet. Please wait for your turn or the scheduled time.</p>
+            )}
 
-          <p className="mt-4 text-blue-500">
-            Redirecting in {countdown} second{countdown > 1 ? 's' : ''}...
-          </p>
-        </div>
+            <p className="mt-4 text-blue-500">
+              Redirecting in {countdown} second{countdown > 1 ? 's' : ''}...
+            </p>
+          </>
+        ) : (
+          <p className="text-xl font-semibold text-gray-800">You do not have any bookings at the moment.</p>
+        )}
       </div>
     </div>
   );
