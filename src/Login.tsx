@@ -7,6 +7,7 @@ function Login() {
     const [pin, setPin] = useState<string>("");
     const [isLogin, setIsLogin] = useState<boolean>(true);
     const navigate = useNavigate();
+    localStorage.removeItem("token");
 
     async function login(): Promise<void> {
         const response = await fetch("http://localhost:5050/login", {
