@@ -46,7 +46,6 @@ function Login() {
     if (isLogin) {
         return (
             <>
-                <Navbar />
                 <div className="w-full h-screen flex justify-center items-center">
                     <div className="w-1/4 h-fit flex flex-col justify-between rounded border-2 pt-8">
                         <div className="flex flex-col px-12 pt-8 py-20 gap-8">
