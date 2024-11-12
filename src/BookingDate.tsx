@@ -38,7 +38,8 @@ function BookingDate() {
                 time: time,
                 slot: slot,
                 userId: userId,
-                reason: state.reason
+                reason: state.reason,
+                category: state.category
             })
         });
 
@@ -46,7 +47,6 @@ function BookingDate() {
     }
     
     async function updateBooking(time: number, slot: number[]): Promise<void> {
-        console.log("Here");
         await fetch(`http://localhost:5050/bookings/`, {
             method: "PUT",
             headers: {
@@ -121,7 +121,7 @@ function BookingDate() {
                             {Array(days).fill(0).map((_: number, index: number) => {
                                 if (index !== 0 && index % 7 === 0) {
                                     return (
-                                        <div className="w-full flex gap-8">
+                                        <div key={index} className="w-full flex gap-8">
                                             <div className="w-12 h-12 flex justify-center items-center rounded hover:bg-slate-200" onClick={() => setSelectedDate(index - 6)}>{index - 6}</div>
                                             <div className="w-12 h-12 flex justify-center items-center rounded hover:bg-slate-200" onClick={() => setSelectedDate(index - 5)}>{index - 5}</div>
                                             <div className="w-12 h-12 flex justify-center items-center rounded hover:bg-slate-200" onClick={() => setSelectedDate(index - 4)}>{index - 4}</div>
@@ -136,7 +136,7 @@ function BookingDate() {
                                 if (index === days - 1) {
                                     if (index + 1 === 30) {
                                         return (
-                                            <div className="w-full flex gap-8">
+                                            <div key={index} className="w-full flex gap-8">
                                                 <div className="w-12 h-12 flex justify-center items-center rounded hover:bg-slate-200" onClick={() => setSelectedDate(index)}>{index}</div>
                                                 <div className="w-12 h-12 flex justify-center items-center rounded hover:bg-slate-200" onClick={() => setSelectedDate(index - 1)}>{index + 1}</div>
                                             </div>
@@ -144,7 +144,7 @@ function BookingDate() {
                                     }
 
                                     return (
-                                        <div className="w-full flex gap-8">
+                                        <div key={index} className="w-full flex gap-8">
                                             <div className="w-12 h-12 flex justify-center items-center rounded hover:bg-slate-200" onClick={() => setSelectedDate(index - 1)}>{index - 1}</div>
                                             <div className="w-12 h-12 flex justify-center items-center rounded hover:bg-slate-200" onClick={() => setSelectedDate(index)}>{index}</div>
                                             <div className="w-12 h-12 flex justify-center items-center rounded hover:bg-slate-200" onClick={() => setSelectedDate(index + 1)}>{index + 1}</div>
@@ -161,7 +161,7 @@ function BookingDate() {
                         <h1 className="text-xl">{months[currentDate.getMonth()]} {selectedDate}</h1>
                     </div>
                     <div className="flex flex-col bg-white border-y-2 p-8 gap-8">
-                        {times.map((time: number) => {
+                        {times.map((time: number, index: number) => {
                             const filteredBookings: any = Object.values(bookings).filter((bookings: any) => bookings.time === time);
                             const slots: number[] = [1, 2, 3, 4, 5, 6];
 
@@ -172,14 +172,32 @@ function BookingDate() {
                             });
 
                             return (
-                                <>
+                                <div key={index} className="flex flex-col gap-4">
                                     <div className="border-b-2 text-xl font-semibold pb-2">{time}am</div>
                                     <div>
-                                        {slots.map((slot: number) => {
+                                        {slots.map((slot: number, index: number) => {
+                                            let suggestedSlots: number = 1;
+
+                                            if (state.category === "OCBC Mobile App") {
+                                                suggestedSlots = 2;
+                                            } else if (state.category === "Loans/Collections") {
+                                                suggestedSlots = 1;
+                                            } else if (state.category === "Credit/Debit Card") {
+                                                suggestedSlots = 1;
+                                            } else if (state.category === "Premier Services") {
+                                                suggestedSlots = 2;
+                                            } else if (state.category === "Investments/Securities") {
+                                                suggestedSlots = 2;
+                                            } else if (state.category === "Bank Account") {
+                                                suggestedSlots = 1;
+                                            } else if (state.category === "Other") {
+                                                suggestedSlots = 3;
+                                            }
+
                                             let time1: number = time;
                                             let time2: number = time;
                                             let slot1: string = String((slot - 1) * 10);
-                                            let slot2: string = String((slot + 2 - 1) * 10);
+                                            let slot2: string = String((slot + suggestedSlots - 1) * 10);
 
                                             if (slot1 === "0" || slot1 === "60") slot1 = "00";
                                             if (slot2 === "0" || slot2 === "60") {
@@ -193,14 +211,14 @@ function BookingDate() {
                                             }
 
 
-                                            if (slots.includes(slot + 2 - 1)) {
+                                            if (slots.includes(slot + suggestedSlots - 1)) {
                                                 return (
-                                                    <motion.button className="w-1/4 bg-red-600 rounded text-white font-semibold m-4 px-3 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => createUserBooking(time, [slot, slot + 2 - 1])}>{`${time1}.${slot1} - ${time2}.${slot2}`}</motion.button>
+                                                    <motion.button key={index} className="w-1/4 bg-red-600 rounded text-white font-semibold m-4 px-3 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => createUserBooking(time, [slot, slot + suggestedSlots - 1])}>{`${time1}.${slot1} - ${time2}.${slot2}`}</motion.button>
                                                 );
                                             }
                                         })}
                                     </div>
-                                </>
+                                </div>
                             );
                         })}
                     </div>

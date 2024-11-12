@@ -17,6 +17,7 @@ const BookingForm: React.FC = () => {
   const [userBookings, setUserBookings] = useState<any>({});
   const [isStaff, setIsStaff] = useState<boolean>(false);
   const [bookings, setBookings] = useState<any>({});
+  const [category, setCategory] = useState<string>("OCBC Mobile App");
 
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
@@ -228,7 +229,7 @@ const BookingForm: React.FC = () => {
                         <textarea className="w-full h-3/4 border-2 rounded resize-none p-2" value={newReason} onChange={(e) => setNewReason(e.target.value)}></textarea>
                       </div>
                       <div className="flex justify-end items-center gap-8">
-                        <Link className="text-sm" to="/booking-date">Reschedule booking</Link>
+                        <Link className="text-sm" to="/booking-date" state={{ category: userBookings[0].category}}>Reschedule booking</Link>
                         <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={editBooking}>Edit</motion.button>
                       </div>
                     </div>
@@ -253,6 +254,18 @@ const BookingForm: React.FC = () => {
             <div className="grid grid-cols-1 gap-6">
               <div>
                 <label className="block text-left text-gray-700 text-sm mb-2">
+                  Booking category<span className="text-red-500">*</span>
+                </label>
+                <select id="types" name="types" className="pt-1 pb-1 pl-1.5 border-2 mb-4 w-full" required onChange={(e) => setCategory(e.target.value)}>
+                    <option value="OCBC Mobile App">OCBC Mobile App</option>
+                    <option value="Loans">Loans/Collections</option>
+                    <option value="Banking Card">Credit/Debit Card</option>
+                    <option value="Premier Services">Premier Services</option>
+                    <option value="Investments">Investment/Securities</option>
+                    <option value="Account">Bank Account</option>
+                    <option value="Other">Other</option>
+                </select>
+                <label className="block text-left text-gray-700 text-sm mb-2">
                   Reason for booking<span className="text-red-500">*</span>
                 </label>
                 <textarea
@@ -274,7 +287,7 @@ const BookingForm: React.FC = () => {
                     type="submit"
                     className="w-full flex justify-center items-center bg-red-500 text-white py-3 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                     to="/booking-date"
-                    state={{ reason: formData.reason }}
+                    state={{ reason: formData.reason, category: category }}
                   >
                     Continue
                   </Link>

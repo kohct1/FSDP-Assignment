@@ -41,11 +41,11 @@ router.get("/userBookings/:userId", async (req, res) => {
 });
 
 router.post("/bookings", async (req, res) => {
-    const { date, time, slot, userId, reason } = req.body;
+    const { date, time, slot, userId, reason, category } = req.body;
 
     try {
         const bookingsCollection = db.collection("Bookings");
-        const bookings = await bookingsCollection.insertOne({ date, time, slot, userId, reason });
+        const bookings = await bookingsCollection.insertOne({ date, time, slot, userId, reason, category });
 
         res.status(200).json({ bookings });
     } catch (err) {
