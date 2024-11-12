@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import BookingDateHeader from "./components/BookingDateHeader";
 
 function BookingDate() {
     const [userId, setUserId] = useState<string>("");
     const [selectedDate, setSelectedDate] = useState<number>(1);
     const [bookings, setBookings] = useState<any>({});
     const [hasBookings, setHasBookings] = useState<boolean>(false);
+    const [userBookings, setUserBookings] = useState<any>({});
     const { state } = useLocation();
     const navigate = useNavigate();
     const currentDate: Date = new Date();
@@ -80,7 +82,10 @@ function BookingDate() {
         const response = await fetch(`http://localhost:5050/userBookings/${userId}/`);
         const result = await response.json();
     
-        if (result.bookings.length > 0) setHasBookings(true);
+        if (result.bookings.length > 0) {
+            setHasBookings(true);
+            setUserBookings(result.bookings);
+        }
     }
 
     async function createUserBooking(time: number, slot: number[]): Promise<void> {
@@ -108,10 +113,7 @@ function BookingDate() {
             <Navbar />
             <div className="w-full h-full flex">
                 <div className="w-3/5 h-full flex flex-col items-center border-r-2 gap-16">
-                    <div className="w-3/5 flex flex-col border-b-2 py-8 gap-2">
-                        <div className="text-2xl text-start font-semibold">You are rescheduling your booking for:</div>
-                        <div className="text-start">Wed, Nov 5 2024, 10.20-10.40</div>
-                    </div>
+                    <BookingDateHeader hasBookings={hasBookings} booking={userBookings[0]} month={months[currentDate.getMonth()]} year={String(currentDate.getFullYear())} />
                     <div className="w-3/5 flex flex-col justify-center items-center gap-8">
                         <h1 className="text-xl font-semibold">{`${months[currentDate.getMonth()]} ${currentDate.getFullYear()}`}</h1>
                         <div className="flex flex-col justify-center items-center gap-4">
@@ -153,7 +155,10 @@ function BookingDate() {
                     </div>
                     </div>
                 <div className="w-2/5 h-full bg-slate-100 overflow-scroll">
-                    <div className="w-full h-1/6 flex items-center text-xl font-semibold px-8">Available time slots</div>
+                    <div className="w-full h-1/6 flex flex-col justify-center items-start px-8">
+                        <h1 className="text-2xl font-semibold">Available time slots for:</h1>
+                        <h1 className="text-xl">{months[currentDate.getMonth()]} {selectedDate}</h1>
+                    </div>
                     <div className="flex flex-col bg-white border-y-2 p-8 gap-8">
                         {times.map((time: number) => {
                             const filteredBookings: any = Object.values(bookings).filter((bookings: any) => bookings.time === time);
@@ -170,9 +175,26 @@ function BookingDate() {
                                     <div className="border-b-2 text-xl font-semibold pb-2">{time}am</div>
                                     <div>
                                         {slots.map((slot: number) => {
+                                            let time1: number = time;
+                                            let time2: number = time;
+                                            let slot1: string = String((slot - 1) * 10);
+                                            let slot2: string = String((slot + 2 - 1) * 10);
+
+                                            if (slot1 === "0" || slot1 === "60") slot1 = "00";
+                                            if (slot2 === "0" || slot2 === "60") {
+                                                slot2 = "00";
+                                                
+                                                if (time2 === 12) {
+                                                    time2 = 1;
+                                                } else {
+                                                    time2 += 1;
+                                                }
+                                            }
+
+
                                             if (slots.includes(slot + 2 - 1)) {
                                                 return (
-                                                    <button className="w-1/4 bg-red-600 rounded text-white font-semibold m-4 px-3 py-2" onClick={() => createUserBooking(time, [slot, slot + 2 - 1])}>{`${time}.${(slot - 1) * 10} - ${time}.${(slot + 2 - 1) * 10}`}</button>
+                                                    <button className="w-1/4 bg-red-600 rounded text-white font-semibold m-4 px-3 py-2" onClick={() => createUserBooking(time, [slot, slot + 2 - 1])}>{`${time1}.${slot1} - ${time2}.${slot2}`}</button>
                                                 );
                                             }
                                         })}

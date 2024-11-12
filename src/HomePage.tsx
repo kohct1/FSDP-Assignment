@@ -1,11 +1,34 @@
 import Navbar from "./components/Navbar";
+import { useState, useEffect } from "react";
 
 function HomePage() {
+    const [userId, setUserId] = useState(null);
+
+    useEffect(() => {
+        getUser();
+      }, []);
+
+    async function getUser(): Promise<void> {
+        const response = await fetch(`http://localhost:5050/decode/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                token: localStorage.getItem("token")
+            })
+        });
+    
+        const result = await response.json();
+    
+        setUserId(result.userId);
+        console.log(result.userId);
+      }
+
   return (
     <div className="bg-white min-h-screen">
       <Navbar />
 
-      {/* Welcome Section */}
       <section className="relative bg-gray-200">
         <img
           src="/images/OCBC_1.png"
@@ -14,7 +37,6 @@ function HomePage() {
         />
       </section>
 
-       {/* Banking Options with Overlap */}
        <div className="relative max-w-7xl mx-auto -mt-24 p-8 bg-white shadow-lg rounded-lg">
         <div className="flex justify-around text-left space-x-4">
           <div className="flex-1">
@@ -45,7 +67,6 @@ function HomePage() {
         </div>
       </div>
 
-      {/* Highlights Section */}
       <section className="max-w mx-auto my-16 p-12 bg-white shadow-lg rounded-lg">
         <div className="text-2xl font-semibold text-red-500 mb-4">HIGHLIGHTS</div>
         <div className="flex flex-col md:flex-row items-center mt-6">
