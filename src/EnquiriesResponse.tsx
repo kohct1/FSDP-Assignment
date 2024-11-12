@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Navbar from "./components/Navbar";
 
+
+
 function EnquiryDetail() {
     const location = useLocation();
     const enquiry = location.state?.enquiry;
