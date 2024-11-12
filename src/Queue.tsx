@@ -10,7 +10,7 @@ const Queue = () => {
     const [initialLeftQueue, setInitialLeftQueue] = useState<number | null>(null);
 
     const navigate = useNavigate();
-    const queueAhead = Math.max(queueCount - leftQueue - 1, 0);
+    const queueAhead = Math.max(queueCount - leftQueue - 1, -1);
     const waitingTime = ((queueAhead * 2) / 60).toFixed(2); // Assume each person takes 2 mins
 
     // Function to format the current time as hh:mm:ss AM/PM
@@ -58,18 +58,24 @@ const Queue = () => {
         ? Math.min((newDeparturesSinceJoining / initialQueueCount) * 100, 100) // Cap at 100%
         : 0;
 
-    // Redirect if queueAhead is 0
-    useEffect(() => {
-        if (queueAhead === 0) {
-            navigate('/callpage'); 
-        }
-    }, [queueAhead, navigate]);
+    // // Redirect if queueAhead is 0
+    // useEffect(() => {
+    //     console.log("Queue Ahead:", queueAhead);  // Log queueAhead value for debugging
+    //     if (queueAhead === 0) {
+    //         navigate('/callpage'); 
+    //     }
+    // }, [queueCount, leftQueue, queueAhead, navigate]);
 
+    // Fetch queue data on component mount and set up polling
     useEffect(() => {
         fetchQueueData();
         const intervalId = setInterval(fetchQueueData, 10000); // Refresh every 10 seconds
+        console.log("Queue Ahead:", queueAhead);  // Log queueAhead value for debugging
+        if (queueAhead === 0) {
+            navigate('/callpage'); 
+        }
         return () => clearInterval(intervalId);
-    }, []);
+    }, [queueCount, leftQueue, queueAhead, navigate]);
 
     return (
         <div className="relative flex flex-col min-h-screen bg-cover bg-center bg-[url('ticketing_bg.jpg')]">

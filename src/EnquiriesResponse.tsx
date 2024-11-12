@@ -10,8 +10,6 @@ function EnquiryDetail() {
     const [userId, setUserId] = useState(null);
 
     useEffect(() => {
-        /* log for testing
-        console.log("Enquiry data received:", enquiry); */
         getUser();
     }, []);
 
@@ -42,7 +40,6 @@ function EnquiryDetail() {
     const handleSendMessage = async (e) => {
         e.preventDefault();
     
-        // Determine if the user is the poster or the responder
         const isUser = userId === enquiry.postedBy;
         const isStaff = userId === enquiry.responseBy;
     
@@ -52,7 +49,6 @@ function EnquiryDetail() {
         }
     
         if (inputMessage.trim()) {
-            // Set postedByID if the user is the poster, otherwise set respondedByID
             const newMessage = {
                 chatMessage: inputMessage,
                 postedByID: isUser ? userId : null,
@@ -60,7 +56,6 @@ function EnquiryDetail() {
                 timestamp: new Date().toISOString()
             };
     
-            // Data to send to the backend
             const messageData = {
                 enquiryId: enquiry._id,
                 message: inputMessage,
@@ -85,7 +80,6 @@ function EnquiryDetail() {
                     const data = await response.json();
                     console.log("Message sent:", data);
     
-                    // Update the messages state to include the new message
                     setMessages(prevMessages => [...prevMessages, newMessage]);
                     setInputMessage("");
                 }
@@ -124,18 +118,23 @@ function EnquiryDetail() {
                 <p className="text-center text-gray-500 mt-6">-End of Conversation-</p>
             </div>
 
-            <form className="mt-6 p-12" onSubmit={handleSendMessage}>
-                <div className="flex">
-                    <input
-                        type="text"
-                        value={inputMessage}
-                        onChange={(e) => setInputMessage(e.target.value)}
-                        placeholder="Type your message..."
-                        className="flex-grow p-2 border border-gray-300 rounded-l"
-                    />
-                    <button type="submit" className="bg-blue-500 text-white p-2 rounded-r">Send</button>
-                </div>
-            </form>
+            {/* Conditionally render the message input form if the status is not "Closed" */}
+            {enquiry?.status !== "Closed" ? (
+                <form className="mt-6 p-12" onSubmit={handleSendMessage}>
+                    <div className="flex">
+                        <input
+                            type="text"
+                            value={inputMessage}
+                            onChange={(e) => setInputMessage(e.target.value)}
+                            placeholder="Type your message..."
+                            className="flex-grow p-2 border border-gray-300 rounded-l"
+                        />
+                        <button type="submit" className="bg-blue-500 text-white p-2 rounded-r">Send</button>
+                    </div>
+                </form>
+            ) : (
+                <p className="text-center text-gray-500 mt-6">This enquiry is closed. No further messages can be sent.</p>
+            )}
         </div>
     );
 }
