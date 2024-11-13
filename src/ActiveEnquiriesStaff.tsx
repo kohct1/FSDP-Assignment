@@ -3,14 +3,17 @@ import Navbar from "./components/Navbar";
 import { useState, useEffect } from 'react';
 import { decodeToken } from "react-jwt";
 import { useNavigate } from "react-router-dom";
+import {createPortal} from 'react-dom';
+import ModalContent from "./components/StaffModalContainer.tsx";
 
 
 function ActiveEnquiriesStaff() {
-    const navigate = useNavigate();
     const [enquiryData, setData] = useState<any>([]);
+    const [showModal, setShowModal] = useState(false);
+    //const [clickedEnquiry, setEnquiry] = useState<any>(String);
 
     async function getEnquiries() {
-        const response = await fetch("http://localhost:5050/enquiries/staff");
+        const response = await fetch("http://localhost:5050/enquiries/staff/open");
         const enquiryData = await response.json();
         setData(enquiryData["enquiries"]);
     }
@@ -36,6 +39,24 @@ function ActiveEnquiriesStaff() {
     }, []);
 
     let token: string;
+
+   
+    function saveEnquiryData(enquiryId : string, staffId : string, status: string) {
+        if(status != "Other Staff Responding") {
+            console.log("Clicked");
+            localStorage.setItem("currentEnquiry", enquiryId);
+            localStorage.setItem("currentStaffId", staffId);
+            localStorage.setItem("currentStatus", status);
+            setShowModal(true);
+        }
+    }
+   
+    useEffect(()=> {   
+        getEnquiries();   
+    }, []);
+
+    let token : string;
+
     let enquiryTypes: any[] = [];
     token = localStorage.getItem("token")?.toString()!;
     const decodedObject = decodeToken(token);
@@ -50,24 +71,24 @@ function ActiveEnquiriesStaff() {
 
     // Create and push JSX for each section of enquiry
     let count = 0;
-    let enquiryElements: any[] = [];
-    for (let enquiryType in enquiryTypes) {
-        let enquiryCategory = (
-            <div className="bg-red-600 w-1/5 p-2 shadow-lg rounded ml-12 mt-10 mb-7 enquiry-category">
-                <p className="font-sans text-white text-xs text-center font-medium md:text-lg sm:text-md">{enquiryTypes[enquiryType]}</p>
-            </div>
-        );
+
+    let enquiryElements: any = [];
+
+    for(let enquiryType in enquiryTypes) {
+        let enquiryCategory = <div className="bg-red-600 w-1/5 p-2 shadow-lg rounded ml-12 mt-10 mb-7 enquiry-category ">
+                                <p className="font-sans text-white text-xs text-center font-medium md:text-lg sm:text-md">{enquiryTypes[enquiryType]}</p>
+                              </div>;
         enquiryElements.push(enquiryCategory);
 
         let enquiryTypedData = enquiryData.filter((enquiry: { type: any; }) => enquiry.type == enquiryTypes[count]);
-        let enquiryElement = enquiryTypedData.map((enquiry: { status: String; message: String; type: String, postedBy: String, _id: ObjectId }) => {
+        let enquiryElement = enquiryTypedData.map((enquiry: {status: String; message: String; type: String, postedBy: String, _id: ObjectId, responseBy: String}) => {
             let status = enquiry.status;
             let opacity = "";
             let hover = "hover:bg-gray-200";
             let cursor = "hover:cursor-pointer";
-
+    
             if (status == "Responding") {
-                if (decodedId == enquiry.postedBy) {
+                if(decodedId == enquiry.responseBy) {
                     status = "Currently Responding";
                 } else {
                     opacity = "opacity-50";
@@ -75,26 +96,38 @@ function ActiveEnquiriesStaff() {
                     hover = "";
                     status = "Other Staff Responding";
                 }
-            } else if (status === "Open") {
+
+            }
+            else if (status == "Open") {
                 status = "";
-            } else {
+            }
+            else if (status == "Closed") {
+                return null;
+            }
+            else {
                 return null;
             }
             let classes = "bg-white w-9/12 p-3 shadow-lg rounded ml-12 mt-5 mb-6 enquiry flex last:mb-14 sm:w-11/12"
             classes += " " + hover + " " + opacity + " " + cursor;
             let enquiryId = enquiry._id.toString();
-
+           
             return (
-                <div className={classes} onClick={() => {
-                    updateResponding(enquiryId, decodedId);
-                    navigate("/user/enquiries/response", { state: { enquiry } });
-                }}>
-                    <p className="font-sans text-black font-medium pl-2 text-xs sm:text-sm md:text-base">{enquiry.type} -</p>
-                    <p className="font-sans text-black pl-2 text-xs sm:text-sm md:text-base">{enquiry.message}</p>
-                    <p className="font-sans text-black pl-2 font-medium ml-auto mr-8 text-xs sm:text-small md:text-base">{status}</p>
-                </div>
+                <>
+                    <div className = {classes} onClick={() => saveEnquiryData(enquiryId, decodedId, status)} id={count.toString()}>
+                        <p className="font-sans text-black font-medium pl-2 text-xs sm:text-sm md:text-base" >{enquiry.type}   -</p>
+                        <p className="font-sans text-black pl-2 text-xs sm:text-sm md:text-base">{enquiry.message}</p>
+                        <p className="font-sans text-black pl-2 font-medium ml-auto mr-8 text-xs sm:text-small md:text-base">{status}</p>
+                    </div>
+                    {showModal && createPortal(
+                                <ModalContent onClose={() => setShowModal(false)}/>,
+                                document.body     
+                    )}
+                </>
             );
         });
+        
+       
+       
         enquiryElements.push(enquiryElement);
         count++;
     }
