@@ -58,7 +58,7 @@ function Enquiries({ type }) {
                 key={index}
                 className="bg-white w-full p-3 shadow-md rounded mt-1 flex items-center cursor-pointer z-10 opacity-100"
                 onClick={() => {
-                    navigate("/user/enquiries/response", { state: { enquiry } });
+                    navigate("/enquiries/response", { state: { enquiry } });
                 }}
             >
                 <p className="font-sans text-gray-800 text-sm flex-grow">

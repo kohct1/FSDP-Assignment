@@ -3,14 +3,13 @@ import Navbar from "./components/Navbar";
 import { useState, useEffect } from 'react';
 import { decodeToken } from "react-jwt";
 import { useNavigate } from "react-router-dom";
-import {createPortal} from 'react-dom';
+import { createPortal } from 'react-dom';
 import ModalContent from "./components/StaffModalContainer.tsx";
-
 
 function ActiveEnquiriesStaff() {
     const [enquiryData, setData] = useState<any>([]);
     const [showModal, setShowModal] = useState(false);
-    //const [clickedEnquiry, setEnquiry] = useState<any>(String);
+    const navigate = useNavigate();
 
     async function getEnquiries() {
         const response = await fetch("http://localhost:5050/enquiries/staff/open");
@@ -18,36 +17,15 @@ function ActiveEnquiriesStaff() {
         setData(enquiryData["enquiries"]);
     }
 
-    async function updateResponding(enquiryId: string, staffId: string) {
-        console.log("Attempting update");
-        await fetch("http://localhost:5050/enquiries/staff/update", {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                id: enquiryId,
-                responseBy: staffId
-            })
-        });
-        // Store responseId in localStorage to use in the response page
-        localStorage.setItem("responseId", enquiryId);
-    }
-
-    useEffect(() => {
-        getEnquiries();
-    }, []);
-
-    let token: string;
-
-   
-    function saveEnquiryData(enquiryId : string, staffId : string, status: string) {
-        if(status != "Other Staff Responding") {
+    function saveEnquiryData(enquiryId: string, staffId: string, status: string, enquiry: any) {
+        if (status !== "Other Staff Responding") {
             console.log("Clicked");
             localStorage.setItem("currentEnquiry", enquiryId);
             localStorage.setItem("currentStaffId", staffId);
             localStorage.setItem("currentStatus", status);
             setShowModal(true);
+            
+            navigate("/enquiries/response", { state: { enquiry } });
         }
     }
    
@@ -74,10 +52,14 @@ function ActiveEnquiriesStaff() {
 
     let enquiryElements: any = [];
 
-    for(let enquiryType in enquiryTypes) {
-        let enquiryCategory = <div className="bg-red-600 w-1/5 p-2 shadow-lg rounded ml-12 mt-10 mb-7 enquiry-category ">
-                                <p className="font-sans text-white text-xs text-center font-medium md:text-lg sm:text-md">{enquiryTypes[enquiryType]}</p>
-                              </div>;
+    for (let enquiryType in enquiryTypes) {
+        let enquiryCategory = (
+            <div className="bg-red-600 w-1/5 p-2 shadow-lg rounded ml-12 mt-10 mb-7 enquiry-category ">
+                <p className="font-sans text-white text-xs text-center font-medium md:text-lg sm:text-md">
+                    {enquiryTypes[enquiryType]}
+                </p>
+            </div>
+        );
         enquiryElements.push(enquiryCategory);
 
         let enquiryTypedData = enquiryData.filter((enquiry: { type: any; }) => enquiry.type == enquiryTypes[count]);
@@ -113,14 +95,14 @@ function ActiveEnquiriesStaff() {
            
             return (
                 <>
-                    <div className = {classes} onClick={() => saveEnquiryData(enquiryId, decodedId, status)} id={count.toString()}>
-                        <p className="font-sans text-black font-medium pl-2 text-xs sm:text-sm md:text-base" >{enquiry.type}   -</p>
+                    <div className={classes} onClick={() => saveEnquiryData(enquiryId, decodedId, status, enquiry)} id={count.toString()}>
+                        <p className="font-sans text-black font-medium pl-2 text-xs sm:text-sm md:text-base">{enquiry.type} -</p>
                         <p className="font-sans text-black pl-2 text-xs sm:text-sm md:text-base">{enquiry.message}</p>
                         <p className="font-sans text-black pl-2 font-medium ml-auto mr-8 text-xs sm:text-small md:text-base">{status}</p>
                     </div>
                     {showModal && createPortal(
-                                <ModalContent onClose={() => setShowModal(false)}/>,
-                                document.body     
+                        <ModalContent onClose={() => setShowModal(false)} />,
+                        document.body
                     )}
                 </>
             );
