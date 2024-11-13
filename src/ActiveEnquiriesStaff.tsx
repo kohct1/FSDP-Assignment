@@ -29,8 +29,6 @@ function ActiveEnquiriesStaff() {
         });
         // Store responseId in localStorage to use in the response page
         localStorage.setItem("responseId", enquiryId);
-        // Navigate to the response page
-        navigate("/user/enquiries/response", { replace: true });
     }
 
     useEffect(() => {
