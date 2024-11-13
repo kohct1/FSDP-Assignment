@@ -8,7 +8,6 @@ import ModalContent from "./components/StaffModalContainer.tsx";
 
 
 function ActiveEnquiriesStaff() {
-    const navigate = useNavigate();
     const [enquiryData, setData] = useState<any>([]);
     const [showModal, setShowModal] = useState(false);
     //const [clickedEnquiry, setEnquiry] = useState<any>(String);
@@ -61,14 +60,14 @@ function ActiveEnquiriesStaff() {
         enquiryElements.push(enquiryCategory);
 
         let enquiryTypedData = enquiryData.filter((enquiry: { type: any; }) => enquiry.type == enquiryTypes[count]);
-        let enquiryElement = enquiryTypedData.map((enquiry: {status: String; message: String; type: String, postedBy: String, _id: ObjectId}) => {
+        let enquiryElement = enquiryTypedData.map((enquiry: {status: String; message: String; type: String, postedBy: String, _id: ObjectId, responseBy: String}) => {
             let status = enquiry.status;
             let opacity = "";
             let hover = "hover:bg-gray-200";
             let cursor = "hover:cursor-pointer";
     
             if (status == "Responding") {
-                if(decodedId == enquiry.postedBy) {
+                if(decodedId == enquiry.responseBy) {
                     status = "Currently Responding";
                 }
                 else {
