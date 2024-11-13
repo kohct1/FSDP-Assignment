@@ -44,7 +44,6 @@ const Ticketing = () => {
             });
             if (response.ok) {
                 const data = await response.json();
-                navigate("/queue");
             } else {
                 console.error("Failed to increment queue count");
             }
