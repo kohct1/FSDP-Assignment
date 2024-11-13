@@ -2,14 +2,12 @@ import { ObjectId } from "mongoose";
 import Navbar from "./components/Navbar";
 import { useState, useEffect } from 'react';
 import { decodeToken } from "react-jwt";
-import { useNavigate } from "react-router-dom";
 import { createPortal } from 'react-dom';
 import ModalContent from "./components/StaffModalContainer.tsx";
 
 function ActiveEnquiriesStaff() {
     const [enquiryData, setData] = useState<any>([]);
     const [showModal, setShowModal] = useState(false);
-    const navigate = useNavigate();
 
     async function getEnquiries() {
         const response = await fetch("http://localhost:5050/enquiries/staff/open");
@@ -20,14 +18,14 @@ function ActiveEnquiriesStaff() {
     function saveEnquiryData(enquiryId: string, staffId: string, status: string, enquiry: any) {
         if (status !== "Other Staff Responding") {
             console.log("Clicked");
-            localStorage.setItem("currentEnquiry", enquiryId);
+            localStorage.setItem("currentEnquiryID", enquiryId);
+            localStorage.setItem("currentEnquiry", JSON.stringify(enquiry));  
             localStorage.setItem("currentStaffId", staffId);
             localStorage.setItem("currentStatus", status);
             setShowModal(true);
-            
-            navigate("/enquiries/response", { state: { enquiry } });
         }
     }
+    
    
     useEffect(()=> {   
         getEnquiries();   
@@ -107,8 +105,6 @@ function ActiveEnquiriesStaff() {
                 </>
             );
         });
-        
-       
        
         enquiryElements.push(enquiryElement);
         count++;
