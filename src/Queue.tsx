@@ -1,6 +1,7 @@
 import Navbar from "./components/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 const Queue = () => {
     const [queueCount, setQueueCount] = useState(0);
@@ -43,6 +44,22 @@ const Queue = () => {
         }
     };
 
+    const leaveQueue = async () => {
+        try {
+            const response = await fetch('http://localhost:5050/dequeue', {
+                method: 'POST',
+            });
+            if (response.ok) {
+                const data = await response.json();
+            } else {
+                console.error("Failed to update left queue");
+            }
+        } catch (error) {
+            console.error("Error updating left queue", error);
+        }
+        navigate('/ticketing');
+    };
+
     // Set initial queue values once when data is first fetched
     useEffect(() => {
         if (initialQueueCount === null && initialLeftQueue === null && queueCount && leftQueue) {
@@ -57,14 +74,6 @@ const Queue = () => {
     const progress = initialQueueCount 
         ? Math.min((newDeparturesSinceJoining / initialQueueCount) * 100, 100) // Cap at 100%
         : 0;
-
-    // // Redirect if queueAhead is 0
-    // useEffect(() => {
-    //     console.log("Queue Ahead:", queueAhead);  // Log queueAhead value for debugging
-    //     if (queueAhead === 0) {
-    //         navigate('/callpage'); 
-    //     }
-    // }, [queueCount, leftQueue, queueAhead, navigate]);
 
     // Fetch queue data on component mount and set up polling
     useEffect(() => {
@@ -115,6 +124,12 @@ const Queue = () => {
                         If it is not an urgent matter, please{' '}
                         <Link to="/bookingpage" className="text-blue-700 underline">book a slot</Link> instead.
                     </p>
+
+                    {/* Leave Queue Button */}
+                    <motion.button className="bg-red-600 text-white text-lg font-semibold px-6 py-3 rounded mt-8" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                        onClick={leaveQueue}>
+                        Leave Queue
+                    </motion.button>
                 </div>
             </main>
         </div>
