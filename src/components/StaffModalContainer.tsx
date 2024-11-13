@@ -3,13 +3,14 @@ import {useNavigate} from "react-router-dom";
 export default function StaffModalContent({onClose}) {
     const navigate = useNavigate();
 
-    let enquiryId = localStorage.getItem("currentEnquiry");
+    let enquiryId = localStorage.getItem("currentEnquiryID");
+    let enquiry = JSON.parse(localStorage.getItem("currentEnquiry") || "{}");
     let staffId = localStorage.getItem("currentStaffId");
     let status = localStorage.getItem("currentStatus");
     console.log(enquiryId + " " + staffId + " " + status);
 
 
-    async function updateResponding(enquiryId : string, staffId : string, status: string) {
+    async function updateResponding(enquiryId : string, staffId : string, status: string, enquiry : any) {
         if (status != "Other Staff Responding") {
             console.log("Attempting update");
             await fetch("http://localhost:5050/enquiries/staff/update", {
@@ -24,7 +25,7 @@ export default function StaffModalContent({onClose}) {
             });
             //Access enquiry conversation here
             localStorage.setItem("responseId", enquiryId);
-            navigate("/user/enquiries/response", { replace: true });
+            navigate("/enquiries/response", { state: { enquiry } });
         }
     }
     async function closeEnquiry(enquiryId : string) {
@@ -47,7 +48,7 @@ export default function StaffModalContent({onClose}) {
     return (
         <div className="z-10 absolute ml-[37.7%] bg-slate-100 bottom-0 p-8 pl-28 pr-28 rounded-md flex justify-center flex-col mb-52 border-2 border-neutral-700 duration-75 flex flex-col justify-center pb-12">
             <h2 className="text-xl font-semibold text-gray-700">Manage Enquiry</h2>
-            <button onClick={() => updateResponding(enquiryId, staffId, status)} className="text-gray-700 font-semibold mt-12 bg-white p-1 rounded-md border-2 border-slate-500">Respond</button>
+            <button onClick={() => updateResponding(enquiryId, staffId, status, enquiry)} className="text-gray-700 font-semibold mt-12 bg-white p-1 rounded-md border-2 border-slate-500">Respond</button>
             <button onClick={() => closeEnquiry(enquiryId)} className="text-gray-700 font-semibold mt-12 bg-white p-1 rounded-md border-2 border-slate-500">Close Enquiry</button>
             <button onClick={onClose} className="text-gray-700 font-semibold mt-12 bg-white p-1 rounded-md border-2 border-slate-500">Close</button>
 
