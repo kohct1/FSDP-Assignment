@@ -6,7 +6,6 @@ import BookingDate from "./BookingDate";
 import BookingPage from './BookingPage';
 import OCBCsignup from './OCBCsignup';
 import HomePage from './HomePage';
-import BookingTime from "./BookingTime";
 import Ticketing from "./Ticketing";
 import Queue from "./Queue";
 import MakeEnquiry from "./MakeEnquiry";
@@ -24,7 +23,6 @@ function App() {
       <Route path="bookingpage" element={<BookingPage />} />
       <Route path="signup" element={<OCBCsignup />} />
       <Route path="homepage" element={<HomePage />} />
-      <Route path="booking-time" element={<BookingTime />} />
       <Route path="ticketing" element={<Ticketing />} />
       <Route path="queue" element={<Queue />} />
       <Route path="user/enquiries/make" element={<MakeEnquiry />} />

@@ -28,7 +28,7 @@ router.post("/register", async (req, res) => {
     try {
         const users = db.collection("Users");
 
-        await users.insertOne({ email, pin });
+        await users.insertOne({ email, pin, role: "Customer" });
 
         res.status(200).json();
     } catch (err) {

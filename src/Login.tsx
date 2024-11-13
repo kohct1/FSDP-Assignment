@@ -4,6 +4,15 @@ import { motion } from "framer-motion";
 import Navbar from "./components/Navbar";
 import {createPortal} from 'react-dom';
 import ModalContent from "./components/RegModalContent.tsx";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogFooter
+} from "@/components/ui/dialog";
 
 
 
@@ -28,7 +37,6 @@ function Login() {
         });
 
         const result = await response.json();
-        console.log(result);
 
         if (result.token)  {
             localStorage.setItem("token", result.token);
@@ -87,11 +95,22 @@ function Login() {
                         <h1 className="text-3xl font-semibold">Online Banking</h1>
                         <input className="border-b-2 outline-0 px-4 py-2" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required/>
                         <input className="border-b-2 outline-0 px-4 py-2" placeholder="PIN" value={pin} onChange={(e) => setPin(e.target.value)} required/>
-                        <button className="bg-red-600 rounded text-white font-semibold py-2" onClick={executeRegistration}>Register</button>
-                            {showModal && createPortal(
-                                <ModalContent onClose={() => setShowModal(false)}/>,
-                                document.body     
-                            )}
+                        <Dialog>
+                            <DialogTrigger className="w-full">
+                                <motion.button className="w-full bg-red-600 rounded text-white font-semibold py-2" onClick={executeRegistration} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>Register</motion.button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Account successfully created!</DialogTitle>
+                                    <DialogDescription>
+                                        You can now login using your newly created account details.
+                                    </DialogDescription>
+                                    <DialogFooter>
+                                        <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setIsLogin(true)}>Next</motion.button>
+                                    </DialogFooter>
+                                </DialogHeader>
+                            </DialogContent>
+                        </Dialog>
                         <h1 className="w-full text-blue-600 text-sm text-center">No Email/PIN? Click here.</h1>
                     </div>
                     <div className="w-full flex bg-slate-100 text-xs px-12 py-4 gap-2">
