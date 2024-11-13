@@ -28,7 +28,8 @@ function BookingTime() {
                 time: time,
                 slot: slot,
                 userId: userId,
-                reason: state.reason
+                reason: state.reason,
+                category: state.cateogry
             })
         });
 
