@@ -37,10 +37,10 @@ function Enquiries({ type }) {
     async function fetchEnquiries() {
         const response = await fetch("http://localhost:5050/enquiries/user");
         const data = await response.json();
-            
+        
         const userEnquiries = Array.isArray(data)
-            ? data.filter(enquiry => enquiry.postedBy === userId)
-            : data.enquiries?.filter(enquiry => enquiry.postedBy === userId) || [];
+            ? data 
+            : data.enquiries || []; 
     
         setEnquiries(userEnquiries);
     }

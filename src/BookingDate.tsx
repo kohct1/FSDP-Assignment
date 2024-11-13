@@ -209,7 +209,8 @@ function BookingDate() {
 
                             return (
                                 <div key={index} className="flex flex-col gap-4">
-                                    <div className="border-b-2 text-xl font-semibold pb-2">{time}am</div>
+                                    <div className="border-b-2 text-xl font-semibold pb-2">{time < 10 || time === 12 ? `${time}pm` : `${time}am`}</div>
+
                                     <div>
                                         {slots.map((slot: number, index: number) => {
                                             let suggestedSlots: number = 1;

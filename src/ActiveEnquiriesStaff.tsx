@@ -1,8 +1,8 @@
 import { ObjectId } from "mongoose";
 import Navbar from "./components/Navbar";
-import {useState, useEffect} from 'react';
-import {decodeToken} from "react-jwt";
-import {useNavigate} from "react-router-dom";
+import { useState, useEffect } from 'react';
+import { decodeToken } from "react-jwt";
+import { useNavigate } from "react-router-dom";
 import {createPortal} from 'react-dom';
 import ModalContent from "./components/StaffModalContainer.tsx";
 
@@ -15,8 +15,31 @@ function ActiveEnquiriesStaff() {
     async function getEnquiries() {
         const response = await fetch("http://localhost:5050/enquiries/staff/open");
         const enquiryData = await response.json();
-        setData(enquiryData["enquiries"]);   
+        setData(enquiryData["enquiries"]);
     }
+
+    async function updateResponding(enquiryId: string, staffId: string) {
+        console.log("Attempting update");
+        await fetch("http://localhost:5050/enquiries/staff/update", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                id: enquiryId,
+                responseBy: staffId
+            })
+        });
+        // Store responseId in localStorage to use in the response page
+        localStorage.setItem("responseId", enquiryId);
+    }
+
+    useEffect(() => {
+        getEnquiries();
+    }, []);
+
+    let token: string;
+
    
     function saveEnquiryData(enquiryId : string, staffId : string, status: string) {
         if(status != "Other Staff Responding") {
@@ -33,24 +56,22 @@ function ActiveEnquiriesStaff() {
     }, []);
 
     let token : string;
-    let enquiryTypes: any[] = [];
-    //compiler will complain if i dont parse as string                            
-    token = localStorage.getItem("token")?.toString()!;
-    const decodedObject =  decodeToken(token);
-    //This line may show an error, but it works as intended
-    const decodedId = decodedObject["userId"];
-  
 
-    //Checks all enquiry types and stores one of each type of enquiry for later
-    for(let enquiry in enquiryData) {
-        if(!enquiryTypes.includes(enquiryData[enquiry]["type"])) {
+    let enquiryTypes: any[] = [];
+    token = localStorage.getItem("token")?.toString()!;
+    const decodedObject = decodeToken(token);
+    const decodedId = decodedObject["userId"];
+
+    // Check all enquiry types and store one of each type
+    for (let enquiry in enquiryData) {
+        if (!enquiryTypes.includes(enquiryData[enquiry]["type"])) {
             enquiryTypes.push(enquiryData[enquiry]["type"]);
         }
     }
 
-
-    //Creates and pushes jsx for each section of enquiry 
+    // Create and push JSX for each section of enquiry
     let count = 0;
+
     let enquiryElements: any = [];
 
     for(let enquiryType in enquiryTypes) {
@@ -69,13 +90,13 @@ function ActiveEnquiriesStaff() {
             if (status == "Responding") {
                 if(decodedId == enquiry.responseBy) {
                     status = "Currently Responding";
-                }
-                else {
+                } else {
                     opacity = "opacity-50";
                     cursor = "hover:cursor-default";
                     hover = "";
                     status = "Other Staff Responding";
                 }
+
             }
             else if (status == "Open") {
                 status = "";
