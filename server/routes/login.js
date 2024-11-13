@@ -36,6 +36,19 @@ router.post("/register", async (req, res) => {
     }
 });
 
+router.post("/checkEmail", async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const users = db.collection("Users");
+        const user = await users.findOne({ email });
+
+        res.status(200).json({ user });
+    } catch (err) {
+        res.status(500).send(err);
+    }
+});
+
 router.post("/decode", async (req, res) => {
     const { token } = req.body;
 

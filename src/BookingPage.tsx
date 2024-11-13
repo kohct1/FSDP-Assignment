@@ -220,7 +220,7 @@ const BookingForm: React.FC = () => {
                           </label>
                           <h1>{booking.reason}</h1>
                           <div className="flex justify-end items-center gap-8">
-                            <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => navigate("/callpage")}>Call</motion.button>
+                            <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => navigate("/webcall")}>Call</motion.button>
                           </div>
                         </div>
                       );
