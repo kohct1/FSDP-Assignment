@@ -3,9 +3,11 @@ import { useLocation } from 'react-router-dom';
 import Navbar from "./components/Navbar";
 
 function EnquiryDetail() {
-    const location = useLocation();
-    const enquiry = location.state?.enquiry;
+    const { state } = useLocation();
+    const enquiry = state.enquiry;
     const [userId, setUserId] = useState(null);
+
+    console.log(state);
 
     useEffect(() => {
         getUser();
@@ -24,6 +26,7 @@ function EnquiryDetail() {
     
         const result = await response.json();
         setUserId(result.userId);
+        console.log("User ID:", result.userId); 
     }
 
     const [messages, setMessages] = useState(enquiry?.messages || []); 
@@ -101,7 +104,7 @@ function EnquiryDetail() {
                     </p>
                 ) : null}
 
-                {messages.map((msg: any, index: number) => (
+                {messages.map((msg, index) => (
                     <div 
                         key={index} 
                         className={`flex items-start mb-4 ${msg.postedByID ? 'justify-start' : 'justify-end'}`}

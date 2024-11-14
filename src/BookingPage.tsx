@@ -308,7 +308,7 @@ const BookingForm: React.FC = () => {
                       <textarea className="w-full h-3/4 border-2 rounded resize-none p-2" value={newReason} onChange={(e) => setNewReason(e.target.value)}></textarea>
                     </div>
                     <div className="flex justify-end items-center gap-8">
-                      <Link className="text-sm" to="/booking-date" state={{ category: userBookings[0].category}}>Reschedule booking</Link>
+                      <Link className="text-sm" to="/booking-date" state={{ category: userBookings[0].category }}>Reschedule booking</Link>
                       <Dialog>
                         <DialogTrigger>
                             <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={editBooking}>Edit</motion.button>

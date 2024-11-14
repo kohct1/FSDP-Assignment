@@ -53,6 +53,7 @@ function MakeEnquiry() {
                 console.log(data); // Check the response from the server
             }
             setShowModal(true);
+            navigate("/user/enquiries/view");
         }
     }
 
