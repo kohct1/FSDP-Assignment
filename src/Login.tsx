@@ -63,7 +63,7 @@ function Login() {
                         <div className="flex flex-col px-12 pt-8 py-20 gap-8">
                             <h1 className="text-3xl font-semibold">Online Banking</h1>
                             <input className="border-b-2 outline-0 px-4 py-2" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                            <input className="border-b-2 outline-0 px-4 py-2" placeholder="PIN" value={pin} onChange={(e) => setPin(e.target.value)} />
+                            <input type="password" className="border-b-2 outline-0 px-4 py-2" placeholder="PIN" value={pin} onChange={(e) => setPin(e.target.value)} />
                             <motion.button className="bg-red-600 rounded text-white font-semibold py-2" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={login}>Login</motion.button>
                             <h1 className="w-full text-blue-600 text-sm text-center">No Email/PIN? Click here.</h1>
                         </div>
