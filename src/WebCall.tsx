@@ -246,18 +246,28 @@ const WebRTCAudioPage: React.FC = () => {
       <audio ref={remoteAudioRef} autoPlay className="hidden" />
 
       <div className="flex gap-8 items-center mt-6">
-        <button
+      <button
           onClick={toggleMute}
-          className={`p-4 rounded-full ${isMuted ? 'bg-gray-500' : 'bg-red-500'} text-white`}
+          className={`w-16 h-16 flex items-center justify-center rounded-full ${
+            isMuted ? 'bg-red-500' : 'bg-green-500'
+          } transition-colors duration-300`}
         >
-          {isMuted ? 'Unmute' : 'Mute'}
+          <img
+            src={isMuted ? '/images/Muted.png' : '/images/Unmuted.png'}
+            alt={isMuted ? 'Mute' : 'Unmute'}
+            className="w-10 h-10"
+          />
         </button>
 
         <button
           onClick={endCall}
-          className="bg-red-500 text-white p-4 rounded-lg hover:bg-red-600"
+          className="w-16 h-16 flex items-center justify-center bg-red-500 rounded-full transition-opacity duration-300 ease-in-out"
         >
-          End Call
+          <img
+            src="/images/EndCall.png"
+            alt="End Call"
+            className="w-10 h-10"
+          />
         </button>
       </div>
     </div>
