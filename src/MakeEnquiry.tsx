@@ -4,6 +4,16 @@ import {useState} from 'react';
 import {decodeToken} from "react-jwt";
 import {createPortal} from 'react-dom';
 import ModalContent from "./components/EnquiryModalContent.tsx";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogFooter
+} from "@/components/ui/dialog";
+import { useNavigate } from "react-router";
 
 async function PostEnquiry(event : any) {
     event.preventDefault();
@@ -47,6 +57,7 @@ async function PostEnquiry(event : any) {
 function MakeEnquiry() {
     const [subjectLength, setSubjectLength] = useState(0);
     const [showModal, setShowModal] = useState(false);
+    const navigate = useNavigate();
 
     async function PostEnquiry(event : any) {
         event.preventDefault();
@@ -112,11 +123,22 @@ function MakeEnquiry() {
                             <label htmlFor="subject" className="w-7/12 mt-2">Enquiry Subject:</label>
                             <textarea id="subject" name="subject" className= "h-32 border mt-2 w-7/12 rounded resize-none p-2" required maxLength={80}  onChange={e => {setSubjectLength(e.target.value.length)}}></textarea>
                             <p className="font-light mt-2 w-7/12">Characters Left: {80-subjectLength}</p>
-                            <motion.button className="bg-red-600 w-3/12 text-white p-1.5 rounded mt-10 mb-8 hover:bg-red-800" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} type="submit">Send</motion.button>
-                            {showModal && createPortal(
-                                <ModalContent onClose={() => setShowModal(false)}/>,
-                                document.body     
-                            )}
+                            <Dialog>
+                                <DialogTrigger className="w-full" disabled={subjectLength === 0}>
+                                    <motion.button className="bg-red-600 w-3/12 text-white p-1.5 rounded mt-10 mb-8 hover:bg-red-800" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} type="submit">Send</motion.button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>Confirm your enquiry</DialogTitle>
+                                        <DialogDescription>
+                                            Confirm that you want to submit this enquiry to be reviewed.
+                                        </DialogDescription>
+                                        <DialogFooter>
+                                            <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => navigate("/user/enquiries/view")}>Confirm</motion.button>
+                                        </DialogFooter>
+                                    </DialogHeader>
+                                </DialogContent>
+                            </Dialog>
                         </form>
                 </div>
             </div>

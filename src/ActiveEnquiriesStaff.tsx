@@ -4,6 +4,16 @@ import { useState, useEffect } from 'react';
 import { decodeToken } from "react-jwt";
 import { createPortal } from 'react-dom';
 import ModalContent from "./components/StaffModalContainer.tsx";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogFooter
+} from "@/components/ui/dialog";
+import { motion } from "framer-motion";
 
 function ActiveEnquiriesStaff() {
     const [enquiryData, setData] = useState<any>([]);
@@ -25,7 +35,42 @@ function ActiveEnquiriesStaff() {
             setShowModal(true);
         }
     }
-    
+  
+        async function updateResponding(enquiryId : string, staffId : string, status: string) {
+        if (status != "Other Staff Responding") {
+            console.log("Attempting update");
+            await fetch("http://localhost:5050/enquiries/staff/update", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                id: enquiryId,
+                responseBy: staffId
+            })
+            });
+            //Access enquiry conversation here
+            localStorage.setItem("responseId", enquiryId);
+            navigate("/user/enquiries/response", { replace: true });
+        }
+    }
+    async function closeEnquiry(enquiryId : string) {
+        
+        if (status != "Other Staff Responding") {
+            console.log("Attempting to close enquiry");
+            await fetch("http://localhost:5050/enquiries/staff/close", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                id: enquiryId,
+            })
+            });
+            window.location.reload();
+            
+        }
+    }
    
     useEffect(()=> {   
         getEnquiries();   
@@ -90,18 +135,31 @@ function ActiveEnquiriesStaff() {
             let classes = "bg-white w-9/12 p-3 shadow-lg rounded ml-12 mt-5 mb-6 enquiry flex last:mb-14 sm:w-11/12"
             classes += " " + hover + " " + opacity + " " + cursor;
             let enquiryId = enquiry._id.toString();
+
+            let staffId: string = "";
+
+            if (localStorage.getItem("currentStaffId")) {
+                staffId = localStorage.getItem("currentStaffId");
+            }
            
             return (
                 <>
-                    <div className={classes} onClick={() => saveEnquiryData(enquiryId, decodedId, status, enquiry)} id={count.toString()}>
-                        <p className="font-sans text-black font-medium pl-2 text-xs sm:text-sm md:text-base">{enquiry.type} -</p>
-                        <p className="font-sans text-black pl-2 text-xs sm:text-sm md:text-base">{enquiry.message}</p>
-                        <p className="font-sans text-black pl-2 font-medium ml-auto mr-8 text-xs sm:text-small md:text-base">{status}</p>
-                    </div>
-                    {showModal && createPortal(
-                        <ModalContent onClose={() => setShowModal(false)} />,
-                        document.body
-                    )}
+                    <Dialog>
+                        <DialogTrigger className="w-full" disabled={status === "Other Staff Responding"}>
+                            <div className = {classes} onClick={() => saveEnquiryData(enquiryId, decodedId, status)} id={count.toString()}>
+                                <p className="font-sans text-black font-medium pl-2 text-xs sm:text-sm md:text-base" >{enquiry.type}   -</p>
+                                <p className="font-sans text-black pl-2 text-xs sm:text-sm md:text-base">{enquiry.message}</p>
+                                <p className="font-sans text-black pl-2 font-medium ml-auto mr-8 text-xs sm:text-small md:text-base">{status}</p>
+                            </div>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader className="flex flex-col gap-4">
+                                <h2 className="text-xl font-semibold text-gray-700">Manage Enquiry</h2>
+                                <button onClick={() => updateResponding(enquiryId, staffId, status)} className="text-white bg-red-600 px-4 py-2 rounded">Respond</button>
+                                <button onClick={() => closeEnquiry(enquiryId)} className="text-white bg-red-600 px-4 py-2 rounded">Close Enquiry</button>
+                            </DialogHeader>
+                        </DialogContent>
+                    </Dialog>
                 </>
             );
         });
