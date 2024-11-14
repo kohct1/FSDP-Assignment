@@ -37,10 +37,10 @@ function Enquiries({ type }) {
     async function fetchEnquiries() {
         const response = await fetch("http://localhost:5050/enquiries/user");
         const data = await response.json();
-            
+        
         const userEnquiries = Array.isArray(data)
-            ? data.filter(enquiry => enquiry.postedBy === userId)
-            : data.enquiries?.filter(enquiry => enquiry.postedBy === userId) || [];
+            ? data 
+            : data.enquiries || []; 
     
         setEnquiries(userEnquiries);
     }
@@ -58,7 +58,7 @@ function Enquiries({ type }) {
                 key={index}
                 className="bg-white w-full p-3 shadow-md rounded mt-1 flex items-center cursor-pointer z-10 opacity-100"
                 onClick={() => {
-                    navigate("/user/enquiries/response", { state: { enquiry } });
+                    navigate("/enquiries/response", { state: { enquiry } });
                 }}
             >
                 <p className="font-sans text-gray-800 text-sm flex-grow">

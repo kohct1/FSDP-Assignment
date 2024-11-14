@@ -27,7 +27,7 @@ function App() {
       <Route path="queue" element={<Queue />} />
       <Route path="user/enquiries/make" element={<MakeEnquiry />} />
       <Route path="user/enquiries/view" element={<CustomerEnquiries/>} />
-      <Route path="user/enquiries/response" element={<EnquiriesResponse />} />
+      <Route path="enquiries/response" element={<EnquiriesResponse />} />
       <Route path="callpage" element={<CallPage />} />
       <Route path="webcall" element={<WebCall />} />
     </Routes>

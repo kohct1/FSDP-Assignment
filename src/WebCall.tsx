@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 
 const WebRTCAudioPage: React.FC = () => {
   const [isCallStarted, setIsCallStarted] = useState(false);
-  const [isSignalingReady, setIsSignalingReady] = useState(false);  
   const [isUserSpeaking, setIsUserSpeaking] = useState(false);
   const [isRemoteSpeaking, setIsRemoteSpeaking] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
-  const [isMuted, setIsMuted] = useState(false); 
+  const [isMuted, setIsMuted] = useState(false);
+  const [isJoiningCall, setIsJoiningCall] = useState(false); // State for disabling the button during call setup
 
   const localAudioRef = useRef<HTMLAudioElement>(null);
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
@@ -49,7 +49,6 @@ const WebRTCAudioPage: React.FC = () => {
 
     signalingSocketRef.current.onopen = () => {
       console.log('WebSocket connection established');
-      setIsSignalingReady(true);  // Set signaling as ready
     };
 
     signalingSocketRef.current.onmessage = async (message) => {
@@ -97,12 +96,11 @@ const WebRTCAudioPage: React.FC = () => {
   };
 
   const startCall = async () => {
+    setIsJoiningCall(true); // Disable the button
+
     try {
       peerConnectionRef.current = new RTCPeerConnection(iceServers);
-
-      if (!signalingSocketRef.current) {
-        setupSignaling();
-      }
+      setupSignaling();
 
       localStream?.getTracks().forEach(track => peerConnectionRef.current?.addTrack(track, localStream));
 
@@ -123,16 +121,15 @@ const WebRTCAudioPage: React.FC = () => {
 
       const offer = await peerConnectionRef.current.createOffer();
       await peerConnectionRef.current.setLocalDescription(offer);
-
-      if (isSignalingReady) {
-        signalingSocketRef.current?.send(JSON.stringify(offer));
-      }
+      signalingSocketRef.current?.send(JSON.stringify(offer));
 
       setIsCallStarted(true);
       monitorSpeaking(localStream!, setIsUserSpeaking);
       startTimer();
     } catch (error) {
       console.error('Error starting call:', error);
+    } finally {
+      setIsJoiningCall(false); // Re-enable the button
     }
   };
 
@@ -199,6 +196,7 @@ const WebRTCAudioPage: React.FC = () => {
         <button
           onClick={startCall}
           className="bg-green-500 text-white p-4 rounded-lg hover:bg-green-600 text-lg"
+          disabled={isJoiningCall} // Disable the button while joining
         >
           Join Call
         </button>
@@ -217,7 +215,7 @@ const WebRTCAudioPage: React.FC = () => {
             }}
           >
             <img
-              src="images\UserIcon.png"
+              src="images/UserIcon.png"
               alt="User"
               className="w-24 h-24 object-contain"
             />
@@ -233,7 +231,7 @@ const WebRTCAudioPage: React.FC = () => {
             }}
           >
             <img
-              src="images\OCBCIcon.png"
+              src="images/OCBCIcon.png"
               alt="OCBC Representative"
               className="w-24 h-24 object-contain" 
             />
@@ -248,7 +246,7 @@ const WebRTCAudioPage: React.FC = () => {
       <audio ref={remoteAudioRef} autoPlay className="hidden" />
 
       <div className="flex gap-8 items-center mt-6">
-        <button
+      <button
           onClick={toggleMute}
           className={`w-16 h-16 flex items-center justify-center rounded-full ${
             isMuted ? 'bg-red-500' : 'bg-green-500'
@@ -272,7 +270,6 @@ const WebRTCAudioPage: React.FC = () => {
           />
         </button>
       </div>
-
     </div>
   );
 };
