@@ -53,6 +53,7 @@ function ActiveEnquiriesStaff() {
             });
             //Access enquiry conversation here
             localStorage.setItem("responseId", enquiryId);
+            enquiry["responseBy"] = staffId; 
             navigate("/enquiries/response", { state: { enquiry } });
         }
     }
@@ -135,7 +136,7 @@ function ActiveEnquiriesStaff() {
             else {
                 return null;
             }
-            let classes = "bg-white w-9/12 p-3 shadow-lg rounded ml-12 mt-5 mb-6 enquiry flex last:mb-14 sm:w-11/12"
+            let classes = "bg-white w-9/12 p-3 shadow-lg rounded ml-12 mt-5 mb-6 enquiry flex sm:w-11/12"
             classes += " " + hover + " " + opacity + " " + cursor;
             let enquiryId = enquiry._id.toString();
 
@@ -176,7 +177,7 @@ function ActiveEnquiriesStaff() {
             <Navbar />
             <div className="w-full h-screen">
                 <h1 className="lg:text-3xl md:text-xl sm:text-base font-semibold md:ml-40 mt-8 ml-40">Open Enquiries</h1>
-                <div className="drop-shadow-lg w-4/5 bg-slate-100 h-3/4 m-auto mt-8 rounded-lg flex-col justify-around overflow-auto" id="enquiries-container">
+                <div className="drop-shadow-lg w-4/5 bg-slate-100 h-3/4 m-auto mt-8 rounded-lg flex-col justify-around overflow-auto pb-14 pt-2" id="enquiries-container">
                     <div className="w-1/5 text-gray-200 h-0">2</div>
                     {enquiryElements}
                 </div>
