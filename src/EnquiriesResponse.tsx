@@ -3,9 +3,11 @@ import { useLocation } from 'react-router-dom';
 import Navbar from "./components/Navbar";
 
 function EnquiryDetail() {
-    const location = useLocation();
-    const enquiry = location.state?.enquiry;
+    const { state } = useLocation();
+    const enquiry = state.enquiry;
     const [userId, setUserId] = useState(null);
+
+    console.log(state);
 
     useEffect(() => {
         getUser();
