@@ -167,6 +167,7 @@ function BookingDate() {
 
         setDisplayTime([displayTime1, displayTime2]);
     }, [selectedSlot]);
+    console.log(currentDate.getDate())
 
     return (
         <div className="w-full h-screen flex flex-col items-center">
@@ -187,7 +188,7 @@ function BookingDate() {
                                             <Day day={index - 3} selectedDay={selectedDate} dayPast={index - 3 < currentDate.getDate()} setSelectedDate={setSelectedDate} />
                                             <Day day={index - 2} selectedDay={selectedDate} dayPast={index - 2 < currentDate.getDate()} setSelectedDate={setSelectedDate} />
                                             <Day day={index - 1} selectedDay={selectedDate} dayPast={index - 1 < currentDate.getDate()} setSelectedDate={setSelectedDate} />
-                                            <Day day={index} selectedDay={selectedDate} dayPast={index <= currentDate.getDate()} setSelectedDate={setSelectedDate} />
+                                            <Day day={index} selectedDay={selectedDate} dayPast={index < currentDate.getDate()} setSelectedDate={setSelectedDate} />
                                         </div>
                                     );
                                 }
