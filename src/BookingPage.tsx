@@ -2,6 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Navbar from "./components/Navbar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter
+} from "@/components/ui/dialog";
 
 const BookingForm: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -142,7 +151,6 @@ const BookingForm: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
     setShowModal(true);
   };
 
@@ -212,7 +220,7 @@ const BookingForm: React.FC = () => {
                           </label>
                           <h1>{booking.reason}</h1>
                           <div className="flex justify-end items-center gap-8">
-                            <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => navigate("/callpage")}>Call</motion.button>
+                            <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => navigate("/webcall")}>Call</motion.button>
                           </div>
                         </div>
                       );
@@ -280,15 +288,43 @@ const BookingForm: React.FC = () => {
                   <div className="w-full flex flex-col justify-center border-2 rounded p-4 gap-4">
                     <div className="flex justify-between">
                       <h1 className="text-lg font-semibold">{months[currentDate.getMonth()]} {userBookings[0].date} {currentDate.getFullYear()}, {`${time1}.${slot1} - ${time2}.${slot2}`}</h1>
-                      <button onClick={deleteBooking}><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path className="fill-red-600" d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg></button>
+                      <Dialog>
+                        <DialogTrigger><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path className="fill-red-600" d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg></DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Are you absolutely sure?</DialogTitle>
+                            <DialogDescription>
+                              This will delete your booking and you will lose your slot. You can create a new booking afterwards.
+                            </DialogDescription>
+                            <DialogFooter>
+                              <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={deleteBooking}>Delete</motion.button>
+                            </DialogFooter>
+                          </DialogHeader>
+                        </DialogContent>
+                      </Dialog>
                     </div>
                     <div className="flex flex-col gap-2">
                       <h1 className="font-semibold">Booking description</h1>
                       <textarea className="w-full h-3/4 border-2 rounded resize-none p-2" value={newReason} onChange={(e) => setNewReason(e.target.value)}></textarea>
                     </div>
                     <div className="flex justify-end items-center gap-8">
-                      <Link className="text-sm" to="/booking-date" state={{ category: userBookings[0].category}}>Reschedule booking</Link>
-                      <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={editBooking}>Edit</motion.button>
+                      <Link className="text-sm" to="/booking-date" state={{ category: userBookings[0].category }}>Reschedule booking</Link>
+                      <Dialog>
+                        <DialogTrigger>
+                            <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={editBooking}>Edit</motion.button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Are you absolutely sure?</DialogTitle>
+                            <DialogDescription>
+                              The will update your booking description.
+                            </DialogDescription>
+                            <DialogFooter>
+                              <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => location.reload()}>Confirm</motion.button>
+                            </DialogFooter>
+                          </DialogHeader>
+                        </DialogContent>
+                      </Dialog>
                     </div>
                   </div>
               </div>

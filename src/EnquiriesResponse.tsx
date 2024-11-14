@@ -3,9 +3,11 @@ import { useLocation } from 'react-router-dom';
 import Navbar from "./components/Navbar";
 
 function EnquiryDetail() {
-    const location = useLocation();
-    const enquiry = location.state?.enquiry;
+    const { state } = useLocation();
+    const enquiry = state.enquiry;
     const [userId, setUserId] = useState(null);
+
+    console.log(state);
 
     useEffect(() => {
         getUser();
@@ -96,9 +98,12 @@ function EnquiryDetail() {
             </h1>
 
             <div className="bg-gray-100 p-6 rounded-lg shadow-md h-76 overflow-y-auto mx-12">
-                <p className="text-gray-600 text-center mb-4">
-                    A staff member has approved your enquiry. Create a message to begin the conversation.
-                </p>
+                {messages.length === 0 ? (
+                    <p className="text-gray-600 text-center mb-4">
+                        Create a message to begin the conversation.
+                    </p>
+                ) : null}
+
                 {messages.map((msg, index) => (
                     <div 
                         key={index} 
@@ -106,7 +111,7 @@ function EnquiryDetail() {
                     >
                         <div className="inline-flex max-w-full p-4 rounded-lg shadow-md bg-white items-center">
                             <p className="text-gray-800 font-medium whitespace-nowrap mr-5">
-                                {msg.postedByID ? "You" : "Staff"} - {msg.postedByID || msg.respondedByID}
+                                {msg.postedByID === userId ? "You" : msg.postedByID ? "User" : "Staff"}
                             </p>
                             <p className="text-gray-700">{msg.chatMessage}</p>
                         </div>
@@ -116,23 +121,24 @@ function EnquiryDetail() {
                 <p className="text-center text-gray-500 mt-6">-End of Conversation-</p>
             </div>
 
-            {/* Conditionally render the message input form if the status is not "Closed" */}
-            {enquiry?.status !== "Closed" ? (
-                <form className="mt-6 p-12" onSubmit={handleSendMessage}>
-                    <div className="flex">
-                        <input
-                            type="text"
-                            value={inputMessage}
-                            onChange={(e) => setInputMessage(e.target.value)}
-                            placeholder="Type your message..."
-                            className="flex-grow p-2 border border-gray-300 rounded-l"
-                        />
-                        <button type="submit" className="bg-blue-500 text-white p-2 rounded-r">Send</button>
-                    </div>
-                </form>
-            ) : (
-                <p className="text-center text-gray-500 mt-6">This enquiry is closed. No further messages can be sent.</p>
-            )}
+        {enquiry?.status === "Closed" ? (
+            <p className="text-center text-gray-500 mt-6">This enquiry is closed. No further messages can be sent.</p>
+        ) : (userId !== enquiry.postedBy && userId !== enquiry.responseBy) ? (
+            <p className="text-center text-gray-500 mt-6">You do not have permission to send messages for this enquiry.</p>
+        ) : (
+            <form className="mt-6 p-12" onSubmit={handleSendMessage}>
+                <div className="flex">
+                    <input
+                        type="text"
+                        value={inputMessage}
+                        onChange={(e) => setInputMessage(e.target.value)}
+                        placeholder="Type your message..."
+                        className="flex-grow p-2 border border-gray-300 rounded-l"
+                    />
+                    <button type="submit" className="bg-blue-500 text-white p-2 rounded-r">Send</button>
+                </div>
+            </form>
+        )}
         </div>
     );
 }

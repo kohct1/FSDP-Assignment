@@ -1,14 +1,23 @@
-import { useState, useEffect, useCallback } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import Navbar from "./components/Navbar";
 import BookingDateHeader from "./components/BookingDateHeader";
 import Day from "./components/Day";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogFooter
+} from "@/components/ui/dialog";
 
 function BookingDate() {
     const currentDate: Date = new Date();
     const [userId, setUserId] = useState<string>("");
-    const [selectedDate, setSelectedDate] = useState<number>(currentDate.getDate());
+    const [email, setEmail] = useState<string>("");
     const [bookings, setBookings] = useState<any>({});
     const [hasBookings, setHasBookings] = useState<boolean>(false);
     const [userBookings, setUserBookings] = useState<any>({});
@@ -18,6 +27,7 @@ function BookingDate() {
     const { state } = useLocation();
     const navigate = useNavigate();
     const days: number = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+    const [selectedDate, setSelectedDate] = useState<number>(currentDate.getDate() + 1 === days ? currentDate.getDate() : currentDate.getDate() + 1);
     const months: string[] = [
         "January", "February", "March", "April", "May", "June", 
         "July", "August", "September", "October", "November", "December"
@@ -81,6 +91,22 @@ function BookingDate() {
         const result = await response.json();
 
         setUserId(result.userId);
+        setEmail(result.email);
+    }
+
+    async function sendEmail(): Promise<void> {
+        await fetch("http://localhost:5050/bookingEmail/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: email,
+                month: months[currentDate.getMonth()],
+                day: String(selectedDate),
+                times: displayTime
+            })
+        });
     }
 
     async function getUserBookings(): Promise<void> {
@@ -98,6 +124,7 @@ function BookingDate() {
             updateBooking(time, slot);
         } else {
             createBooking(time, slot);
+            sendEmail();
         }
     }
 
@@ -154,12 +181,12 @@ function BookingDate() {
                                 if (index !== 0 && index % 7 === 0) {
                                     return (
                                         <div key={index} className="w-full flex gap-8">
-                                            <Day day={index - 6} selectedDay={selectedDate} dayPast={index - 6 <= currentDate.getDate()} setSelectedDate={setSelectedDate} />
-                                            <Day day={index - 5} selectedDay={selectedDate} dayPast={index - 5 <= currentDate.getDate()} setSelectedDate={setSelectedDate} />
-                                            <Day day={index - 4} selectedDay={selectedDate} dayPast={index - 4 <= currentDate.getDate()} setSelectedDate={setSelectedDate} />
-                                            <Day day={index - 3} selectedDay={selectedDate} dayPast={index - 3 <= currentDate.getDate()} setSelectedDate={setSelectedDate} />
-                                            <Day day={index - 2} selectedDay={selectedDate} dayPast={index - 2 <= currentDate.getDate()} setSelectedDate={setSelectedDate} />
-                                            <Day day={index - 1} selectedDay={selectedDate} dayPast={index - 1 <= currentDate.getDate()} setSelectedDate={setSelectedDate} />
+                                            <Day day={index - 6} selectedDay={selectedDate} dayPast={index - 6 < currentDate.getDate()} setSelectedDate={setSelectedDate} />
+                                            <Day day={index - 5} selectedDay={selectedDate} dayPast={index - 5 < currentDate.getDate()} setSelectedDate={setSelectedDate} />
+                                            <Day day={index - 4} selectedDay={selectedDate} dayPast={index - 4 < currentDate.getDate()} setSelectedDate={setSelectedDate} />
+                                            <Day day={index - 3} selectedDay={selectedDate} dayPast={index - 3 < currentDate.getDate()} setSelectedDate={setSelectedDate} />
+                                            <Day day={index - 2} selectedDay={selectedDate} dayPast={index - 2 < currentDate.getDate()} setSelectedDate={setSelectedDate} />
+                                            <Day day={index - 1} selectedDay={selectedDate} dayPast={index - 1 < currentDate.getDate()} setSelectedDate={setSelectedDate} />
                                             <Day day={index} selectedDay={selectedDate} dayPast={index <= currentDate.getDate()} setSelectedDate={setSelectedDate} />
                                         </div>
                                     );
@@ -169,17 +196,17 @@ function BookingDate() {
                                     if (index + 1 === 30) {
                                         return (
                                             <div key={index} className="w-full flex gap-8">
-                                                <Day day={index} selectedDay={selectedDate} dayPast={index <= currentDate.getDate()} setSelectedDate={setSelectedDate} />
-                                                <Day day={index + 1} selectedDay={selectedDate} dayPast={index + 1 <= currentDate.getDate()} setSelectedDate={setSelectedDate} />
+                                                <Day day={index} selectedDay={selectedDate} dayPast={index < currentDate.getDate()} setSelectedDate={setSelectedDate} />
+                                                <Day day={index + 1} selectedDay={selectedDate} dayPast={index + 1 < currentDate.getDate()} setSelectedDate={setSelectedDate} />
                                             </div>
                                         );
                                     }
 
                                     return (
                                         <div key={index} className="w-full flex gap-8">
-                                            <div className="w-12 h-12 flex justify-center items-center rounded hover:bg-slate-200" onClick={() => setSelectedDate(index - 1)}>{index - 1}</div>
-                                            <div className="w-12 h-12 flex justify-center items-center rounded hover:bg-slate-200" onClick={() => setSelectedDate(index)}>{index}</div>
-                                            <div className="w-12 h-12 flex justify-center items-center rounded hover:bg-slate-200" onClick={() => setSelectedDate(index + 1)}>{index + 1}</div>
+                                            <Day day={index - 1} selectedDay={selectedDate} dayPast={index - 1 < currentDate.getDate()} setSelectedDate={setSelectedDate} />
+                                            <Day day={index} selectedDay={selectedDate} dayPast={index < currentDate.getDate()} setSelectedDate={setSelectedDate} />
+                                            <Day day={index + 1} selectedDay={selectedDate} dayPast={index + 1 < currentDate.getDate()} setSelectedDate={setSelectedDate} />
                                         </div>
                                     );
                                 }
@@ -188,7 +215,22 @@ function BookingDate() {
                     </div>
                     <div className="w-full flex flex-col items-center gap-2">
                         <h1>{selectedSlot.length === 0 ? "Select a booking date and time" : `Book for: ${months[currentDate.getMonth()]} ${selectedDate} ${String(currentDate.getFullYear())}, ${displayTime[0]} - ${displayTime[1]}`}</h1>
-                        <motion.button className="w-1/4 bg-red-600 rounded text-white font-semibold m-4 px-3 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => createUserBooking(selectedTime, selectedSlot)}>Confirm</motion.button>
+                        <Dialog>
+                            <DialogTrigger className="w-full">
+                                <motion.button className="w-1/4 bg-red-600 rounded text-white font-semibold m-4 px-3 py-2" disabled={selectedTime && selectedSlot.length > 0 ? false : true} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>Confirm</motion.button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Are you absolutely sure?</DialogTitle>
+                                    <DialogDescription>
+                                        {`You are creating a booking for ${months[currentDate.getMonth()]} ${selectedDate} ${String(currentDate.getFullYear())}, ${displayTime[0]} - ${displayTime[1]}`}
+                                    </DialogDescription>
+                                    <DialogFooter>
+                                        <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => createUserBooking(selectedTime, selectedSlot)}>Confirm</motion.button>
+                                    </DialogFooter>
+                                </DialogHeader>
+                            </DialogContent>
+                        </Dialog>
                     </div>
                 </div>
                 <div className="w-2/5 h-full bg-slate-100 overflow-scroll">
@@ -210,7 +252,6 @@ function BookingDate() {
                             return (
                                 <div key={index} className="flex flex-col gap-4">
                                     <div className="border-b-2 text-xl font-semibold pb-2">{time < 10 || time === 12 ? `${time}pm` : `${time}am`}</div>
-
                                     <div>
                                         {slots.map((slot: number, index: number) => {
                                             let suggestedSlots: number = 1;
