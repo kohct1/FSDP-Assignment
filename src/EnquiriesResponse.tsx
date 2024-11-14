@@ -24,7 +24,6 @@ function EnquiryDetail() {
     
         const result = await response.json();
         setUserId(result.userId);
-        console.log("User ID:", result.userId); 
     }
 
     const [messages, setMessages] = useState(enquiry?.messages || []); 
@@ -102,7 +101,7 @@ function EnquiryDetail() {
                     </p>
                 ) : null}
 
-                {messages.map((msg, index) => (
+                {messages.map((msg: any, index: number) => (
                     <div 
                         key={index} 
                         className={`flex items-start mb-4 ${msg.postedByID ? 'justify-start' : 'justify-end'}`}

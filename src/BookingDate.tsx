@@ -181,12 +181,12 @@ function BookingDate() {
                                 if (index !== 0 && index % 7 === 0) {
                                     return (
                                         <div key={index} className="w-full flex gap-8">
-                                            <Day day={index - 6} selectedDay={selectedDate} dayPast={index - 6 <= currentDate.getDate()} setSelectedDate={setSelectedDate} />
-                                            <Day day={index - 5} selectedDay={selectedDate} dayPast={index - 5 <= currentDate.getDate()} setSelectedDate={setSelectedDate} />
-                                            <Day day={index - 4} selectedDay={selectedDate} dayPast={index - 4 <= currentDate.getDate()} setSelectedDate={setSelectedDate} />
-                                            <Day day={index - 3} selectedDay={selectedDate} dayPast={index - 3 <= currentDate.getDate()} setSelectedDate={setSelectedDate} />
-                                            <Day day={index - 2} selectedDay={selectedDate} dayPast={index - 2 <= currentDate.getDate()} setSelectedDate={setSelectedDate} />
-                                            <Day day={index - 1} selectedDay={selectedDate} dayPast={index - 1 <= currentDate.getDate()} setSelectedDate={setSelectedDate} />
+                                            <Day day={index - 6} selectedDay={selectedDate} dayPast={index - 6 < currentDate.getDate()} setSelectedDate={setSelectedDate} />
+                                            <Day day={index - 5} selectedDay={selectedDate} dayPast={index - 5 < currentDate.getDate()} setSelectedDate={setSelectedDate} />
+                                            <Day day={index - 4} selectedDay={selectedDate} dayPast={index - 4 < currentDate.getDate()} setSelectedDate={setSelectedDate} />
+                                            <Day day={index - 3} selectedDay={selectedDate} dayPast={index - 3 < currentDate.getDate()} setSelectedDate={setSelectedDate} />
+                                            <Day day={index - 2} selectedDay={selectedDate} dayPast={index - 2 < currentDate.getDate()} setSelectedDate={setSelectedDate} />
+                                            <Day day={index - 1} selectedDay={selectedDate} dayPast={index - 1 < currentDate.getDate()} setSelectedDate={setSelectedDate} />
                                             <Day day={index} selectedDay={selectedDate} dayPast={index <= currentDate.getDate()} setSelectedDate={setSelectedDate} />
                                         </div>
                                     );
@@ -196,17 +196,17 @@ function BookingDate() {
                                     if (index + 1 === 30) {
                                         return (
                                             <div key={index} className="w-full flex gap-8">
-                                                <Day day={index} selectedDay={selectedDate} dayPast={index <= currentDate.getDate()} setSelectedDate={setSelectedDate} />
-                                                <Day day={index + 1} selectedDay={selectedDate} dayPast={index + 1 <= currentDate.getDate()} setSelectedDate={setSelectedDate} />
+                                                <Day day={index} selectedDay={selectedDate} dayPast={index < currentDate.getDate()} setSelectedDate={setSelectedDate} />
+                                                <Day day={index + 1} selectedDay={selectedDate} dayPast={index + 1 < currentDate.getDate()} setSelectedDate={setSelectedDate} />
                                             </div>
                                         );
                                     }
 
                                     return (
                                         <div key={index} className="w-full flex gap-8">
-                                            <div className="w-12 h-12 flex justify-center items-center rounded hover:bg-slate-200" onClick={() => setSelectedDate(index - 1)}>{index - 1}</div>
-                                            <div className="w-12 h-12 flex justify-center items-center rounded hover:bg-slate-200" onClick={() => setSelectedDate(index)}>{index}</div>
-                                            <div className="w-12 h-12 flex justify-center items-center rounded hover:bg-slate-200" onClick={() => setSelectedDate(index + 1)}>{index + 1}</div>
+                                            <Day day={index - 1} selectedDay={selectedDate} dayPast={index - 1 < currentDate.getDate()} setSelectedDate={setSelectedDate} />
+                                            <Day day={index} selectedDay={selectedDate} dayPast={index < currentDate.getDate()} setSelectedDate={setSelectedDate} />
+                                            <Day day={index + 1} selectedDay={selectedDate} dayPast={index + 1 < currentDate.getDate()} setSelectedDate={setSelectedDate} />
                                         </div>
                                     );
                                 }
