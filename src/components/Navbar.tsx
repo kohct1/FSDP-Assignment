@@ -2,26 +2,73 @@ import { Link } from "react-router-dom"
 import { useState, useEffect } from "react";
 import {decodeToken} from "react-jwt";
 import {useNavigate} from "react-router-dom";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogFooter
+} from "@/components/ui/dialog";
+import { motion } from "framer-motion";
 
-function PopulateLinks({role}) {
+function PopulateLinks({ role, handleLogout }: { role: string, handleLogout: () => void }) {
     if(role == "Customer") {
         return (  
-        <div className="flex space-x-10">
-            <Link to="/bookingpage" className="text-gray-600 font-semibold">Booking</Link>
-            <Link to="/ticketing" className="text-gray-600 font-semibold">Queue</Link>
-            <Link to="/user/enquiries/view" className="text-gray-600 font-semibold">Enquiry Portal</Link>
-        </div>);
+            <div className="flex items-center gap-8">
+                <Link to="/bookingpage" className="text-gray-600 text-lg font-semibold">Booking</Link>
+                <Link to="/ticketing" className="text-gray-600 text-lg font-semibold">Queue</Link>
+                <Link to="/user/enquiries/view" className="text-gray-600 text-lg font-semibold">Enquiry Portal</Link>
+                <Dialog>
+                    <DialogTrigger>
+                        <motion.button className="bg-red-600 rounded text-lg text-white font-semibold px-3 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>Log out</motion.button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Are you absolutely sure?</DialogTitle>
+                            <DialogDescription>
+                                You are logging out of your account. You can log in again in the login page.
+                            </DialogDescription>
+                            <DialogFooter>
+                                <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleLogout}>Log out</motion.button>
+                            </DialogFooter>
+                        </DialogHeader>
+                    </DialogContent>
+                </Dialog>
+            </div>
+        );
     }
     else if (role == "Staff") {
         return (
-            <div className="flex space-x-10">
+            <div className="flex items-center gap-8">
                 <Link to="/bookingpage" className="text-gray-600 font-semibold">Booking</Link>
                 <Link to="/staff/enquiries" className="text-gray-600 font-semibold">Enquiry Portal</Link>
+                <Dialog>
+                    <DialogTrigger>
+                        <motion.button className="bg-red-600 rounded text-lg text-white font-semibold px-3 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>Log out</motion.button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Are you absolutely sure?</DialogTitle>
+                            <DialogDescription>
+                                You are logging out of your account. You can log in again in the login page.
+                            </DialogDescription>
+                            <DialogFooter>
+                                <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleLogout}>Log out</motion.button>
+                            </DialogFooter>
+                        </DialogHeader>
+                    </DialogContent>
+                </Dialog>
             </div>
         );
     }
     else {
-        return(null);
+        return(
+            <div className="flex space-x-10">
+                <Link to="/" className="text-gray-600 font-semibold">Login</Link>
+            </div>
+        );
     }
 
 }
@@ -61,26 +108,14 @@ function Navbar() {
         const result = await response.json();
     
         setUserId(result.userId);
-        console.log(result.userId);
-      }
+    }
 
     //Logout handler
     const handleLogout = () => {
     // Clear user data (in this case, from localStorage)
         localStorage.removeItem('userId');
         setUserId(null);
-        setShowLogoutPrompt(false); // Close the logout prompt
         navigate('/'); // Redirect to login page
-    };
-
-    //Show logout prompt
-    const handleShowLogoutPrompt = () => {
-         setShowLogoutPrompt(true);
-    };
-
-    // // Close logout prompt
-    const handleCloseLogoutPrompt = () => {
-        setShowLogoutPrompt(false);
     };
 
     return (
@@ -94,93 +129,11 @@ function Navbar() {
                             className="h-12"
                         />
                     </Link>
-                    <div className="flex space-x-10">
                     <PopulateLinks
                         role = {decodedRole}
+                        handleLogout={handleLogout}
                     />
-                        {userId ? (
-                            <button 
-                                onClick={handleShowLogoutPrompt}
-                                className="text-gray-600 font-semibold"
-                            >
-                                Logged In
-                            </button>
-                        ) : (
-                            <Link to="/" className="text-gray-600 font-semibold">
-                                Login
-                            </Link>
-                        )}
-                    </div>
                 </div>
-
-                {/* Logout confirmation modal */}
-            {showLogoutPrompt && (
-                <>
-                <div className="fixed inset-0 bg-gray-800 bg-opacity-70 z-40"></div>
-
-                <div className="absolute inset-40 flex justify-center items-center z-40 mt-[-80px]">
-                    <div className="bg-white p-6 rounded-md shadow-lg text-center">
-                        <h3 className="text-xl font-semibold mb-4">Are you sure you want to log out?</h3>
-                        <div className="space-x-4">
-                            <button 
-                                onClick={handleLogout} 
-                                className="bg-red-500 text-white px-4 py-2 rounded-md"
-                            >
-                                Yes, Log Out
-                            </button>
-                            <button 
-                                onClick={handleCloseLogoutPrompt} 
-                                className="bg-gray-500 text-white px-4 py-2 rounded-md"
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                        {userId ? (
-                            <button 
-                                onClick={handleShowLogoutPrompt}
-                                className="text-gray-600 font-semibold"
-                            >
-                                Logged In
-                            </button>
-                        ) : (
-                            <Link to="/" className="text-gray-600 font-semibold">
-                                Login
-                            </Link>
-                        )}
-                    </div>
-                </div>
-
-                {/* Logout confirmation modal */}
-            {showLogoutPrompt && (
-                <>
-                <div className="fixed inset-0 bg-gray-800 bg-opacity-70 z-40"></div>
-
-                <div className="absolute inset-40 flex justify-center items-center z-40 mt-[-80px]">
-                    <div className="bg-white p-6 rounded-md shadow-lg text-center">
-                        <h3 className="text-xl font-semibold mb-4">Are you sure you want to log out?</h3>
-                        <div className="space-x-4">
-                            <button 
-                                onClick={handleLogout} 
-                                className="bg-red-500 text-white px-4 py-2 rounded-md"
-                            >
-                                Yes, Log Out
-                            </button>
-                            <button 
-                                onClick={handleCloseLogoutPrompt} 
-                                className="bg-gray-500 text-white px-4 py-2 rounded-md"
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                </>
-            )}
-
-
-        
-                </>
-            )}
         </div>
 
         

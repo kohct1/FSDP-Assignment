@@ -309,7 +309,22 @@ const BookingForm: React.FC = () => {
                     </div>
                     <div className="flex justify-end items-center gap-8">
                       <Link className="text-sm" to="/booking-date" state={{ category: userBookings[0].category}}>Reschedule booking</Link>
-                      <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={editBooking}>Edit</motion.button>
+                      <Dialog>
+                        <DialogTrigger>
+                            <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={editBooking}>Edit</motion.button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Are you absolutely sure?</DialogTitle>
+                            <DialogDescription>
+                              The will update your booking description.
+                            </DialogDescription>
+                            <DialogFooter>
+                              <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => location.reload()}>Confirm</motion.button>
+                            </DialogFooter>
+                          </DialogHeader>
+                        </DialogContent>
+                      </Dialog>
                     </div>
                   </div>
               </div>
