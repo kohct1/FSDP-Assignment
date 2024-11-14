@@ -17,6 +17,7 @@ import {
 function BookingDate() {
     const currentDate: Date = new Date();
     const [userId, setUserId] = useState<string>("");
+    const [email, setEmail] = useState<string>("");
     const [bookings, setBookings] = useState<any>({});
     const [hasBookings, setHasBookings] = useState<boolean>(false);
     const [userBookings, setUserBookings] = useState<any>({});
@@ -90,6 +91,22 @@ function BookingDate() {
         const result = await response.json();
 
         setUserId(result.userId);
+        setEmail(result.email);
+    }
+
+    async function sendEmail(): Promise<void> {
+        await fetch("http://localhost:5050/bookingEmail/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: email,
+                month: months[currentDate.getMonth()],
+                day: String(selectedDate),
+                times: displayTime
+            })
+        });
     }
 
     async function getUserBookings(): Promise<void> {
@@ -107,6 +124,7 @@ function BookingDate() {
             updateBooking(time, slot);
         } else {
             createBooking(time, slot);
+            sendEmail();
         }
     }
 
