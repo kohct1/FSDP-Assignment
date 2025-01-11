@@ -281,7 +281,7 @@ const BookingForm: React.FC = () => {
       <div className="w-full h-screen">
           <Navbar />
           <div className="w-full h-full flex flex-col items-center">
-              <div className="w-1/2 h-1/2 flex flex-col items-center p-8 gap-8">
+              <div className="w-1/2 h-full flex flex-col items-center p-8 gap-8">
                   <div className="w-full border-b-2 py-8">
                       <h1 className="w-full text-2xl text-start font-semibold">Bookings</h1>
                   </div>
@@ -334,10 +334,10 @@ const BookingForm: React.FC = () => {
   }
 
   return (
-    <div className="bg-gray-100">
+    <div className="h-screen bg-gray-100">
       <Navbar />
 
-      <div className="flex justify-center items-center py-12">
+      <div className="h-full flex justify-center items-center py-12">
         <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-8">
           <h1 className="text-3xl font-semibold text-gray-800 mb-2">Make a Booking</h1>
           <p className="text-gray-600 text-sm mb-8">
