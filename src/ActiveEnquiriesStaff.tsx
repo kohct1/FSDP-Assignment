@@ -2,23 +2,16 @@ import { ObjectId } from "mongoose";
 import Navbar from "./components/Navbar";
 import { useState, useEffect } from 'react';
 import { decodeToken } from "react-jwt";
-import { createPortal } from 'react-dom';
-import ModalContent from "./components/StaffModalContainer.tsx";
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-    DialogFooter
+    DialogTrigger
 } from "@/components/ui/dialog";
-import { motion } from "framer-motion";
 import { useNavigate } from "react-router";
 
 function ActiveEnquiriesStaff() {
     const [enquiryData, setData] = useState<any>([]);
-    const [showModal, setShowModal] = useState(false);
     const navigate = useNavigate();
 
     async function getEnquiries() {
@@ -34,7 +27,7 @@ function ActiveEnquiriesStaff() {
             localStorage.setItem("currentEnquiry", JSON.stringify(enquiry));  
             localStorage.setItem("currentStaffId", staffId);
             localStorage.setItem("currentStatus", status);
-            setShowModal(true);
+            
         }
     }
 
