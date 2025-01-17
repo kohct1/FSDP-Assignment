@@ -81,7 +81,7 @@ const ChatbotButton = ({ isOpen, toggleChat }) => {
             className="fixed bottom-6 right-6 bg-red-600 text-white rounded-full p-4 shadow-lg cursor-pointer"
             onClick={toggleChat}
         >
-            <img
+            <motion.img
                 src="/images/Chatbot.png"
                 alt="Chatbot"
                 className="w-12 h-12 object-contain"
@@ -89,6 +89,7 @@ const ChatbotButton = ({ isOpen, toggleChat }) => {
                 transition={{ duration: 0.3 }}
             />
         </motion.div>
+        
     );
 };
 
@@ -157,6 +158,10 @@ const ChatbotPopup = ({ isOpen, toggleChat, messages, clearChat }) => {
                                 className={`mb-4 flex ${
                                     message.isUser ? "justify-end" : "justify-start"
                                 }`}
+                                style={{
+                                    paddingRight: message.isUser ? "8px" : "40px", 
+                                    paddingLeft: message.isUser ? "40px" : "8px",  
+                                }}
                             >
                                 <p
                                     className={`p-2 rounded-lg max-w-xs ${
@@ -192,8 +197,7 @@ function ActiveEnquiriesCustomer() {
     const navigate = useNavigate();
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [messages, setMessages] = useState([
-        { text: "Hi I need help.", isUser: true },
-        { text: "Alright no problem! What can I help with?", isUser: false },
+        { text: "Hello! What can I help with today?", isUser: false },
     ]);
 
     const toggleChat = () => {
@@ -201,7 +205,7 @@ function ActiveEnquiriesCustomer() {
     };
 
     const clearChat = () => {
-        setMessages([]);
+        setMessages([{ text: "Hello! What can I help with today?", isUser: false }]); // Reset to system message
     };
 
 
