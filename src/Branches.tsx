@@ -944,7 +944,7 @@ function Branches() {
                 <div className="w-full h-full flex justify-center items-center">
                     <div className="w-1/5 h-full flex flex-col overflow-y-scroll">
                         <BranchSearch search={search} setSearch={setSearch} />
-                        <div className="flex items-center p-4 gap-4">
+                        <div className="flex items-center border-b-[1px] p-4 gap-4">
                             <Checkbox checked={nearest} onCheckedChange={() => setNearest(!nearest)} />
                             <h1>Nearest Branch</h1>
                         </div>

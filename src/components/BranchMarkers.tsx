@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 // leaflet
 import "leaflet/dist/leaflet.css";
 import { Marker, Popup, useMap } from "react-leaflet";
+import { Button } from "./ui/button";
 
 function BranchMarkers({ branches, selectedBranch, nearest }: { branches: object[], selectedBranch: object, nearest: boolean }) {
     const [userLocation, setUserLocation] = useState([0, 0]);
@@ -35,7 +36,14 @@ function BranchMarkers({ branches, selectedBranch, nearest }: { branches: object
         }
     }, [userLocation]);
 
+    function handleDirections(branch: object) {
+        const url = `https://www.google.com/maps/dir/${userLocation[0]},${userLocation[1]}/${branch.address}`;
+
+        window.open(url, "_blank");
+    }
+
     if (nearest) {
+        console.log(userLocation)
         return (
             <>
                 <Marker position={userLocation}>
@@ -63,6 +71,7 @@ function BranchMarkers({ branches, selectedBranch, nearest }: { branches: object
                             <h1 className="text-xl font-semibold">{branch.landmark}</h1>
                             <p>{branch.address}, {branch.postalCode}</p>
                             <p>{branch.openingHours}</p>
+                            <Button className="w-full bg-red-600" onClick={() => handleDirections(branch)}>Get Directions</Button>
                         </Popup>
                     </Marker>
                 );

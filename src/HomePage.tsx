@@ -22,7 +22,6 @@ function HomePage() {
         const result = await response.json();
     
         setUserId(result.userId);
-        console.log(result.userId);
       }
 
   return (
