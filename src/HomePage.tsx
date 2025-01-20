@@ -1,13 +1,16 @@
 import Navbar from "./components/Navbar";
 import { useState, useEffect } from "react";
+import useWebSocket from "react-use-websocket";
+import {decodeToken} from "react-jwt";
 
 function HomePage() {
     const [userId, setUserId] = useState(null);
-
+  
+   
     useEffect(() => {
         getUser();
       }, []);
-
+    
     async function getUser(): Promise<void> {
         const response = await fetch(`http://localhost:5050/decode/`, {
             method: "POST",
@@ -20,10 +23,9 @@ function HomePage() {
         });
     
         const result = await response.json();
-    
         setUserId(result.userId);
-        console.log(result.userId);
-      }
+      
+   }
 
   return (
     <div className="bg-white min-h-screen">

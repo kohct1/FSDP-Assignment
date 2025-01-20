@@ -17,6 +17,7 @@ import {
 
 
 
+
 function Login() {
     const [email, setEmail] = useState<string>("");
     const [pin, setPin] = useState<string>("");
@@ -39,9 +40,13 @@ function Login() {
         });
 
         const result = await response.json();
+     
 
         if (result.token)  {
             localStorage.setItem("token", result.token);
+            const tempArray = email.split('@');
+            const username = tempArray[0];
+            localStorage.setItem('username', username);
             navigate("/homepage");
         }
     }
@@ -56,6 +61,7 @@ function Login() {
                 email: email,
                 pin: pin
             })
+
         });
     }
     
