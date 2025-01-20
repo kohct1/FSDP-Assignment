@@ -93,15 +93,61 @@ const ChatbotButton = ({ isOpen, toggleChat }) => {
     );
 };
 
-const ChatbotPopup = ({ isOpen, toggleChat, messages, clearChat }) => {
+const ChatbotPopup = ({ isOpen, toggleChat, messages, setMessages, clearChat }) => {
     const [showMenu, setShowMenu] = useState(false);
     const [newMessage, setNewMessage] = useState("");
+    const [isTyping, setIsTyping] = useState(false);
 
-    const handleSendMessage = () => {
+    const handleSendMessage = async () => {
         if (newMessage.trim() !== "") {
-            messages.push({ text: newMessage, isUser: true });
-            messages.push({ text: "Alright no problem! What can I help with?", isUser: false });
-            setNewMessage("");
+            // Immediately add the user's message to the state
+            setMessages((prevMessages) => [
+                ...prevMessages,
+                { text: newMessage, isUser: true },
+            ]);
+
+            const currentMessage = newMessage; // Capture the current message
+            setNewMessage(""); // Clear the input field
+            setIsTyping(true); // Set bot to typing state
+
+            try {
+                const response = await fetch("http://localhost:3000/generate-text", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ prompt: currentMessage }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Add the bot's response to the state
+                    setMessages((prevMessages) => [
+                        ...prevMessages,
+                        { text: data.text, isUser: false },
+                    ]);
+                } else {
+                    setMessages((prevMessages) => [
+                        ...prevMessages,
+                        {
+                            text: "Error: Unable to get a response from the server.",
+                            isUser: false,
+                        },
+                    ]);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                setMessages((prevMessages) => [
+                    ...prevMessages,
+                    {
+                        text: "Error: Unable to connect to the server.",
+                        isUser: false,
+                    },
+                ]);
+            } finally {
+                setIsTyping(false); // Stop typing state
+            }
         }
     };
 
@@ -113,55 +159,48 @@ const ChatbotPopup = ({ isOpen, toggleChat, messages, clearChat }) => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 30 }}
                     transition={{ duration: 0.3 }}
-                    className="fixed bottom-28 right-6 w-100 bg-white rounded-lg shadow-lg overflow-hidden z-40"
+                    className="fixed bottom-28 right-6 w-[400px] h-[520px] bg-white rounded-lg shadow-lg overflow-hidden z-40"
                 >
                     {/* Header */}
-                    <div className="bg-red-600 text-white font-bold p-5 flex items-center justify-between relative">
+                    <div className="bg-red-600 text-white font-bold p-5 flex items-center justify-between">
                         <div className="flex items-center">
-                            <div className="w-10 h-10 bg-white rounded-full flex justify-center items-center mr-3">
-                                <img
-                                    src="/images/UserIcon.png" 
-                                    alt="Chatbot Icon"
-                                    className="w-8 h-8 object-contain rounded-full"
-                                />
-                            </div>
+                            <img
+                                src="/images/UserIcon.png"
+                                alt="Chatbot Icon"
+                                className="w-10 h-10 object-contain mr-3"
+                            />
                             <span>Chat with ChatterBot!</span>
                         </div>
-                        <div className="relative">
-                            <button
-                                onClick={() => setShowMenu(!showMenu)}
-                                className="text-xl focus:outline-none"
+                        <button
+                            onClick={() => setShowMenu(!showMenu)}
+                            className="text-xl focus:outline-none"
+                        >
+                            &#x22EE;
+                        </button>
+                        {showMenu && (
+                            <div className="absolute right-8 bg-white shadow-lg rounded-lg">
+                                <button
+                                onClick={() => {
+                                    clearChat();
+                                    setShowMenu(false);
+                                }}
+                                className="block w-full px-6 py-2 rounded-lg text-gray-700 hover:bg-gray-300 hover:text-gray-900 transition-all duration-200"
                             >
-                                &#x22EE;
+                                Clear Chat
                             </button>
-                            {showMenu && (
-                                <div className="absolute right-0 bg-white shadow-lg rounded-lg overflow-hidden text-gray-700">
-                                    <button
-                                        onClick={() => {
-                                            clearChat();
-                                            setShowMenu(false);
-                                        }}
-                                        className="block w-full text-center px-4 py-1 hover:bg-gray-100 whitespace-nowrap"
-                                    >
-                                        Clear Chat
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+
+                            </div>
+                        )}
                     </div>
 
-                    {/* Chat Body */}
-                    <div className="p-4 h-80 overflow-y-auto bg-gray-50">
+                    {/* Messages */}
+                    <div className="p-4 h-[380px] overflow-y-auto bg-gray-50">
                         {messages.map((message, index) => (
                             <div
                                 key={index}
                                 className={`mb-4 flex ${
                                     message.isUser ? "justify-end" : "justify-start"
                                 }`}
-                                style={{
-                                    paddingRight: message.isUser ? "8px" : "40px", 
-                                    paddingLeft: message.isUser ? "40px" : "8px",  
-                                }}
                             >
                                 <p
                                     className={`p-2 rounded-lg max-w-xs ${
@@ -174,6 +213,13 @@ const ChatbotPopup = ({ isOpen, toggleChat, messages, clearChat }) => {
                                 </p>
                             </div>
                         ))}
+                        {isTyping && (
+                            <div className="mb-4 flex justify-start">
+                                <p className="p-2 rounded-lg max-w-xs bg-gray-200 text-gray-700 text-left">
+                                    ChatterBot is typing...
+                                </p>
+                            </div>
+                        )}
                     </div>
 
                     {/* Input Box */}
@@ -182,8 +228,18 @@ const ChatbotPopup = ({ isOpen, toggleChat, messages, clearChat }) => {
                             type="text"
                             placeholder="Enter your message..."
                             className="flex-1 border rounded-lg px-3 py-2 mr-2 text-gray-700"
+                            value={newMessage}
+                            onChange={(e) => setNewMessage(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    handleSendMessage();
+                                }
+                            }}
                         />
-                        <button className="bg-red-600 text-white px-4 py-2 rounded-lg">
+                        <button
+                            className="bg-red-600 text-white px-4 py-2 rounded-lg"
+                            onClick={handleSendMessage}
+                        >
                             <span>&#9658;</span>
                         </button>
                     </div>
@@ -247,6 +303,7 @@ function ActiveEnquiriesCustomer() {
                 isOpen={isChatOpen}
                 toggleChat={toggleChat}
                 messages={messages}
+                setMessages={setMessages}
                 clearChat={clearChat}
             />
         </div>

@@ -5,18 +5,25 @@ import booking from "./routes/booking.js";
 import queue from "./routes/queue.js";
 import enquiry from "./routes/enquiry.js";
 import email from "./routes/email.js";
+import chatcontroller from "./routes/chatcontroller.js";
 
 const app = express();
 const PORT = process.env.PORT || 5050;
 
 
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"], 
+    allowedHeaders: ["Content-Type"],
+}));
+
 app.use(express.json());
 app.use("/", login);
 app.use("/", booking);
 app.use("/", queue);
 app.use("/enquiries", enquiry);
 app.use("/", email);
+app.use("/", chatcontroller);
 
 
 app.listen(PORT, () => {
