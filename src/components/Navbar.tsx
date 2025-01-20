@@ -43,6 +43,7 @@ function PopulateLinks({ role, handleLogout }: { role: string, handleLogout: () 
         return (
             <div className="flex items-center gap-8">
                 <Link to="/bookingpage" className="text-gray-600 font-semibold">Booking</Link>
+                <Link to="/staff/queue" className="text-gray-600 font-semibold"> Queue</Link>
                 <Link to="/staff/enquiries" className="text-gray-600 font-semibold">Enquiry Portal</Link>
                 <Dialog>
                     <DialogTrigger>
