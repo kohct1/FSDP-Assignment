@@ -22,16 +22,20 @@ function broadcastAll() {
 //When receiving a message
 function handleMessage(rawMessage, uuid) {
   const message = JSON.parse(rawMessage.toString());
-  const currentUser = users[uuid];
-  currentUser.state = message;
- 
-  broadcastAll();
-  console.log(`${currentUser.username} has updated their state`);
-  
+  //Triggers the broadcast if its a ping
+  if(message["ping"] == 'True') {
+    broadcastAll();
+  }
+  else {
+    let currentUser = users[uuid];
+    currentUser.state = message;
+    broadcastAll();
+    console.log(`${currentUser.username} has updated their state`);
+  }
 }
 
 function handleClose(uuid) {
-  console.log(`${users[uuid].username} has disconnected`);
+  console.log(`User ${users[uuid].username} has disconnected`);
   delete connections[uuid];
   delete users[uuid];
 
@@ -44,7 +48,6 @@ wsServer.on('connection', (connection, request) => {
   //clients.add(connection);
   const {username} = url.parse(request.url, true).query;
   const uuid = uuidv4(); 
-
   console.log("User Credentials: " + uuid + " " + username);
   //Sets each connection to its uuid
   connections[uuid] = connection;
@@ -53,11 +56,12 @@ wsServer.on('connection', (connection, request) => {
     username: username,
     //Send messages in state
     state: {
-      typing: "",
-      status: "Online"
+      typing: "Not typing",
+      status: "Offline",
+      ping: "False"
     }
   }
-
+  broadcastAll();
   connection.on('message', message => handleMessage(message, uuid));
   connection.on('close', () => handleClose(uuid));
   /*
@@ -72,9 +76,6 @@ wsServer.on('connection', (connection, request) => {
     });
   });
   */
-  connection.on('close', () => {
-    clients.delete(connection);
-  });
 });
 
 server.listen(port, () => {

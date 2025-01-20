@@ -2,6 +2,19 @@ import { ObjectId } from "mongoose";
 import Navbar from "./components/Navbar";
 import { useState, useEffect } from 'react';
 import { decodeToken } from "react-jwt";
+import useWebSocket, {ReadyState} from "react-use-websocket";
+
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+    DropdownMenuItem
+
+
+
+} from "@/components/ui/dropdown-menu";
 import {
     Dialog,
     DialogContent,
@@ -12,7 +25,32 @@ import { useNavigate } from "react-router";
 
 function ActiveEnquiriesStaff() {
     const [enquiryData, setData] = useState<any>([]);
+    const [messageData, setMessageData] = useState();
     const navigate = useNavigate();
+    const username = localStorage.getItem('username');
+    const wsURL = `ws://localhost:8080?username=${username}`;
+    const {lastMessage, sendJsonMessage} = useWebSocket<any>(wsURL, {share: true, shouldReconnect: () => true});
+
+    //Sends the initial message to retrieve
+    useEffect(() => {
+        sendJsonMessage({
+            typing: "Not typing",
+            status: "Online",
+            ping: "False",
+        });
+    },[])
+
+
+    //Should retrieve updated websocket messages at all times and parse them
+    useEffect(() => {
+        if(lastMessage) {
+            const message = lastMessage.data;
+            const messageData = JSON.parse(message);
+            setMessageData(messageData);
+        }
+    }, [lastMessage]);
+    
+
 
     async function getEnquiries() {
         const response = await fetch("http://localhost:5050/enquiries/staff/open");
@@ -164,12 +202,41 @@ function ActiveEnquiriesStaff() {
         enquiryElements.push(enquiryElement);
         count++;
     }
+    let onlineUser = [''];
+    let offlineUser = [''];
 
+    if(messageData) {
+        let keys = Object.keys(messageData);
+        for(let i = 0; i < keys.length; i++) {
+            let username = messageData[keys[i]]["username"];
+            let message = messageData[keys[i]];
+            let status = message["state"]["status"];
+            if(status == "Online") {
+                onlineUser.push(username);
+            }
+            else {
+                offlineUser.push(username);
+            }
+        }
+    }
+    
     return (
         <>
             <Navbar />
             <div className="w-full h-screen">
-                <h1 className="lg:text-3xl md:text-xl sm:text-base font-semibold md:ml-40 mt-8 ml-40">Open Enquiries</h1>
+                <div className="flex flex-row items-center">
+                    <h1 className="lg:text-3xl md:text-xl sm:text-base font-semibold md:ml-40 mt-8 mr-9">Open Enquiries</h1>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger className="mt-10 border-2 p-1 rounded-md justify-self-end">Staff Status</DropdownMenuTrigger>
+                        <DropdownMenuContent className="mt-2 flex flex-col pb-2">
+                            <DropdownMenuLabel className="text-base pb-0">Online Staff</DropdownMenuLabel>
+                            <DropdownMenuSeparator/>
+                            {onlineUser.map(name => (
+                                <p key={name} className="ml-2 mt-0.5">{name}</p>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
                 <div className="drop-shadow-lg w-4/5 bg-slate-100 h-3/4 m-auto mt-8 rounded-lg flex-col justify-around overflow-auto pb-14 pt-2" id="enquiries-container">
                     <div className="w-1/5 text-gray-200 h-0">2</div>
                     {enquiryElements}
