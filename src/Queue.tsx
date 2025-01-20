@@ -102,7 +102,7 @@ const Queue = () => {
     // Fetch queue data on component mount and set up polling
     useEffect(() => {
         fetchQueueData();
-        const intervalId = setInterval(fetchQueueData, 10000); // Refresh every 10 seconds
+        const intervalId = setInterval(fetchQueueData, 100); // Refresh every 1ms
         if (queueAhead === 0) {
             navigate("/callpage");
         }
