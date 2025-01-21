@@ -98,17 +98,26 @@ const ChatbotPopup = ({ isOpen, toggleChat, messages, setMessages, clearChat }) 
     const [newMessage, setNewMessage] = useState("");
     const [isTyping, setIsTyping] = useState(false);
 
+    useEffect(() => {
+        const savedMessages = localStorage.getItem("chatMessages");
+        if (savedMessages) {
+            setMessages(JSON.parse(savedMessages));
+        }
+    }, []);
+
     const handleSendMessage = async () => {
         if (newMessage.trim() !== "") {
-            // Immediately add the user's message to the state
-            setMessages((prevMessages) => [
-                ...prevMessages,
-                { text: newMessage, isUser: true },
-            ]);
+            const userMessage = { text: newMessage, isUser: true };
 
-            const currentMessage = newMessage; // Capture the current message
-            setNewMessage(""); // Clear the input field
-            setIsTyping(true); // Set bot to typing state
+            setMessages((prevMessages) => {
+                const updatedMessages = [...prevMessages, userMessage];
+                localStorage.setItem("chatMessages", JSON.stringify(updatedMessages));
+                return updatedMessages;
+            });
+
+            const currentMessage = newMessage; 
+            setNewMessage("");
+            setIsTyping(true); 
 
             try {
                 const response = await fetch("http://localhost:3000/generate-text", {
@@ -122,29 +131,37 @@ const ChatbotPopup = ({ isOpen, toggleChat, messages, setMessages, clearChat }) 
                 const data = await response.json();
 
                 if (response.ok) {
-                    // Add the bot's response to the state
-                    setMessages((prevMessages) => [
-                        ...prevMessages,
-                        { text: data.text, isUser: false },
-                    ]);
+                    const botMessage = { text: data.text, isUser: false };
+
+                    setMessages((prevMessages) => {
+                        const updatedMessages = [...prevMessages, botMessage];
+                        localStorage.setItem("chatMessages", JSON.stringify(updatedMessages));
+                        return updatedMessages;
+                    });
                 } else {
-                    setMessages((prevMessages) => [
-                        ...prevMessages,
-                        {
-                            text: "Error: Unable to get a response from the server.",
-                            isUser: false,
-                        },
-                    ]);
+                    const errorMessage = {
+                        text: "Error: Unable to get a response from the server.",
+                        isUser: false,
+                    };
+    
+                    setMessages((prevMessages) => {
+                        const updatedMessages = [...prevMessages, errorMessage];
+                        localStorage.setItem("chatMessages", JSON.stringify(updatedMessages));
+                        return updatedMessages;
+                    });
                 }
             } catch (error) {
                 console.error("Error:", error);
-                setMessages((prevMessages) => [
-                    ...prevMessages,
-                    {
-                        text: "Error: Unable to connect to the server.",
-                        isUser: false,
-                    },
-                ]);
+                const errorMessage = {
+                    text: "Error: Unable to connect to the server.",
+                    isUser: false,
+                };
+    
+                setMessages((prevMessages) => {
+                    const updatedMessages = [...prevMessages, errorMessage];
+                    localStorage.setItem("chatMessages", JSON.stringify(updatedMessages));
+                    return updatedMessages;
+                });
             } finally {
                 setIsTyping(false); // Stop typing state
             }
@@ -261,9 +278,16 @@ function ActiveEnquiriesCustomer() {
     };
 
     const clearChat = () => {
-        setMessages([{ text: "Hello! What can I help with today?", isUser: false }]); // Reset to system message
+        setMessages([{ text: "Hello! What can I help with today?", isUser: false }]);
+        localStorage.removeItem("chatMessages");
     };
 
+    useEffect(() => {
+        const handleBeforeUnload = () => localStorage.removeItem("chatMessages");
+        window.addEventListener("beforeunload", handleBeforeUnload);
+    
+        return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+    }, []);
 
     return (
         <div
