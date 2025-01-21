@@ -173,6 +173,7 @@ function EnquiryDetail() {
         }
     };   
     let onlineUser = [''];
+    let onlineStaff = [''];
     if(messageData) {
         let keys = Object.keys(messageData);
         for(let i = 0; i < keys.length; i++) {
@@ -180,8 +181,10 @@ function EnquiryDetail() {
             let message = messageData[keys[i]];
             let status = message["state"]["status"];
             let role = message["state"]["role"];
-
             if(status == "Online" && role == "Staff") {
+                onlineStaff.push(username);
+            }
+            else if (status == "Online") {
                 onlineUser.push(username);
             }
         }
@@ -199,9 +202,14 @@ function EnquiryDetail() {
                 <DropdownMenu>
                         <DropdownMenuTrigger className="border-2 p-2 rounded-md mr-14 bg-red-600 text-white text-base">Staff Status</DropdownMenuTrigger>
                         <DropdownMenuContent className="mt-2 flex flex-col pb-2">
-                            <DropdownMenuLabel className="text-base pb-0">Online Staff ({onlineUser.length -1})</DropdownMenuLabel>
+                            <DropdownMenuLabel className="text-base pb-0 mt-2">Online Staff ({onlineStaff.length -1})</DropdownMenuLabel>
                             <DropdownMenuSeparator/>
-                            {onlineUser.map(name => (
+                            {onlineStaff.map(name => (
+                                <p key={name} className="ml-2 mt-0.5">{name}</p>
+                            ))}
+                             <DropdownMenuLabel className="text-base pb-0 mt-4">Online Users ({onlineUser.length -1})</DropdownMenuLabel>
+                             <DropdownMenuSeparator/>
+                             {onlineUser.map(name => (
                                 <p key={name} className="ml-2 mt-0.5">{name}</p>
                             ))}
                         </DropdownMenuContent>

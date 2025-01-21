@@ -204,7 +204,7 @@ function ActiveEnquiriesStaff() {
         count++;
     }
     let onlineUser = [''];
-    let offlineUser = [''];
+    let onlineStaff = [''];
 
     if(messageData) {
         let keys = Object.keys(messageData);
@@ -214,6 +214,9 @@ function ActiveEnquiriesStaff() {
             let status = message["state"]["status"];
             let role = message["state"]["role"];
             if(status == "Online" && role == "Staff") {
+                onlineStaff.push(username);
+            }
+            else if (status == "Online") {
                 onlineUser.push(username);
             }
         }
@@ -223,20 +226,25 @@ function ActiveEnquiriesStaff() {
         <>
             <Navbar />
             <div className="w-full h-screen">
-                <div className="flex flex-row items-center justify-between">
-                    <h1 className="lg:text-3xl md:text-xl sm:text-base font-semibold md:ml-40 mt-8">Open Enquiries</h1>
+                <div className="flex flex-row items-center justify-between mt-8">
+                    <h1 className="lg:text-3xl md:text-xl sm:text-base font-semibold md:ml-40">Open Enquiries</h1>
                     <DropdownMenu>
-                        <DropdownMenuTrigger className="mt-10 border-2 p-2 rounded-md mr-52 bg-red-600 text-white">Staff Status</DropdownMenuTrigger>
-                        <DropdownMenuContent className="mt-2 flex flex-col pb-2">
-                            <DropdownMenuLabel className="text-base pb-0">Online Staff ({onlineUser.length -1})</DropdownMenuLabel>
-                            <DropdownMenuSeparator/>
-                            {onlineUser.map(name => (
-                                <p key={name} className="ml-2 mt-0.5">{name}</p>
-                            ))}
-                        </DropdownMenuContent>
+                        <DropdownMenuTrigger className="border-2 p-2 rounded-md mr-14 bg-red-600 text-white text-base mr-52">Staff Status</DropdownMenuTrigger>
+                            <DropdownMenuContent className="mt-2 flex flex-col pb-2 justify-center">
+                                <DropdownMenuLabel className="text-base pb-0 mt-2">Online Staff ({onlineStaff.length -1})</DropdownMenuLabel>
+                                <DropdownMenuSeparator/>
+                                {onlineStaff.map(name => (
+                                    <p key={name} className="ml-2 mt-0.5">{name}</p>
+                                ))}
+                                 <DropdownMenuLabel className="text-base pb-0 mt-4">Online Users ({onlineUser.length -1})</DropdownMenuLabel>
+                                 <DropdownMenuSeparator/>
+                                {onlineUser.map(name => (
+                                    <p key={name} className="ml-2 mt-0.5">{name}</p>
+                                ))}                                            
+                            </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
-                <div className="drop-shadow-lg w-4/5 bg-slate-100 h-3/4 m-auto mt-8 rounded-lg flex-col justify-around overflow-auto pb-14 pt-2" id="enquiries-container">
+                <div className="drop-shadow-lg w-4/5 bg-slate-100 h-3/4 m-auto mt-8 rounded-lg flex-col justify-around overflow-auto pb-10 pt-2" id="enquiries-container">
                     <div className="w-1/5 text-gray-200 h-0">2</div>
                     {enquiryElements}
                 </div>
