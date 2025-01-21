@@ -58,7 +58,9 @@ wsServer.on('connection', (connection, request) => {
     state: {
       typing: "Not typing",
       status: "Offline",
-      ping: "False"
+      ping: "False",
+      onEnquiry: "False",
+      role: "Unknown"
     }
   }
   broadcastAll();

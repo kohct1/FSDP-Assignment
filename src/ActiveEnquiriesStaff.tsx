@@ -2,7 +2,7 @@ import { ObjectId } from "mongoose";
 import Navbar from "./components/Navbar";
 import { useState, useEffect } from 'react';
 import { decodeToken } from "react-jwt";
-import useWebSocket, {ReadyState} from "react-use-websocket";
+import useWebSocket from "react-use-websocket";
 
 import {
     DropdownMenu,
@@ -10,11 +10,8 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-    DropdownMenuItem
-
-
-
 } from "@/components/ui/dropdown-menu";
+
 import {
     Dialog,
     DialogContent,
@@ -30,13 +27,18 @@ function ActiveEnquiriesStaff() {
     const username = localStorage.getItem('username');
     const wsURL = `ws://localhost:8080?username=${username}`;
     const {lastMessage, sendJsonMessage} = useWebSocket<any>(wsURL, {share: true, shouldReconnect: () => true});
-
+    const userRole = localStorage.getItem('role');
+    console.log(userRole);
     //Sends the initial message to retrieve
     useEffect(() => {
         sendJsonMessage({
             typing: "Not typing",
             status: "Online",
             ping: "False",
+            onEnquiry: "False",
+            role: userRole
+
+         
         });
     },[])
 
@@ -60,7 +62,6 @@ function ActiveEnquiriesStaff() {
 
     function saveEnquiryData(enquiryId: string, staffId: string, status: string, enquiry: any) {
         if (status !== "Other Staff Responding") {
-            console.log("Clicked");
             localStorage.setItem("currentEnquiryID", enquiryId);
             localStorage.setItem("currentEnquiry", JSON.stringify(enquiry));  
             localStorage.setItem("currentStaffId", staffId);
@@ -211,11 +212,9 @@ function ActiveEnquiriesStaff() {
             let username = messageData[keys[i]]["username"];
             let message = messageData[keys[i]];
             let status = message["state"]["status"];
-            if(status == "Online") {
+            let role = message["state"]["role"];
+            if(status == "Online" && role == "Staff") {
                 onlineUser.push(username);
-            }
-            else {
-                offlineUser.push(username);
             }
         }
     }
@@ -224,12 +223,12 @@ function ActiveEnquiriesStaff() {
         <>
             <Navbar />
             <div className="w-full h-screen">
-                <div className="flex flex-row items-center">
-                    <h1 className="lg:text-3xl md:text-xl sm:text-base font-semibold md:ml-40 mt-8 mr-9">Open Enquiries</h1>
+                <div className="flex flex-row items-center justify-between">
+                    <h1 className="lg:text-3xl md:text-xl sm:text-base font-semibold md:ml-40 mt-8">Open Enquiries</h1>
                     <DropdownMenu>
-                        <DropdownMenuTrigger className="mt-10 border-2 p-1 rounded-md justify-self-end">Staff Status</DropdownMenuTrigger>
+                        <DropdownMenuTrigger className="mt-10 border-2 p-2 rounded-md mr-52 bg-red-600 text-white">Staff Status</DropdownMenuTrigger>
                         <DropdownMenuContent className="mt-2 flex flex-col pb-2">
-                            <DropdownMenuLabel className="text-base pb-0">Online Staff</DropdownMenuLabel>
+                            <DropdownMenuLabel className="text-base pb-0">Online Staff ({onlineUser.length -1})</DropdownMenuLabel>
                             <DropdownMenuSeparator/>
                             {onlineUser.map(name => (
                                 <p key={name} className="ml-2 mt-0.5">{name}</p>
