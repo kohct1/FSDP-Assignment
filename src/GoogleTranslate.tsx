@@ -4,16 +4,14 @@ import { useLocation } from 'react-router-dom';
 const GoogleTranslate: React.FC = () => {
   const [widgetInitialized, setWidgetInitialized] = useState(false);
   const translateElementRef = useRef<HTMLDivElement | null>(null);
-  const location = useLocation(); // Track screen changes
+  const location = useLocation();
+  const observerRef = useRef<MutationObserver | null>(null);
 
-  // Function to initialize the Google Translate widget
   const initializeWidget = () => {
     if (window.google && window.google.translate && window.google.translate.TranslateElement) {
       if (translateElementRef.current) {
-        // Clear previous content if it exists
-        translateElementRef.current.innerHTML = '';
+        translateElementRef.current.innerHTML = ''; // Clear any previous widget
 
-        // Initialize the Google Translate widget
         new window.google.translate.TranslateElement(
           {
             pageLanguage: 'en',
@@ -26,60 +24,88 @@ const GoogleTranslate: React.FC = () => {
 
         setWidgetInitialized(true);
         console.log('Google Translate Widget initialized.');
+
+        // Observe for changes to the Google Translate banner
+        setupBannerObserver();
       }
     } else {
-      console.error('Google Translate Element not available.');
+      console.error('Google Translate Element is not available.');
     }
   };
 
-  // Function to load the Google Translate script dynamically
   const loadGoogleTranslateScript = () => {
     const scriptId = 'google-translate-script';
-    let script = document.getElementById(scriptId) as HTMLScriptElement | null;
+    const existingScript = document.getElementById(scriptId);
 
-    if (!script) {
-      // Create the script element if it doesn't exist
-      script = document.createElement('script');
-      script.id = scriptId;
-      script.src =
-        'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-      script.async = true;
-
-      // Define the global callback to initialize the widget when the script is loaded
-      window.googleTranslateElementInit = () => {
-        // Directly initialize the widget without delay
-        initializeWidget();
-      };
-
-      script.onload = () => {
-        console.log('Google Translate script loaded successfully.');
-      };
-
-      script.onerror = () => {
-        console.error('Failed to load the Google Translate script.');
-      };
-
-      document.body.appendChild(script);
-    } else {
-      // If the script is already in the DOM, initialize the widget
-      console.log('Google Translate script already loaded. Reinitializing...');
-      initializeWidget();
+    if (existingScript) {
+      existingScript.remove();
     }
+
+    const script = document.createElement('script');
+    script.id = scriptId;
+    script.src =
+      'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+    script.async = true;
+
+    window.googleTranslateElementInit = () => {
+      initializeWidget();
+    };
+
+    script.onload = () => {
+      console.log('Google Translate script loaded successfully.');
+    };
+
+    script.onerror = () => {
+      console.error('Failed to load the Google Translate script.');
+    };
+
+    document.body.appendChild(script);
   };
 
-  // React useEffect hook to track screen changes and initialize the widget
+  const setupBannerObserver = () => {
+    const bodyObserver = new MutationObserver(() => {
+      const banner = document.querySelector('.goog-te-banner-frame');
+      const navbar = document.querySelector('.navbar'); // Adjust this selector based on your navbar
+
+      if (banner) {
+        // Add padding to the navbar if the banner is present
+        if (navbar) {
+          navbar.setAttribute('style', 'padding-top: 40px; transition: padding 0.3s;');
+        }
+      } else {
+        // Remove the padding if the banner is gone
+        if (navbar) {
+          navbar.setAttribute('style', 'padding-top: 0px; transition: padding 0.3s;');
+        }
+      }
+    });
+
+    // Observe the body for changes (e.g., banner added/removed)
+    bodyObserver.observe(document.body, { childList: true, subtree: true });
+
+    // Clean up observer on unmount
+    observerRef.current = bodyObserver;
+  };
+
   useEffect(() => {
-    // Load the script and initialize the widget on route change
     loadGoogleTranslateScript();
 
-    // Cleanup on component unmount or when the location changes
     return () => {
       if (translateElementRef.current) {
-        translateElementRef.current.innerHTML = ''; // Clear widget content
+        translateElementRef.current.innerHTML = '';
       }
-      setWidgetInitialized(false); // Reset widget state
+      setWidgetInitialized(false);
+
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+
+      const script = document.getElementById('google-translate-script');
+      if (script) {
+        script.remove();
+      }
     };
-  }, [location]); // Reinitialize on location change (route change)
+  }, [location]);
 
   const handleLogoClick = () => {
     if (translateElementRef.current) {
