@@ -27,6 +27,9 @@ const GoogleTranslate: React.FC = () => {
 
         // Observe for changes to the Google Translate banner
         setupBannerObserver();
+
+        // Observe for language selection changes
+        setupObserver();
       }
     } else {
       console.error('Google Translate Element is not available.');
@@ -60,6 +63,8 @@ const GoogleTranslate: React.FC = () => {
     };
 
     document.body.appendChild(script);
+
+    
   };
 
   const setupBannerObserver = () => {
@@ -85,6 +90,24 @@ const GoogleTranslate: React.FC = () => {
 
     // Clean up observer on unmount
     observerRef.current = bodyObserver;
+  };
+
+  const setupObserver = () => {
+    if (translateElementRef.current) {
+      // Create a MutationObserver to watch for changes in the dropdown
+      observerRef.current = new MutationObserver(() => {
+        // Close the dropdown once a language is selected
+        if (translateElementRef.current) {
+          translateElementRef.current.style.display = 'none';
+        }
+      });
+
+      // Observe the dropdown for changes
+      observerRef.current.observe(translateElementRef.current, {
+        childList: true,
+        subtree: true,
+      });
+    }
   };
 
   useEffect(() => {
