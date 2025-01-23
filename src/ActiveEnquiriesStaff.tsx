@@ -28,18 +28,23 @@ function ActiveEnquiriesStaff() {
     const wsURL = `ws://localhost:8080?username=${username}`;
     const {lastMessage, sendJsonMessage} = useWebSocket<any>(wsURL, {share: true, shouldReconnect: () => true});
     const userRole = localStorage.getItem('role');
-    console.log(userRole);
+
     //Sends the initial message to retrieve
     useEffect(() => {
-        sendJsonMessage({
-            typing: "Not typing",
-            status: "Online",
-            ping: "False",
-            onEnquiry: "False",
-            role: userRole
+        sendJsonMessage(
+            {
+                message: {
 
-         
-        });
+                },
+                state: 
+                {
+                    typing: "Not typing",
+                    status: "Online",
+                    onEnquiry: "False",
+                    role: userRole
+                }
+            }
+        );
     },[])
 
 

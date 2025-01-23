@@ -11,6 +11,7 @@ const wsServer = new WebSocketServer({ server });
 const connections = {};
 const users = {};
 
+//Need to update code to support message data
 function broadcastAll() {
   Object.keys(connections).forEach(uuid =>{
     const connection = connections[uuid];
@@ -22,16 +23,13 @@ function broadcastAll() {
 //When receiving a message
 function handleMessage(rawMessage, uuid) {
   const message = JSON.parse(rawMessage.toString());
-  //Triggers the broadcast if its a ping
-  if(message["ping"] == 'True') {
-    broadcastAll();
-  }
-  else {
-    let currentUser = users[uuid];
-    currentUser.state = message;
-    broadcastAll();
-    console.log(`${currentUser.username} has updated their state`);
-  }
+  console.log(message);
+  let currentUser = users[uuid];
+  currentUser.state = message.state;
+  currentUser.message = message.message;
+  broadcastAll();
+  console.log(`${currentUser.username} has updated their state or message`);
+  
 }
 
 function handleClose(uuid) {
@@ -55,13 +53,16 @@ wsServer.on('connection', (connection, request) => {
   users[uuid] = {
     username: username,
     //Send messages in state
+    message: {
+
+    },
     state: {
       typing: "Not typing",
       status: "Offline",
       ping: "False",
       onEnquiry: "False",
       role: "Unknown"
-    }
+    },
   }
   broadcastAll();
   connection.on('message', message => handleMessage(message, uuid));

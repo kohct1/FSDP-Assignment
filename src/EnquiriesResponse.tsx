@@ -26,6 +26,8 @@ function EnquiryDetail() {
     const [respondingUser, setRespondingUser] = useState("");
     const messagesEndRef = useRef(null);
     const userRole = localStorage.getItem("role");
+    const [newMessage, setNewMessage] = useState(Object); 
+    const [userIds, setUserIds] = useState([""]);
 
     async function getUser() {
         const response = await fetch(`http://localhost:5050/decode/`, {
@@ -44,6 +46,7 @@ function EnquiryDetail() {
         console.log("User ID:", result.userId); 
     }
 
+    //retrieves message names from database for both users.
     async function getMessageUsers(postedId : any, respondingId : any) {
         console.log("Posted ID: " + postedId + " \nResponding ID: " + respondingId);
         const response = await fetch(`http://localhost:5050/user`, {
@@ -85,22 +88,78 @@ function EnquiryDetail() {
             isResponding = "True";
         }
         sendJsonMessage({
-            typing: "Not typing",
-            status: "Online",
-            ping: "False",
-            onEnquiry: isResponding,
-            role: userRole
+            message: {
+
+            },
+            state: 
+            {
+                typing: "Not typing",
+                status: "Online",
+                onEnquiry: isResponding,
+                role: userRole
+            }
         });
-        
     }, [userId]);
 
+    //Listens for new messages on the websocket connection
     useEffect(() => {
         if(lastMessage) {
             const message = lastMessage.data;
             const messageData = JSON.parse(message);
             setMessageData(messageData);
+            let keys = Object.keys(messageData);
+            for(let i = 0; i < keys.length; i++) {
+                let username = messageData[keys[i]]["username"];
+                let message = messageData[keys[i]]["message"];
+                //Checks if current message is sent to correct enquiry
+                if((username == postedUser || username == respondingUser) && message.enquiryID == enquiry.id) {
+                    let chatMessage = message.chatMessage;
+                    let postedById = message.postedByID;
+                    let respondedById = message.respondedByID;
+                    let timestamp = message.timestamp;
+                    //Deal with the appending tmr and test with desktop client
+                    messages.append({chatMessage: chatMessage, postedByID: postedById, respondedByID: respondedById, timestamp: timestamp});
+                    console.log("passed: " + username + " message: " + JSON.stringify(message));
+                }
+            }
+            
+
         }
     }, [lastMessage]);
+
+    //Sends websocket message when new message is set
+    useEffect(() => {
+        if(newMessage) {
+            let isResponding = "False";
+            let messageContent = newMessage.chatMessage;
+            let postedId = newMessage.postedBy;
+            let respondingId = newMessage.respondedBy;
+            let timestamp = newMessage.timestamp;
+           
+            if(enquiry.responseBy == userId) {
+                isResponding = "True";
+            }
+            sendJsonMessage(
+                {
+                    state:
+                    {
+                        typing: "Not typing",
+                        status: "Online",
+                        onEnquiry: isResponding,
+                        role: userRole
+                    },
+                    message: 
+                    {
+                        chatMessage : messageContent,
+                        postedByID : postedId,
+                        respondedByID : respondingId,
+                        timestamp : timestamp,
+                        enquiryId : enquiry._id
+                    }
+                }
+            );
+        }
+    }, [newMessage]);
     
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -117,16 +176,23 @@ function EnquiryDetail() {
                 }
             }
         }
+        setUserIds([postedId, respondingId]);
         getMessageUsers(postedId, respondingId);
        
     }, [messages]);
+
+    
+
 
     const handleSendMessage = async (e) => {
         e.preventDefault();
     
         const isUser = userId === enquiry.postedBy;
         const isStaff = userId === enquiry.responseBy;
-    
+        const postedByID = isUser ? userId : null;
+        const respondedByID = isUser ? userId : null;
+
+
         if (!isStaff && !isUser) {
             console.error("You do not have permission to send messages for this enquiry.");
             return;
@@ -135,18 +201,27 @@ function EnquiryDetail() {
         if (inputMessage.trim()) {
             const newMessage = {
                 chatMessage: inputMessage,
-                postedByID: isUser ? userId : null,
-                respondedByID: isStaff ? userId : null,
+                postedByID: postedByID,
+                respondedByID: respondedByID,
                 timestamp: new Date().toISOString()
             };
-    
+
             const messageData = {
                 enquiryId: enquiry._id,
                 message: inputMessage,
                 senderId: userId,
-                postedByID: isUser ? userId : null,
-                respondedByID: isStaff ? userId : null
+                postedByID: postedByID,
+                respondedByID: respondedByID
             };
+
+            setNewMessage(
+                {
+                    chatMessage : inputMessage,
+                    postedByID : postedByID,
+                    respondedByID : respondedByID,
+                    timestamp : new Date().toISOString(),
+                }
+            )
     
             try {
                 const response = await fetch("http://localhost:5050/enquiries/sendMessage", {
@@ -163,7 +238,7 @@ function EnquiryDetail() {
                 } else {
                     const data = await response.json();
                     console.log("Message sent:", data);
-    
+                    //Sets previous messages here
                     setMessages(prevMessages => [...prevMessages, newMessage]);
                     setInputMessage("");
                 }
@@ -190,7 +265,6 @@ function EnquiryDetail() {
         }
       
     }
-
     return (
         <div className="w-full min-h-screen bg-gray-50">
             <Navbar />
