@@ -10,25 +10,40 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+//BUGS: Switching messages will result in duplicate messages sent for some reason. This does not seem to be an issue of the webscokets?
+
 
 function EnquiryDetail() {
-    const { state } = useLocation();
     //Retrieve enquirydata from state.enquiry
-    const enquiry = state.enquiry;
+    const [enquiry, setEnquiry] = useState(Object);
     const [userId, setUserId] = useState(null);
-    const username = localStorage.getItem('username');
-    const wsURL = `ws://localhost:8080?username=${username}`;
-    const {lastMessage, sendJsonMessage} = useWebSocket<any>(wsURL, {share: true, shouldReconnect: () => true});
     const [messageData, setMessageData] = useState();
     const [messages, setMessages] = useState(enquiry?.messages || []); 
     const [inputMessage, setInputMessage] = useState("");
     const [postedUser, setPostedUser] = useState("");
     const [respondingUser, setRespondingUser] = useState("");
-    const messagesEndRef = useRef(null);
-    const userRole = localStorage.getItem("role");
-    const [newMessage, setNewMessage] = useState(Object); 
-    const [userIds, setUserIds] = useState([""]);
+    const [newMessage, setNewMessage] = useState(Object);
 
+    const messagesEndRef = useRef(null);
+    const username = localStorage.getItem('username');
+    const wsURL = `ws://localhost:8080?username=${username}`; 
+    const enquiryID = localStorage.getItem("currentEnquiryID");
+    const userRole = localStorage.getItem("role");
+
+    const {lastMessage, sendJsonMessage} = useWebSocket<any>(wsURL, {share: true, shouldReconnect: () => true});
+
+    async function getEnquiry() {
+        const response = await fetch("http://localhost:5050/enquiries/staff/open");
+        const enquiryData = await response.json();
+        
+        for(let i = 0; i < enquiryData['enquiries'].length; i++) {
+            if(enquiryData['enquiries'][i]["_id"] == enquiryID) {
+                setEnquiry(enquiryData['enquiries'][i]);
+                setMessages(enquiryData["enquiries"][i]["messages"]);
+            }
+        }
+    }
+    
     async function getUser() {
         const response = await fetch(`http://localhost:5050/decode/`, {
             method: "POST",
@@ -41,14 +56,16 @@ function EnquiryDetail() {
         });
         
         const result = await response.json();
-
         setUserId(result.userId);
-        console.log("User ID:", result.userId); 
+        //console.log("User ID:", result.userId); 
     }
 
     //retrieves message names from database for both users.
-    async function getMessageUsers(postedId : any, respondingId : any) {
-        console.log("Posted ID: " + postedId + " \nResponding ID: " + respondingId);
+    async function getMessageUsers() {
+        
+        let postedId = enquiry["postedBy"];
+        let respondingId = enquiry["responseBy"];
+        //console.log("Posted ID: " + postedId + " \nResponding ID: " + respondingId);
         const response = await fetch(`http://localhost:5050/user`, {
             method: "GET",
             headers: {
@@ -75,56 +92,54 @@ function EnquiryDetail() {
         let username2 = tempArray2[0].charAt(0).toUpperCase() + tempArray2[0].slice(1);
         setPostedUser(username);
         setRespondingUser(username2);
-        console.log("Posted User: " + username + "\nResponding User: " + username2);
+        //console.log("Posted User: " + username + "\nResponding User: " + username2);
     }
 
     useEffect(() => {
+        getEnquiry();
         getUser();
-    });
-    
+    }, []);
+
     useEffect(() => {
-        let isResponding = "False";
-        if(enquiry.responseBy == userId) {
-            isResponding = "True";
+        if(enquiry.postedBy) {
+            getMessageUsers();
         }
-        sendJsonMessage({
-            message: {
 
-            },
-            state: 
-            {
-                typing: "Not typing",
-                status: "Online",
-                onEnquiry: isResponding,
-                role: userRole
-            }
-        });
-    }, [userId]);
+    }, [enquiry])
 
+    
+    
     //Listens for new messages on the websocket connection
     useEffect(() => {
         if(lastMessage) {
             const message = lastMessage.data;
             const messageData = JSON.parse(message);
+          
             setMessageData(messageData);
             let keys = Object.keys(messageData);
             for(let i = 0; i < keys.length; i++) {
                 let username = messageData[keys[i]]["username"];
                 let message = messageData[keys[i]]["message"];
+                let chatMessage = "";
+                if(message.chatMessage) {
+                    chatMessage = message.chatMessage;
+                }
+               
                 //Checks if current message is sent to correct enquiry
-                if((username == postedUser || username == respondingUser) && message.enquiryID == enquiry.id) {
-                    let chatMessage = message.chatMessage;
-                    let postedById = message.postedByID;
-                    let respondedById = message.respondedByID;
-                    let timestamp = message.timestamp;
-                    //Deal with the appending tmr and test with desktop client
-                    messages.append({chatMessage: chatMessage, postedByID: postedById, respondedByID: respondedById, timestamp: timestamp});
-                    console.log("passed: " + username + " message: " + JSON.stringify(message));
+                if((username == postedUser || username == respondingUser) && message.enquiryID == enquiry.id && chatMessage.trim() != "") {
+                    
+                    let postedById = username == postedUser ? userId : null;
+                    let respondedById = username == respondingUser ? userId : null;
+                    let timestamp = message.timestamp;      
+                    messages[messages.length] = {chatMessage: chatMessage, postedByID: postedById, respondedByID: respondedById, timestamp: timestamp};
+                    //console.log(messages[messages.length -1]);
+                    //console.log("passed: " + username + " message: " + JSON.stringify(message));
                 }
             }
             
-
+            
         }
+        console.log(messages);
     }, [lastMessage]);
 
     //Sends websocket message when new message is set
@@ -135,7 +150,6 @@ function EnquiryDetail() {
             let postedId = newMessage.postedBy;
             let respondingId = newMessage.respondedBy;
             let timestamp = newMessage.timestamp;
-           
             if(enquiry.responseBy == userId) {
                 isResponding = "True";
             }
@@ -162,27 +176,8 @@ function EnquiryDetail() {
     }, [newMessage]);
     
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-        console.log(messages);
-        let postedId;
-        let respondingId;
-        if(messages) {
-            for(let i = 0; i < messages.length; i++) {
-                if(messages[i].postedByID != null) {
-                    postedId = messages[i].postedByID;
-                }
-                if(messages[i].respondedByID != null) {
-                    respondingId = messages[i].respondedByID;
-                }
-            }
-        }
-        setUserIds([postedId, respondingId]);
-        getMessageUsers(postedId, respondingId);
-       
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });   
     }, [messages]);
-
-    
-
 
     const handleSendMessage = async (e) => {
         e.preventDefault();
@@ -190,8 +185,7 @@ function EnquiryDetail() {
         const isUser = userId === enquiry.postedBy;
         const isStaff = userId === enquiry.responseBy;
         const postedByID = isUser ? userId : null;
-        const respondedByID = isUser ? userId : null;
-
+        const respondedByID = isStaff ? userId : null;
 
         if (!isStaff && !isUser) {
             console.error("You do not have permission to send messages for this enquiry.");
@@ -199,13 +193,7 @@ function EnquiryDetail() {
         }
     
         if (inputMessage.trim()) {
-            const newMessage = {
-                chatMessage: inputMessage,
-                postedByID: postedByID,
-                respondedByID: respondedByID,
-                timestamp: new Date().toISOString()
-            };
-
+            
             const messageData = {
                 enquiryId: enquiry._id,
                 message: inputMessage,
@@ -214,6 +202,7 @@ function EnquiryDetail() {
                 respondedByID: respondedByID
             };
 
+            console.log("Setting new message: chat:" + inputMessage + "postedBy:" + postedByID + "respondedBy:" + respondedByID);
             setNewMessage(
                 {
                     chatMessage : inputMessage,
@@ -237,9 +226,7 @@ function EnquiryDetail() {
                     console.error("Error sending message:", textResponse);
                 } else {
                     const data = await response.json();
-                    console.log("Message sent:", data);
-                    //Sets previous messages here
-                    setMessages(prevMessages => [...prevMessages, newMessage]);
+                    console.log("Message sent:", data); 
                     setInputMessage("");
                 }
             } catch (error) {
@@ -247,6 +234,8 @@ function EnquiryDetail() {
             }
         }
     };   
+    
+    //Status display
     let onlineUser = [''];
     let onlineStaff = [''];
     if(messageData) {
@@ -265,6 +254,7 @@ function EnquiryDetail() {
         }
       
     }
+
     return (
         <div className="w-full min-h-screen bg-gray-50">
             <Navbar />
@@ -274,7 +264,7 @@ function EnquiryDetail() {
                     {enquiry?.type} - {enquiry?.message}
                 </div>
                 <DropdownMenu>
-                        <DropdownMenuTrigger className="border-2 p-2 rounded-md mr-14 bg-red-600 text-white text-base">Staff Status</DropdownMenuTrigger>
+                        <DropdownMenuTrigger className="border-2 p-2 rounded-md mr-14 bg-red-600 text-white text-base">User Status</DropdownMenuTrigger>
                         <DropdownMenuContent className="mt-2 flex flex-col pb-2">
                             <DropdownMenuLabel className="text-base pb-0 mt-2">Online Staff ({onlineStaff.length -1})</DropdownMenuLabel>
                             <DropdownMenuSeparator/>
@@ -305,7 +295,7 @@ function EnquiryDetail() {
                     >
                         <div className="inline-flex max-w-full p-4 rounded-lg shadow-md bg-white items-center">
                             <p className="text-gray-800 font-medium whitespace-nowrap mr-2">
-                                {msg.postedByID == userId ? username + ":" : msg.postedByID ? postedUser +":" : respondingUser + ":"}
+                                {msg.postedByID != null ? postedUser : respondingUser }
                             </p>
                             <p className="text-gray-700">{msg.chatMessage}</p>
                         </div>

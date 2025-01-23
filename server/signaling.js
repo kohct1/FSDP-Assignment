@@ -12,9 +12,15 @@ const connections = {};
 const users = {};
 
 //Need to update code to support message data
-function broadcastAll() {
+function broadcastAll(inputUuid) {
   Object.keys(connections).forEach(uuid =>{
     const connection = connections[uuid];
+    //Removes old message messagedata
+    
+    if(uuid != inputUuid) {
+      users[uuid]["message"] = {};
+    }
+    
     const message = JSON.stringify(users);
     connection.send(message);
   })
@@ -23,11 +29,10 @@ function broadcastAll() {
 //When receiving a message
 function handleMessage(rawMessage, uuid) {
   const message = JSON.parse(rawMessage.toString());
-  console.log(message);
   let currentUser = users[uuid];
   currentUser.state = message.state;
   currentUser.message = message.message;
-  broadcastAll();
+  broadcastAll(uuid);
   console.log(`${currentUser.username} has updated their state or message`);
   
 }
@@ -54,7 +59,6 @@ wsServer.on('connection', (connection, request) => {
     username: username,
     //Send messages in state
     message: {
-
     },
     state: {
       typing: "Not typing",
