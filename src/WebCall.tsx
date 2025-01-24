@@ -20,31 +20,26 @@ const WebRTCAudioPage: React.FC = () => {
   const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
-    getUser();
+    getRole();
   }, []);
 
-  async function getUser() {
-    const response = await fetch("http://localhost:5050/decode/", {
+  async function getRole(): Promise<void> {
+    const response = await fetch(`http://localhost:5050/role/`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+          "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        token: localStorage.getItem("token"),
-      }),
+          token: localStorage.getItem("token")
+      })
     });
-  
-    if (!response.ok) {
-      console.error('Failed to decode token:', await response.text());
-      return;
-    }
-  
+    
     const result = await response.json();
-  
-    if (result.email && result.email.endsWith("@ocbcstaff.com")) {
+
+    if (result.role === "Staff") {
       setRole("Staff");
     } else {
-      setRole("Customer"); 
+      setRole("Customer")
     }
   }
   
