@@ -1,5 +1,6 @@
 import Navbar from "./components/Navbar";
 import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import { motion } from "framer-motion";
 
 const StaffQueue = () => {
@@ -7,6 +8,9 @@ const StaffQueue = () => {
     const [leftQueue, setLeftQueue] = useState(0);
     const [currentCall, setCurrentCall] = useState<number | null>(null);
     const [lastUpdatedTime, setLastUpdatedTime] = useState("");
+    const [averageRating, setAverageRating] = useState("No ratings yet");
+    const [recentFeedback, setRecentFeedback] = useState(null);
+    const navigate = useNavigate();
 
     // Function to format the current time as hh:mm:ss AM/PM
     const getCurrentTime = () => {
@@ -35,10 +39,27 @@ const StaffQueue = () => {
         }
     };
 
+    // Fetch feedback summary data from the backend
+    const fetchFeedbackSummary = async () => {
+        try {
+            const response = await fetch("http://localhost:5050/staff/feedbackSummary");
+            if (response.ok) {
+                const data = await response.json();
+                setAverageRating(data.averageRating);
+                setRecentFeedback(data.recentFeedback);
+            } else {
+                console.error("Failed to fetch feedback summary");
+            }
+        } catch (error) {
+            console.error("Error fetching feedback summary:", error);
+        }
+    };
+
     // Call the next person in the queue
     const callNextPerson = () => {
         if (queueCount - leftQueue > 0) {
             setCurrentCall(leftQueue + 1);
+            navigate("/webcall");
         } else {
             alert("No one in the queue to call!");
         }
@@ -65,10 +86,14 @@ const StaffQueue = () => {
         }
     };
 
-    // Fetch queue data on component mount and set up polling
+    // Fetch queue and feedback data on component mount and set up polling
     useEffect(() => {
         fetchQueueData();
-        const intervalId = setInterval(fetchQueueData, 10000); // Refresh every 10 seconds
+        fetchFeedbackSummary();
+        const intervalId = setInterval(() => {
+            fetchQueueData();
+            fetchFeedbackSummary();
+        }, 10000); // Refresh every 10 seconds
         return () => clearInterval(intervalId);
     }, []);
 
@@ -82,7 +107,8 @@ const StaffQueue = () => {
 
             {/* Main Content */}
             <main className="relative z-10 flex justify-center items-center flex-grow">
-                <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full text-center opacity-100">
+                {/* Original Box */}
+                <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full text-center opacity-100 h-full">
                     <h2 className="text-lg font-semibold">Staff Queue Management</h2>
 
                     <div className="my-6">
@@ -100,23 +126,51 @@ const StaffQueue = () => {
                     <div className="flex flex-col gap-4">
                         {/* Call Next Button */}
                         <motion.button
-                        className="bg-red-600 text-white text-lg font-semibold px-6 py-3 rounded mt-8"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={callNextPerson}
-                    >
-                        Call Next Person
-                    </motion.button>
+                            className="bg-red-600 text-white text-lg font-semibold px-6 py-3 rounded mt-8"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={callNextPerson}
+                        >
+                            Call Next Person
+                        </motion.button>
 
                         {/* Complete Call Button */}
                         <motion.button
-                        className="bg-white-600 text-red-600 text-lg font-semibold px-6 py-3 rounded mt-8"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={completeCall}
-                    >
-                        Complete Current Call
-                    </motion.button>
+                            className="bg-white-600 text-red-600 text-lg font-semibold px-6 py-3 rounded mt-8"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={completeCall}
+                        >
+                            Complete Current Call
+                        </motion.button>
+                    </div>
+                </div>
+
+                {/* Stacked Boxes (Positioned to the Right, Same Height as Original Box) */}
+                <div className="flex flex-col gap-4 ml-8 h-full">
+                    {/* Box 1 */}
+                    <div className="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full text-center opacity-100 flex-1">
+                        <p className="text-lg mt-4">
+                            Average Rating: <span className="font-bold">{averageRating}</span>
+                        </p>
+                    </div>
+
+                    {/* Box 2 */}
+                    <div className="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full text-center opacity-100 flex-1">
+                        <div className="mt-6">
+                            <h2 className="text-lg font-semibold">Latest Feedback</h2>
+                            {recentFeedback ? (
+                                <div className="text-left mt-4">
+                                    <p className="font-bold">Rating: {recentFeedback.rating}/5</p>
+                                    <p className={recentFeedback.feedback ? "italic" : ""}>
+                                        {recentFeedback.feedback ? `"${recentFeedback.feedback}"` : "No feedback provided"}
+                                    </p>
+
+                                </div>
+                            ) : (
+                                <p>No feedback available</p>
+                            )}
+                        </div>
                     </div>
                 </div>
             </main>

@@ -14,7 +14,6 @@ import CustomerEnquiries from "./ActiveEnquiriesCustomer";
 import EnquiriesResponse from "./EnquiriesResponse";
 import CallPage from "./CallPage";
 import WebCall from "./WebCall";
-import FeedbackForm from "./FeedbackForm";
 function App() {
   return (
     <Routes>
@@ -32,7 +31,6 @@ function App() {
       <Route path="enquiries/response" element={<EnquiriesResponse />} />
       <Route path="callpage" element={<CallPage />} />
       <Route path="webcall" element={<WebCall />} />
-      <Route path="feedbackform" element={<FeedbackForm/>} />
     </Routes>
   );
 }

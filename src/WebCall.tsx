@@ -17,6 +17,37 @@ const WebRTCAudioPage: React.FC = () => {
   const speakingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const navigate = useNavigate();
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  async function getUser() {
+    const response = await fetch("http://localhost:5050/decode/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token: localStorage.getItem("token"),
+      }),
+    });
+  
+    if (!response.ok) {
+      console.error('Failed to decode token:', await response.text());
+      return;
+    }
+  
+    const result = await response.json();
+  
+    if (result.email && result.email.endsWith("@ocbcstaff.com")) {
+      setRole("Staff");
+    } else {
+      setRole("Customer"); 
+    }
+  }
+  
 
   const SIGNALING_SERVER_URL = 'ws://localhost:8080';
   const iceServers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
@@ -141,8 +172,14 @@ const WebRTCAudioPage: React.FC = () => {
     setIsRemoteSpeaking(false);
     setCallDuration(0);
     clearInterval(timerIntervalRef.current!);
-    localStream?.getTracks().forEach(track => track.stop());
-    navigate('/homepage');
+    localStream?.getTracks().forEach((track) => track.stop());
+  
+    if (role === "Staff") {
+      navigate("/staff/queue");
+    } else {
+      localStorage.setItem("showFeedbackForm", "true");
+      navigate("/homepage");
+    }
   };
 
   const monitorSpeaking = (stream: MediaStream, setSpeaking: React.Dispatch<React.SetStateAction<boolean>>) => {
@@ -246,7 +283,7 @@ const WebRTCAudioPage: React.FC = () => {
       <audio ref={remoteAudioRef} autoPlay className="hidden" />
 
       <div className="flex gap-8 items-center mt-6">
-      <button
+        <button
           onClick={toggleMute}
           className={`w-16 h-16 flex items-center justify-center rounded-full ${
             isMuted ? 'bg-red-500' : 'bg-green-500'
