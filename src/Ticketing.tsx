@@ -88,7 +88,7 @@ const Ticketing = () => {
 
     useEffect(() => {
         fetchQueueData();
-        const intervalId = setInterval(fetchQueueData, 30000); // Poll every 30 seconds
+        const intervalId = setInterval(fetchQueueData, 100); // Poll every 1ms
         return () => clearInterval(intervalId);
     }, []);
 

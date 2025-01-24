@@ -7,9 +7,11 @@ const StaffQueue = () => {
     const [queueCount, setQueueCount] = useState(0);
     const [leftQueue, setLeftQueue] = useState(0);
     const [currentCall, setCurrentCall] = useState<number | null>(null);
+    const [callStarted, setCallStarted] = useState(false); // Track if a call has started
     const [lastUpdatedTime, setLastUpdatedTime] = useState("");
     const [averageRating, setAverageRating] = useState("No ratings yet");
     const [recentFeedback, setRecentFeedback] = useState(null);
+    const [isProcessing, setIsProcessing] = useState(false); // For locking the button
     const navigate = useNavigate();
 
     // Function to format the current time as hh:mm:ss AM/PM
@@ -58,7 +60,9 @@ const StaffQueue = () => {
     // Call the next person in the queue
     const callNextPerson = () => {
         if (queueCount - leftQueue > 0) {
-            setCurrentCall(leftQueue + 1);
+            setCurrentCall(leftQueue + 1); // Set the currently serving call
+            setCallStarted(true); // Indicate that a call has started
+            setLastUpdatedTime(getCurrentTime());
             navigate("/webcall");
         } else {
             alert("No one in the queue to call!");
@@ -67,34 +71,62 @@ const StaffQueue = () => {
 
     // Mark the current call as completed
     const completeCall = async () => {
-        if (currentCall !== null) {
+        if (isProcessing) return; // Prevent overlapping requests
+        if (currentCall !== null && callStarted) {
+            setIsProcessing(true); // Lock further button presses
+
             try {
                 const response = await fetch("http://localhost:5050/dequeue", {
                     method: "POST",
                 });
+
                 if (response.ok) {
-                    setLeftQueue((prev) => prev + 1);
-                    setCurrentCall(null);
+                    await fetchQueueData(); // Refresh queue data immediately
                 } else {
                     console.error("Failed to update left queue");
                 }
             } catch (error) {
                 console.error("Error completing the call:", error);
+            } finally {
+                setIsProcessing(false); // Unlock the button
             }
+            //force values to be reset
+            setLeftQueue((prev) => prev + 1); // Update the left queue count
+            setCallStarted(false); // Ensure "Call Next Person" must be pressed again
+            setCurrentCall(null); // Reset the current call after processing
         } else {
-            alert("No active call to complete!");
+            alert("You need to call the next person before completing a call!");
         }
     };
 
-    // Fetch queue and feedback data on component mount and set up polling
+    // Setup polling and initial fetch
     useEffect(() => {
+        let intervalId: NodeJS.Timeout | null = null;
+
+        const startPolling = () => {
+            if (!intervalId) {
+                intervalId = setInterval(fetchQueueData, 100); // Poll every 1ms
+            }
+        };
+
+        const stopPolling = () => {
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+        };
+
+        // Initial fetch
         fetchQueueData();
         fetchFeedbackSummary();
-        const intervalId = setInterval(() => {
-            fetchQueueData();
-            fetchFeedbackSummary();
-        }, 10000); // Refresh every 10 seconds
-        return () => clearInterval(intervalId);
+
+        // Start polling
+        startPolling();
+
+        return () => {
+            // Cleanup polling
+            stopPolling();
+        };
     }, []);
 
     return (
@@ -136,10 +168,13 @@ const StaffQueue = () => {
 
                         {/* Complete Call Button */}
                         <motion.button
-                            className="bg-white-600 text-red-600 text-lg font-semibold px-6 py-3 rounded mt-8"
+                            className={`bg-white-600 text-red-600 text-lg font-semibold px-6 py-3 rounded mt-8 ${
+                                !callStarted || isProcessing ? "opacity-50 cursor-not-allowed" : ""
+                            }`}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={completeCall}
+                            disabled={!callStarted || isProcessing} // Disable unless conditions are met
                         >
                             Complete Current Call
                         </motion.button>
