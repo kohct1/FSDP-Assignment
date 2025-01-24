@@ -111,6 +111,7 @@ function EnquiryDetail() {
     
     //Listens for new messages on the websocket connection
     useEffect(() => {
+      
         if(lastMessage) {
             const message = lastMessage.data;
             const messageData = JSON.parse(message);
@@ -130,8 +131,16 @@ function EnquiryDetail() {
                     
                     let postedById = username == postedUser ? userId : null;
                     let respondedById = username == respondingUser ? userId : null;
-                    let timestamp = message.timestamp;      
-                    messages[messages.length] = {chatMessage: chatMessage, postedByID: postedById, respondedByID: respondedById, timestamp: timestamp};
+                    let timestamp = message.timestamp;    
+                    let duplicate = false;
+                    for(let i = 0; i < messages.length; i++) {
+                        if(messages[i]["timestamp"] == timestamp) {
+                            duplicate = true;
+                        }
+                    }  
+                    if(!duplicate) {
+                        messages[messages.length] = {chatMessage: chatMessage, postedByID: postedById, respondedByID: respondedById, timestamp: timestamp};
+                    }
                     //console.log(messages[messages.length -1]);
                     //console.log("passed: " + username + " message: " + JSON.stringify(message));
                 }
