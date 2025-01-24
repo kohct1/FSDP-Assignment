@@ -63,7 +63,6 @@ const StaffQueue = () => {
             setCurrentCall(leftQueue + 1); // Set the currently serving call
             setCallStarted(true); // Indicate that a call has started
             setLastUpdatedTime(getCurrentTime());
-            navigate("/webcall");
         } else {
             alert("No one in the queue to call!");
         }
