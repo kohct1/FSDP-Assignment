@@ -35,7 +35,6 @@ function ActiveEnquiriesStaff() {
         sendJsonMessage(
             {
                 message: {
-
                 },
                 state: 
                 {
@@ -90,7 +89,6 @@ function ActiveEnquiriesStaff() {
                 })
             });
             //Access enquiry conversation here
-            localStorage.setItem("responseId", enquiryId);
             enquiry["responseBy"] = staffId; 
             navigate("/enquiries/response", { state: { enquiry } });
         }

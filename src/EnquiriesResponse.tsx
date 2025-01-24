@@ -23,7 +23,7 @@ function EnquiryDetail() {
     const [postedUser, setPostedUser] = useState("");
     const [respondingUser, setRespondingUser] = useState("");
     const [newMessage, setNewMessage] = useState(Object);
-
+    console.log(enquiry);
     const messagesEndRef = useRef(null);
     const username = localStorage.getItem('username');
     const wsURL = `ws://localhost:8080?username=${username}`; 
@@ -39,6 +39,7 @@ function EnquiryDetail() {
         for(let i = 0; i < enquiryData['enquiries'].length; i++) {
             if(enquiryData['enquiries'][i]["_id"] == enquiryID) {
                 setEnquiry(enquiryData['enquiries'][i]);
+                //if(enquiryData["enquiries"][i] != )
                 setMessages(enquiryData["enquiries"][i]["messages"]);
             }
         }
@@ -291,13 +292,13 @@ function EnquiryDetail() {
             
 
             <div className="bg-gray-100 p-6 rounded-lg shadow-md h-76 overflow-y-auto mx-12">
-                {messages.length === 0 ? (
+                {messages?.length === 0 ? (
                     <p className="text-gray-600 text-center mb-4">
                         Create a message to begin the conversation.
                     </p>
                 ) : null}
 
-                {messages.map((msg, index) => (
+                {messages?.map((msg, index) => (
                     <div 
                         key={index} 
                         className={`flex items-start mb-4 ${msg.postedByID ? 'justify-start' : 'justify-end'}`}
