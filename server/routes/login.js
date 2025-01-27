@@ -55,7 +55,7 @@ router.post("/decode", async (req, res) => {
     try {
         const decoded = jwt.decode(token, process.env.JWT_SECRET);
 
-        res.status(200).json({ userId: decoded.userId, email: decoded.email });
+        res.status(200).json({ userId: decoded.userId, email: decoded.email, role: decoded.role});
     } catch (err) {
         res.status(500).send(err);
     }

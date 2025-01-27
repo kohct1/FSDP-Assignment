@@ -2,7 +2,7 @@ import { ObjectId } from "mongoose";
 import Navbar from "./components/Navbar";
 import { useState, useEffect } from 'react';
 import { decodeToken } from "react-jwt";
-import useWebSocket, {ReadyState} from "react-use-websocket";
+import useWebSocket from "react-use-websocket";
 
 import {
     DropdownMenu,
@@ -10,13 +10,11 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-    DropdownMenuItem
-
-
-
 } from "@/components/ui/dropdown-menu";
+
 import {
     Dialog,
+    DialogTitle,
     DialogContent,
     DialogHeader,
     DialogTrigger
@@ -30,14 +28,23 @@ function ActiveEnquiriesStaff() {
     const username = localStorage.getItem('username');
     const wsURL = `ws://localhost:8080?username=${username}`;
     const {lastMessage, sendJsonMessage} = useWebSocket<any>(wsURL, {share: true, shouldReconnect: () => true});
+    const userRole = localStorage.getItem('role');
 
     //Sends the initial message to retrieve
     useEffect(() => {
-        sendJsonMessage({
-            typing: "Not typing",
-            status: "Online",
-            ping: "False",
-        });
+        sendJsonMessage(
+            {
+                message: {
+                },
+                state: 
+                {
+                    typing: "Not typing",
+                    status: "Online",
+                    onEnquiry: "False",
+                    role: userRole
+                }
+            }
+        );
     },[])
 
 
@@ -60,13 +67,12 @@ function ActiveEnquiriesStaff() {
 
     function saveEnquiryData(enquiryId: string, staffId: string, status: string, enquiry: any) {
         if (status !== "Other Staff Responding") {
-            console.log("Clicked");
             localStorage.setItem("currentEnquiryID", enquiryId);
             localStorage.setItem("currentEnquiry", JSON.stringify(enquiry));  
             localStorage.setItem("currentStaffId", staffId);
             localStorage.setItem("currentStatus", status);
-            
         }
+        console.log(enquiryId);
     }
 
     async function updateResponding(enquiryId : string, staffId : string, status: string, enquiry : any) {
@@ -83,7 +89,6 @@ function ActiveEnquiriesStaff() {
                 })
             });
             //Access enquiry conversation here
-            localStorage.setItem("responseId", enquiryId);
             enquiry["responseBy"] = staffId; 
             navigate("/enquiries/response", { state: { enquiry } });
         }
@@ -102,7 +107,6 @@ function ActiveEnquiriesStaff() {
                 })
             });
             window.location.reload();
-            
         }
     }
    
@@ -181,17 +185,19 @@ function ActiveEnquiriesStaff() {
                 <>
                     <Dialog>
                         <DialogTrigger className="w-full" disabled={status === "Other Staff Responding"}>
-                            <div className = {classes} onClick={() => saveEnquiryData(enquiryId, decodedId, status, enquiry)} id={count.toString()}>
+                            <div className = {classes} onClick={() => saveEnquiryData(enquiryId, decodedId, status, enquiry)} id={count.toString()} key={enquiryId}>
                                 <p className="font-sans text-black font-medium pl-2 text-xs sm:text-sm md:text-base" >{enquiry.type}   -</p>
                                 <p className="font-sans text-black pl-2 text-xs sm:text-sm md:text-base">{enquiry.message}</p>
                                 <p className="font-sans text-black pl-2 font-medium ml-auto mr-8 text-xs sm:text-small md:text-base">{status}</p>
                             </div>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent className="w-1/2">
                             <DialogHeader className="flex flex-col gap-4">
-                                <h2 className="text-xl font-semibold text-gray-700">Manage Enquiry</h2>
-                                <button onClick={() => updateResponding(enquiryId, staffId, status, enquiry)} className="text-white bg-red-600 px-4 py-2 rounded">Respond</button>
-                                <button onClick={() => closeEnquiry(enquiryId)} className="text-white bg-red-600 px-4 py-2 rounded">Close Enquiry</button>
+                                <DialogTitle className="text-xl font-semibold text-gray-700 mb-7">Manage Enquiry</DialogTitle>
+                                <div className="flex flex-row">
+                                    <button onClick={() => updateResponding(enquiryId, staffId, status, enquiry)} className="text-white bg-red-600 hover:bg-red-800 px-4 py-1.5 rounded">Respond</button>
+                                    <button onClick={() => closeEnquiry(enquiryId)} className="text-white bg-red-600 hover:bg-red-800 px-4 py-1 rounded ml-6">Close Enquiry</button>
+                                </div>
                             </DialogHeader>
                         </DialogContent>
                     </Dialog>
@@ -203,7 +209,7 @@ function ActiveEnquiriesStaff() {
         count++;
     }
     let onlineUser = [''];
-    let offlineUser = [''];
+    let onlineStaff = [''];
 
     if(messageData) {
         let keys = Object.keys(messageData);
@@ -211,11 +217,12 @@ function ActiveEnquiriesStaff() {
             let username = messageData[keys[i]]["username"];
             let message = messageData[keys[i]];
             let status = message["state"]["status"];
-            if(status == "Online") {
-                onlineUser.push(username);
+            let role = message["state"]["role"];
+            if(status == "Online" && role == "Staff") {
+                onlineStaff.push(username);
             }
-            else {
-                offlineUser.push(username);
+            else if (status == "Online") {
+                onlineUser.push(username);
             }
         }
     }
@@ -224,20 +231,25 @@ function ActiveEnquiriesStaff() {
         <>
             <Navbar />
             <div className="w-full h-screen">
-                <div className="flex flex-row items-center">
-                    <h1 className="lg:text-3xl md:text-xl sm:text-base font-semibold md:ml-40 mt-8 mr-9">Open Enquiries</h1>
+                <div className="flex flex-row items-center justify-between mt-8">
+                    <h1 className="lg:text-3xl md:text-xl sm:text-l font-semibold sm:ml-40 ml-32">Open Enquiries</h1>
                     <DropdownMenu>
-                        <DropdownMenuTrigger className="mt-10 border-2 p-1 rounded-md justify-self-end">Staff Status</DropdownMenuTrigger>
-                        <DropdownMenuContent className="mt-2 flex flex-col pb-2">
-                            <DropdownMenuLabel className="text-base pb-0">Online Staff</DropdownMenuLabel>
-                            <DropdownMenuSeparator/>
-                            {onlineUser.map(name => (
-                                <p key={name} className="ml-2 mt-0.5">{name}</p>
-                            ))}
-                        </DropdownMenuContent>
+                        <DropdownMenuTrigger className="border-2 p-2 rounded-md mr-14 bg-red-600 hover:bg-red-800 text-white text-base sm:mr-52 mr-20">User Status</DropdownMenuTrigger>
+                            <DropdownMenuContent className="mt-2 flex flex-col pb-2 justify-center">
+                                <DropdownMenuLabel className="text-base pb-0 mt-2">Online Staff ({onlineStaff.length -1})</DropdownMenuLabel>
+                                <DropdownMenuSeparator/>
+                                {onlineStaff.map(name => (
+                                    <p key={name} className="ml-2 mt-0.5">{name}</p>
+                                ))}
+                                 <DropdownMenuLabel className="text-base pb-0 mt-4">Online Users ({onlineUser.length -1})</DropdownMenuLabel>
+                                 <DropdownMenuSeparator/>
+                                {onlineUser.map(name => (
+                                    <p key={name} className="ml-2 mt-0.5">{name}</p>
+                                ))}                                            
+                            </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
-                <div className="drop-shadow-lg w-4/5 bg-slate-100 h-3/4 m-auto mt-8 rounded-lg flex-col justify-around overflow-auto pb-14 pt-2" id="enquiries-container">
+                <div className="drop-shadow-lg w-4/5 bg-slate-100 h-3/4 m-auto mt-8 rounded-lg flex-col justify-around overflow-auto pb-10 pt-2" id="enquiries-container">
                     <div className="w-1/5 text-gray-200 h-0">2</div>
                     {enquiryElements}
                 </div>
