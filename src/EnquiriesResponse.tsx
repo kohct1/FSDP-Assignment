@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 import Navbar from "./components/Navbar";
 import useWebSocket from "react-use-websocket";
+import {motion} from "motion/react";
 
 import {
     DropdownMenu,
@@ -10,8 +10,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-//BUGS: Switching messages will result in duplicate messages sent for some reason. This does not seem to be an issue of the webscokets?
-
+import { send } from 'node:process';
 
 function EnquiryDetail() {
     //Retrieve enquirydata from state.enquiry
@@ -23,14 +22,25 @@ function EnquiryDetail() {
     const [postedUser, setPostedUser] = useState("");
     const [respondingUser, setRespondingUser] = useState("");
     const [newMessage, setNewMessage] = useState(Object);
-    console.log(enquiry);
+    const [isTyping, setIsTyping] = useState(Boolean);
+    const [isFocused, setIsFocused] = useState(Boolean);
+
     const messagesEndRef = useRef(null);
-    const username = localStorage.getItem('username');
-    const wsURL = `ws://localhost:8080?username=${username}`; 
+    const currentUsername = localStorage.getItem('username');
+    const wsURL = `ws://localhost:8080?username=${currentUsername}`; 
     const enquiryID = localStorage.getItem("currentEnquiryID");
     const userRole = localStorage.getItem("role");
-
+    const inputBox = document.getElementById("response-input");
     const {lastMessage, sendJsonMessage} = useWebSocket<any>(wsURL, {share: true, shouldReconnect: () => true});
+
+    inputBox?.addEventListener("focusin", ()=> {
+        setIsFocused(true);
+        
+    });
+
+    inputBox?.addEventListener("focusout", () => {
+        setIsFocused(false);        
+    });
 
     async function getEnquiry() {
         const response = await fetch("http://localhost:5050/enquiries/staff/open");
@@ -99,6 +109,7 @@ function EnquiryDetail() {
     useEffect(() => {
         getEnquiry();
         getUser();
+        setIsTyping(false);
     }, []);
 
     useEffect(() => {
@@ -108,8 +119,45 @@ function EnquiryDetail() {
 
     }, [enquiry])
 
-    
-    
+    useEffect(() => {
+        if(isFocused == true) {
+            sendJsonMessage(
+                {
+                    state:
+                    {
+                        typing: "Typing",
+                        status: "Online",
+                        onEnquiry: false,
+                        role: userRole,
+                        sentBy: currentUsername
+                    },
+                    message: 
+                    {
+                        enquiryID: enquiry._id
+                    }
+                }
+            )
+        }
+        else {
+            sendJsonMessage(
+                {
+                    state:
+                    {
+                        typing: "Not typing",
+                        status: "Online",
+                        onEnquiry: false,
+                        role: userRole,
+                        sentBy: currentUsername
+                    },
+                    message: 
+                    {
+                        enquiryID: enquiry._id
+                    }
+                }
+            )
+        }
+    }, [isFocused]);
+ 
     //Listens for new messages on the websocket connection
     useEffect(() => {
       
@@ -119,17 +167,32 @@ function EnquiryDetail() {
           
             setMessageData(messageData);
             let keys = Object.keys(messageData);
+            let alreadyTyping = false;
             for(let i = 0; i < keys.length; i++) {
                 let username = messageData[keys[i]]["username"];
                 let message = messageData[keys[i]]["message"];
+       
                 let chatMessage = "";
                 if(message.chatMessage) {
                     chatMessage = message.chatMessage;
                 }
-               
+                let typing = messageData[keys[i]]["state"]["typing"];
+                let sentBy = messageData[keys[i]]["state"]["sentBy"];
+
+                let typingMsg = typing == "Typing" ? "typing" : "not typing";
+                //console.log("User: " + sentBy + " is " +  typingMsg + " over the connection. The current user is " + currentUsername);
+           
+
+                if(typing == "Typing" && message.enquiryID == enquiry._id && sentBy != currentUsername) {
+                    alreadyTyping = true;
+                    setIsTyping(true);
+                }
+                else if (alreadyTyping == false) {
+                    setIsTyping(false);
+                }
                 //Checks if current message is sent to correct enquiry
-                if((username == postedUser || username == respondingUser) && message.enquiryID == enquiry.id && chatMessage.trim() != "") {
-                    
+                if(message.enquiryID == enquiry.id && chatMessage.trim() != "") {
+                  
                     let postedById = username == postedUser ? userId : null;
                     let respondedById = username == respondingUser ? userId : null;
                     let timestamp = message.timestamp;    
@@ -149,7 +212,6 @@ function EnquiryDetail() {
             
             
         }
-        console.log(messages);
     }, [lastMessage]);
 
     //Sends websocket message when new message is set
@@ -212,7 +274,7 @@ function EnquiryDetail() {
                 respondedByID: respondedByID
             };
 
-            console.log("Setting new message: chat:" + inputMessage + "postedBy:" + postedByID + "respondedBy:" + respondedByID);
+            //console.log("Setting new message: chat:" + inputMessage + "postedBy:" + postedByID + "respondedBy:" + respondedByID);
             setNewMessage(
                 {
                     chatMessage : inputMessage,
@@ -244,6 +306,8 @@ function EnquiryDetail() {
             }
         }
     };   
+
+   
     
     //Status display
     let onlineUser = [''];
@@ -291,7 +355,7 @@ function EnquiryDetail() {
             </h1>
             
 
-            <div className="bg-gray-100 p-6 rounded-lg shadow-md h-76 overflow-y-auto mx-12">
+            <div className="bg-gray-100 p-6 rounded-lg shadow-md h-76 overflow-y-auto mx-12 mb-0" id="messageBox">
                 {messages?.length === 0 ? (
                     <p className="text-gray-600 text-center mb-4">
                         Create a message to begin the conversation.
@@ -320,16 +384,26 @@ function EnquiryDetail() {
         ) : (userId !== enquiry.postedBy && userId !== enquiry.responseBy) ? (
             <p className="text-center text-gray-500 mt-6">You do not have permission to send messages for this enquiry.</p>
         ) : (
-            <form className="mt-6 p-12" onSubmit={handleSendMessage}>
-                <div className="flex">
-                    <input
+            //Text bubble could use eventlistener on key down and up to send messages back from the websocket
+            <form className="p-12" onSubmit={handleSendMessage}>
+                <div className="flex flex-col items-center">
+                    {isTyping == false ? null : 
+                        <div className="flex flex-row mr-auto ml-2 mb-1">
+                            <p className="flex flex-row">{currentUsername == postedUser ? respondingUser : postedUser} is typing</p>
+                            <motion.div className='ml-1 font-semibold' initial={{opacity: "100%"}} animate = {{opacity: "0"}} transition = {{type: "easeInOut", duration: 1, repeat: Infinity, repeatType: "reverse"}}>.</motion.div>
+                            <motion.div className='ml-1 font-semibold' initial={{opacity: "100%"}} animate = {{opacity: "0"}} transition = {{type: "easeInOut", duration: 1, repeat: Infinity, repeatType: "reverse", delay: 0.5}}>.</motion.div>
+                            <motion.div className='ml-1 font-semibold' initial={{opacity: "100%"}} animate = {{opacity: "0"}} transition = {{type: "easeInOut", duration: 1, repeat: Infinity, repeatType: "reverse", delay: 1}}>.</motion.div>
+                        </div>
+                    }
+                    <input 
+                        id="response-input"
                         type="text"
                         value={inputMessage}
                         onChange={(e) => setInputMessage(e.target.value)}
                         placeholder="Type your message..."
-                        className="flex-grow p-2 border border-gray-300 rounded-l"
+                        className="flex-grow p-2 border border-gray-300 rounded-l w-full mb-4 mt-0"
                     />
-                    <button type="submit" className="bg-blue-500 text-white p-2 rounded-r">Send</button>
+                    <button type="submit" className="bg-blue-500 text-white p-2 rounded w-1/4 mt-4">Send</button>
                 </div>
             </form>
         )}
