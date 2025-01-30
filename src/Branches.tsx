@@ -11,6 +11,13 @@ import BranchMarkers from "./components/BranchMarkers";
 import BranchButton from "./components/BranchButton";
 import BranchSearch from "./components/BranchSearch";
 import { Checkbox } from "./components/ui/checkbox";
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 function Branches() {
     const [branches, setBranches] = useState<object[]>([]);
@@ -926,6 +933,8 @@ function Branches() {
     const [selectedBranch, setSelectedBranch] = useState<object>({});
     const [search, setSearch] = useState<string>("");
     const [nearest, setNearest] = useState(false);
+    const [opening, setOpening] = useState("");
+    const [closing, setClosing] = useState("");
 
     useEffect(() => {
         setBranches(data);
@@ -937,6 +946,21 @@ function Branches() {
         setBranches(filteredData);
     }, [search]);
 
+    useEffect(() => {
+        let filteredData = data;
+
+        if (opening != "") {
+            filteredData = filteredData.filter((branch: object) => branch.openingHours.toLowerCase().includes(opening));
+        }
+
+        if (closing != "") {
+            console.log("sdfsd")
+            filteredData = filteredData.filter((branch: object) => branch.openingHours.toLowerCase().includes(closing));
+        }
+
+        setBranches(filteredData);
+    }, [opening, closing]);
+
     return (
         <>
             <div className="w-full h-screen flex flex-col">
@@ -944,10 +968,61 @@ function Branches() {
                 <div className="w-full h-full flex justify-center items-center">
                     <div className="w-1/5 h-full flex flex-col overflow-y-scroll">
                         <BranchSearch search={search} setSearch={setSearch} />
-                        <div className="flex items-center border-b-[1px] p-4 gap-4">
-                            <Checkbox checked={nearest} onCheckedChange={() => setNearest(!nearest)} />
-                            <h1>Nearest Branch</h1>
-                        </div>
+                        <Accordion type="single" collapsible>
+                            <AccordionItem className="px-4" value="item-1">
+                                <AccordionTrigger>Filter Options</AccordionTrigger>
+                                <AccordionContent className="flex flex-col gap-4">
+                                    <div className="flex gap-16">
+                                        <div className="flex flex-col gap-2">
+                                            <h1 className="font-semibold">Opening Times</h1>
+                                            <RadioGroup defaultValue="option-one" onValueChange={(value) => setOpening(value)}>
+                                                <div className="flex items-center space-x-2">
+                                                    <RadioGroupItem value="" id="option-one" />
+                                                    <h1>All</h1>
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                    <RadioGroupItem value="9.00am" id="option-two" />
+                                                    <h1>9.00am</h1>
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                    <RadioGroupItem value="10.00am" id="option-three" />
+                                                    <h1>10.00am</h1>
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                    <RadioGroupItem value="11.00am" id="option-four" />
+                                                    <h1>11.00am</h1>
+                                                </div>
+                                            </RadioGroup>
+                                        </div>
+                                        <div className="flex flex-col gap-2">
+                                            <h1 className="font-semibold">Closing Times</h1>
+                                            <RadioGroup defaultValue="option-one" onValueChange={(value) => setClosing(value)}>
+                                                <div className="flex items-center space-x-2">
+                                                    <RadioGroupItem value="" id="option-one" />
+                                                    <h1>All</h1>
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                    <RadioGroupItem value="4.30pm" id="option-two" />
+                                                    <h1>4.30pm</h1>
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                    <RadioGroupItem value="5.00pm" id="option-three" />
+                                                    <h1>5.00pm</h1>
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                    <RadioGroupItem value="7.00pm" id="option-four" />
+                                                    <h1>7.00pm</h1>
+                                                </div>
+                                            </RadioGroup>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <Checkbox checked={nearest} onCheckedChange={() => setNearest(!nearest)} />
+                                        <h1 className="font-semibold">Nearest Branch</h1>
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
                         {branches.map((branch: object, index: number) => {
                             return (
                                 <BranchButton key={index} branch={branch} setSelectedBranch={setSelectedBranch}/>
