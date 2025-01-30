@@ -2,16 +2,38 @@ import React, { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import FeedbackForm from "./components/FeedbackForm"; 
 
-function HomePage() {
-  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+import { useState, useEffect } from "react";
+import useWebSocket from "react-use-websocket";
+import {decodeToken} from "react-jwt";
 
-  useEffect(() => {
-    const feedbackFlag = localStorage.getItem("showFeedbackForm");
-    if (feedbackFlag === "true") {
-      setShowFeedbackForm(true);
-      localStorage.removeItem("showFeedbackForm"); // Remove the flag after setting it
-    }
-  }, []);
+function HomePage() {
+    const [userId, setUserId] = useState(null);
+    const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+   
+    useEffect(() => {
+        getUser();
+        const feedbackFlag = localStorage.getItem("showFeedbackForm");
+        if (feedbackFlag === "true") {
+          setShowFeedbackForm(true);
+          localStorage.removeItem("showFeedbackForm"); // Remove the flag after setting it
+        }
+      }, []);
+    }, []);
+    
+    async function getUser(): Promise<void> {
+        const response = await fetch(`http://localhost:5050/decode/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                token: localStorage.getItem("token")
+            })
+        });
+    
+        const result = await response.json();
+        setUserId(result.userId);
+   }
 
   return (
     <div className="bg-white min-h-screen">

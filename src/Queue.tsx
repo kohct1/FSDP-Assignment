@@ -134,7 +134,7 @@ const Queue = () => {
                         </div>
                     </div>
 
-                    <p className="text-lg">
+                    <p className="text-lg mt-8">
                         Estimated Waiting Time: <strong>{waitingTime} minutes</strong>
                     </p>
 

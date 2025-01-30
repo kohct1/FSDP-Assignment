@@ -342,6 +342,7 @@ const BookingForm: React.FC = () => {
       <Navbar />
 
       <div className="h-full flex justify-center items-center py-12">
+
         <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-8">
         <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-semibold text-gray-800">Make a Booking</h1>

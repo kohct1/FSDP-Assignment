@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import './App.css'
 import Login from "./Login";
 import Enquiry from './ActiveEnquiriesStaff';
@@ -14,6 +14,8 @@ import CustomerEnquiries from "./ActiveEnquiriesCustomer";
 import EnquiriesResponse from "./EnquiriesResponse";
 import CallPage from "./CallPage";
 import WebCall from "./WebCall";
+import Branches from "./Branches";
+
 function App() {
   return (
     <Routes>
@@ -31,6 +33,7 @@ function App() {
       <Route path="enquiries/response" element={<EnquiriesResponse />} />
       <Route path="callpage" element={<CallPage />} />
       <Route path="webcall" element={<WebCall />} />
+      <Route path="branches" element={<Branches />} />
     </Routes>
   );
 }

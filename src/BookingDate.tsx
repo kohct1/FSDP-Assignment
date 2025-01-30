@@ -13,6 +13,10 @@ import {
     DialogTrigger,
     DialogFooter
 } from "@/components/ui/dialog";
+import { gapi } from "gapi-script";
+import { Button } from "./components/ui/button";
+
+const clientId = "730772704554-stei2mnsmj852u34spa0fi870l07plmj.apps.googleusercontent.com";
 
 function BookingDate() {
     const currentDate: Date = new Date();
@@ -167,7 +171,95 @@ function BookingDate() {
 
         setDisplayTime([displayTime1, displayTime2]);
     }, [selectedSlot]);
-    console.log(currentDate.getDate())
+
+    useEffect(() => {
+        function start() {
+            gapi.client.init({
+                clientId: clientId,
+                scope: 'https://www.googleapis.com/auth/calendar',
+            });
+        }
+
+        gapi.load('client:auth2', start);
+    }, []);
+
+    function handleLogin() {
+        const auth = gapi.auth2.getAuthInstance();
+        auth.signIn().then(() => {
+            console.log('User signed in');
+            createEvent();
+            navigate("/homepage");
+        });
+    };
+
+    let suggestedSlots: number = 1;
+
+    if (state.category === "OCBC Mobile App") {
+        suggestedSlots = 2;
+    } else if (state.category === "Loans/Collections") {
+        suggestedSlots = 1;
+    } else if (state.category === "Credit/Debit Card") {
+        suggestedSlots = 1;
+    } else if (state.category === "Premier Services") {
+        suggestedSlots = 2;
+    } else if (state.category === "Investments/Securities") {
+        suggestedSlots = 2;
+    } else if (state.category === "Bank Account") {
+        suggestedSlots = 1;
+    } else if (state.category === "Other") {
+        suggestedSlots = 3;
+    }
+
+    let time1: number = selectedTime;
+    let time2: number = selectedTime;
+    let slot1: string = String((selectedSlot[0] - 1) * 10);
+    let slot2: string = String((selectedSlot[0] + suggestedSlots - 1) * 10);
+
+    if (slot1 === "0" || slot1 === "60") slot1 = "00";
+    if (slot2 === "0" || slot2 === "60") {
+        slot2 = "00";
+        
+        if (time2 === 12) {
+            time2 = 1;
+        } else {
+            time2 += 1;
+        }
+    }
+
+    async function createEvent() {
+        const event = {
+            summary: 'OCBC Online Meeting',
+            location: 'Online',
+            description: state.reason,
+            start: {
+                dateTime: `${String(currentDate.getFullYear())}-${currentDate.getMonth() + 1}-${selectedDate}T${time1}:${slot1}:00+08:00`,
+                timeZone: 'Asia/Singapore',
+            },
+            end: {
+                dateTime: `${String(currentDate.getFullYear())}-${currentDate.getMonth() + 1}-${selectedDate}T${time2}:${slot2}:00+08:00`,
+                timeZone: 'Asia/Singapore',
+            },
+        };
+      
+        const token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
+      
+        try {
+            const response = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+                method: 'POST',
+                headers: {
+                Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(event),
+            });
+      
+            const data = await response.json();
+            console.log('Event created: ', data);
+            alert(`Event created: ${data.htmlLink}`);
+        } catch (error) {
+            console.error('Error creating event:', error);
+        }
+      };
 
     return (
         <div className="w-full h-screen flex flex-col items-center">
@@ -227,7 +319,22 @@ function BookingDate() {
                                         {`You are creating a booking for ${months[currentDate.getMonth()]} ${selectedDate} ${String(currentDate.getFullYear())}, ${displayTime[0]} - ${displayTime[1]}`}
                                     </DialogDescription>
                                     <DialogFooter>
-                                        <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => createUserBooking(selectedTime, selectedSlot)}>Confirm</motion.button>
+                                        <Dialog>
+                                            <DialogTrigger>
+                                                <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => createUserBooking(selectedTime, selectedSlot)}>Confirm</motion.button>
+                                            </DialogTrigger>
+                                            <DialogContent>
+                                                <DialogHeader>
+                                                    <DialogTitle>Do you want to add this to your Google Calendar?</DialogTitle>
+                                                    <DialogDescription>
+                                                        We will add this booking to your Google Calendar
+                                                    </DialogDescription>
+                                                    <DialogFooter>
+                                                        <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => handleLogin()}>Confirm</motion.button>
+                                                    </DialogFooter>
+                                                </DialogHeader>
+                                            </DialogContent>
+                                        </Dialog>
                                     </DialogFooter>
                                 </DialogHeader>
                             </DialogContent>
