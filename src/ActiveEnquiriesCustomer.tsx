@@ -31,7 +31,7 @@ function ActiveEnquiriesCustomer() {
         
         pastEnquiryElements = pastEnquiries?.map((enquiry : any) => {
             return(<>
-                <div key={enquiry._id} className="bg-white w-full p-3 shadow-md rounded mt-1 flex items-center cursor-pointer z-10 opacity-100" onClick={() => handleClick(enquiry._id.toString())}>
+                <div key={enquiry._id} className="bg-white w-full p-3 shadow-md rounded mt-1 flex items-center cursor-pointer z-10 opacity-100 hover:bg-gray-200" onClick={() => handleClick(enquiry._id.toString())}>
                     <p className="font-sans text-gray-800 text-sm flex-grow">
                         {`${enquiry.type || "Enquiry"} - ${enquiry.message || "Undefined"}`}
                     </p>
@@ -40,7 +40,7 @@ function ActiveEnquiriesCustomer() {
     
         activeEnquiryElements = activeEnquiries?.map((enquiry : any) => {
             return(<>
-                <div key={enquiry._id} className="bg-white w-full p-3 shadow-md rounded mt-1 flex items-center cursor-pointer z-10 opacity-100" onClick={() => handleClick(enquiry._id.toString())}>
+                <div key={enquiry._id} className="bg-white w-full p-3 shadow-md rounded mt-1 flex items-center cursor-pointer z-10 opacity-100 hover:bg-gray-200" onClick={() => handleClick(enquiry._id.toString())}>
                     <p className="font-sans text-gray-800 text-sm flex-grow">
                         {`${enquiry.type || "Enquiry"} - ${enquiry.message || "Undefined"}`}
                     </p>
@@ -93,30 +93,6 @@ function ActiveEnquiriesCustomer() {
     }
 
 
-    
- 
-    
-    /*
-    const pastEnquiryElements = enquiries.length > 0
-        ? enquiries.map((enquiry : {_id}, index) => {
-            <div
-                key={index}
-                className="bg-white w-full p-3 shadow-md rounded mt-1 flex items-center cursor-pointer z-10 opacity-100"
-                onClick={() => handleClick(enquiry._id.toString())}
-            >
-                <p className="font-sans text-gray-800 text-sm flex-grow">
-                    {`${enquiry.type || "Enquiry"} - ${enquiry.message || "Undefined"}`}
-                </p>
-            </div>
-        )
-        : <p className="text-gray-500 text-center mt-4">
-            {type === "Active" ? "No active enquiries found." : "No closed enquiries found."}
-          </p>;
-
-    return(<>{pastEnquiryElements}</>)};
-    */
-   
-
     return (
         <div
             className="relative flex flex-col min-h-screen bg-cover bg-center"
@@ -126,11 +102,13 @@ function ActiveEnquiriesCustomer() {
 
             <Navbar />
             <div className="relative w-full h-screen px-10">
-                <h1 className="lg:text-3xl md:text-xl sm:text-base font-semibold md:ml-40 mt-8 ml-40">
-                    Open Enquiries
-                </h1>
+                <div className="bg-gray-100 shadow-lg rounded-lg opacity-90 lg:w-[305px] pb-3 flex align-center pt-3 mt-10 md:w-[260px] w-[220px]">
+                    <h1 className="lg:text-2xl md:text-xl sm:text-base font-semibold ml-10">
+                        Customer Enquiries
+                    </h1>
+                </div>
                 <div className="flex justify-center gap-10 mt-10">
-                    <div className="bg-gray-100 w-2/3 px-8 py-6 shadow-lg rounded-lg opacity-70">
+                    <div className="bg-gray-100 w-2/3 px-8 py-6 shadow-lg rounded-lg opacity-90">
                         <h2 className="text-xl font-semibold text-gray-700 mb-4">Active Enquiries</h2>
                         {
                             activeEnquiries?.length != 0 ? presentElements : 
@@ -148,7 +126,7 @@ function ActiveEnquiriesCustomer() {
                             </motion.button>
                         </div>
                     </div>
-                    <div className="bg-gray-100 w-1/3 px-8 py-6 shadow-lg rounded-lg opacity-70">
+                    <div className="bg-gray-100 w-1/3 px-8 py-6 shadow-lg rounded-lg opacity-90">
                         <h2 className="text-xl font-semibold text-gray-700 mb-4">Past Enquiries</h2>
                         {
                             pastEnquiries?.length != 0 ? pastElements :

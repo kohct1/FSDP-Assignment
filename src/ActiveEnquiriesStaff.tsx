@@ -20,6 +20,7 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog";
 import { useNavigate } from "react-router";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 function ActiveEnquiriesStaff() {
     const [enquiryData, setData] = useState<any>([]);
@@ -193,8 +194,9 @@ function ActiveEnquiriesStaff() {
                         </DialogTrigger>
                         <DialogContent className="w-1/2">
                             <DialogHeader className="flex flex-col gap-4">
-                                <DialogTitle className="text-xl font-semibold text-gray-700 mb-7">Manage Enquiry</DialogTitle>
-                                <div className="flex flex-row">
+                                <DialogTitle className="text-xl font-semibold text-gray-700">Manage Enquiry</DialogTitle>
+                                <DialogDescription>Close or respond to a customer's enquiry. A closed enquiry cannot be reopened!</DialogDescription>
+                                <div className="flex flex-row mt-2">
                                     <button onClick={() => updateResponding(enquiryId, staffId, status, enquiry)} className="text-white bg-red-600 hover:bg-red-800 px-4 py-1.5 rounded">Respond</button>
                                     <button onClick={() => closeEnquiry(enquiryId)} className="text-white bg-red-600 hover:bg-red-800 px-4 py-1 rounded ml-6">Close Enquiry</button>
                                 </div>
