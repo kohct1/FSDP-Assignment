@@ -20,6 +20,7 @@ function PopulateLinks({ role, handleLogout }: { role: string, handleLogout: () 
                 <Link to="/bookingpage" className="text-gray-600 text-lg font-semibold">Booking</Link>
                 <Link to="/ticketing" className="text-gray-600 text-lg font-semibold">Queue</Link>
                 <Link to="/user/enquiries/view" className="text-gray-600 text-lg font-semibold">Enquiry Portal</Link>
+                <Link to="/branches" className="text-gray-600 text-lg font-semibold">Branches</Link>
                 <Dialog>
                     <DialogTrigger>
                         <motion.button className="bg-red-600 rounded text-lg text-white font-semibold px-3 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>Log out</motion.button>
