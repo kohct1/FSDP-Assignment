@@ -24,7 +24,6 @@ function HomePage() {
     
         const result = await response.json();
         setUserId(result.userId);
-      
    }
 
   return (
