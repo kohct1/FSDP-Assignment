@@ -78,9 +78,6 @@ function Login() {
                 console.log(result.user[i]["email"]);
             }  
         }
-       
-        
-       
     }
 
     async function register(): Promise<void> {

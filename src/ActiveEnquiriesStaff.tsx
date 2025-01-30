@@ -19,7 +19,7 @@ import {
     DialogHeader,
     DialogTrigger
 } from "@/components/ui/dialog";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { DialogDescription } from "@radix-ui/react-dialog";
 
 function ActiveEnquiriesStaff() {
@@ -91,7 +91,7 @@ function ActiveEnquiriesStaff() {
             });
             //Access enquiry conversation here
             enquiry["responseBy"] = staffId; 
-            navigate("/enquiries/response", { state: { enquiry } });
+            navigate("/enquiries/response");
         }
     }
     async function closeEnquiry(enquiryId : string) {
