@@ -171,7 +171,7 @@ function Login() {
         <div className="w-full h-screen flex justify-center items-center bg-[url(/images/OCBCBackground.jpg)] bg-cover">
             <div className="w-1/4 h-fit flex flex-col justify-between rounded border-2 pt-8 bg-white">
                 <div className="flex flex-col px-12 gap-8 md:pt-8 md:pb-16 gap-8 pb-4 pt-4">
-                    <h1 className="text-3xl font-semibold pb-2 ml-auto mr-auto">OCBC Online</h1>
+                    <h1 className="lg:text-3xl font-semibold text-xl ml-auto mr-auto pb-2text-3xl font-semibold pb-2 ml-auto mr-auto">OCBC Online</h1>
                     <input className="border-b-2 outline-0 px-4 py-2" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required/>
                     <input className="border-b-2 outline-0 px-4 py-2" placeholder="PIN" value={pin} onChange={(e) => setPin(e.target.value)} required/>
                     <Dialog>

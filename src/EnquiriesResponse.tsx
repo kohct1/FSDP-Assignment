@@ -330,7 +330,7 @@ function EnquiryDetail() {
     }
 
     return (
-        <div className="w-full min-h-screen bg-gray-50 bg-[url(/images/OCBCEnquiryBackground.jpg)] bg-cover bg-blend-darken">
+        <div className="w-full min-h-screen bg-gray-50 ">
             <Navbar />
             
             <h1 className="text-2xl font-semibold text-black py-4 p-12 mb-9 mt-12 flex justify-between">
@@ -389,7 +389,7 @@ function EnquiryDetail() {
                 <div className="flex flex-col items-center">
                     {isTyping == false ? null : 
                         <div className="flex flex-row mr-auto ml-2 mb-1">
-                            <p className="flex flex-row">{currentUsername == postedUser ? respondingUser : postedUser} is typing</p>
+                            <p className="flex flex-row text-black">{currentUsername == postedUser ? respondingUser : postedUser} is typing</p>
                             <motion.div className='ml-1 font-semibold' initial={{opacity: "100%"}} animate = {{opacity: "0"}} transition = {{type: "easeInOut", duration: 1, repeat: Infinity, repeatType: "reverse"}}>.</motion.div>
                             <motion.div className='ml-1 font-semibold' initial={{opacity: "100%"}} animate = {{opacity: "0"}} transition = {{type: "easeInOut", duration: 1, repeat: Infinity, repeatType: "reverse", delay: 0.5}}>.</motion.div>
                             <motion.div className='ml-1 font-semibold' initial={{opacity: "100%"}} animate = {{opacity: "0"}} transition = {{type: "easeInOut", duration: 1, repeat: Infinity, repeatType: "reverse", delay: 1}}>.</motion.div>
