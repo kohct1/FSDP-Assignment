@@ -159,23 +159,51 @@ const WebRTCAudioPage: React.FC = () => {
     }
   };
 
-  const endCall = () => {
-    peerConnectionRef.current?.close();
-    signalingSocketRef.current?.close();
-    setIsCallStarted(false);
-    setIsUserSpeaking(false);
-    setIsRemoteSpeaking(false);
-    setCallDuration(0);
-    clearInterval(timerIntervalRef.current!);
-    localStream?.getTracks().forEach((track) => track.stop());
+  const endCall = async () => {
+    try {
+      // Complete the call if necessary (for processing the queue, etc.)
+      await completeCall();
   
-    if (role === "Staff") {
-      navigate("/staff/queue");
-    } else {
-      localStorage.setItem("showFeedbackForm", "true");
-      navigate("/homepage");
+      // Close peer connection and signaling socket
+      peerConnectionRef.current?.close();
+      signalingSocketRef.current?.close();
+      setIsCallStarted(false);
+      setIsUserSpeaking(false);
+      setIsRemoteSpeaking(false);
+      setCallDuration(0);
+      clearInterval(timerIntervalRef.current!);
+      localStream?.getTracks().forEach((track) => track.stop());
+      
+      // Navigate based on the role
+      if (role === "Staff") {
+        navigate("/staff/queue");
+      } else {
+        localStorage.setItem("showFeedbackForm", "true");
+        navigate("/homepage");
+      }
+    } catch (error) {
+      console.error("Error ending the call:", error);
     }
   };
+  
+  const completeCall = async () => {
+    if (isCallStarted) {  
+      try {
+        const response = await fetch("http://localhost:5050/dequeue", {
+          method: "POST",
+        });
+  
+        if (!response.ok) {
+          console.error("Failed to update left queue");
+        }
+      } catch (error) {
+        console.error("Error completing the call:", error);
+      } 
+    } else {
+      alert("You need to call the next person before completing a call!");
+    }
+  };
+  
 
   const monitorSpeaking = (stream: MediaStream, setSpeaking: React.Dispatch<React.SetStateAction<boolean>>) => {
     const audioContext = new (window.AudioContext || window.AudioContext)();

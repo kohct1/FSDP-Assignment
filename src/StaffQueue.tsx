@@ -63,40 +63,9 @@ const StaffQueue = () => {
             setCurrentCall(leftQueue + 1); // Set the currently serving call
             setCallStarted(true); // Indicate that a call has started
             setLastUpdatedTime(getCurrentTime());
-            //navigate('/webcall');
-            // does not work :c
+            navigate('/webcall');
         } else {
             alert("No one in the queue to call!");
-        }
-    };
-
-    // Mark the current call as completed
-    const completeCall = async () => {
-        if (isProcessing) return; // Prevent overlapping requests
-        if (currentCall !== null && callStarted) {
-            setIsProcessing(true); // Lock further button presses
-
-            try {
-                const response = await fetch("http://localhost:5050/dequeue", {
-                    method: "POST",
-                });
-
-                if (response.ok) {
-                    await fetchQueueData(); // Refresh queue data immediately
-                } else {
-                    console.error("Failed to update left queue");
-                }
-            } catch (error) {
-                console.error("Error completing the call:", error);
-            } finally {
-                setIsProcessing(false); // Unlock the button
-            }
-            //force values to be reset
-            setLeftQueue((prev) => prev + 1); // Update the left queue count
-            setCallStarted(false); // Ensure "Call Next Person" must be pressed again
-            setCurrentCall(null); // Reset the current call after processing
-        } else {
-            alert("You need to call the next person before completing a call!");
         }
     };
 
@@ -148,9 +117,6 @@ const StaffQueue = () => {
                         <h3 className="text-xl font-bold">Queue Status</h3>
                         <p className="text-lg">Total in Queue: {queueCount}</p>
                         <p className="text-lg">Left Queue: {leftQueue}</p>
-                        <p className="text-lg">
-                            Currently Serving: {currentCall !== null ? currentCall : "None"}
-                        </p>
                         <p className="text-sm text-black-500 mt-2">
                             Status Last Updated: {lastUpdatedTime}
                         </p>
@@ -165,19 +131,6 @@ const StaffQueue = () => {
                             onClick={callNextPerson}
                         >
                             Call Next Person
-                        </motion.button>
-
-                        {/* Complete Call Button */}
-                        <motion.button
-                            className={`bg-white-600 text-red-600 text-lg font-semibold px-6 py-3 rounded mt-8 ${
-                                !callStarted || isProcessing ? "opacity-50 cursor-not-allowed" : ""
-                            }`}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={completeCall}
-                            disabled={!callStarted || isProcessing} // Disable unless conditions are met
-                        >
-                            Complete Current Call
                         </motion.button>
                     </div>
                 </div>
