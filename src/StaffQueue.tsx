@@ -6,12 +6,9 @@ import { motion } from "framer-motion";
 const StaffQueue = () => {
     const [queueCount, setQueueCount] = useState(0);
     const [leftQueue, setLeftQueue] = useState(0);
-    const [currentCall, setCurrentCall] = useState<number | null>(null);
-    const [callStarted, setCallStarted] = useState(false); // Track if a call has started
     const [lastUpdatedTime, setLastUpdatedTime] = useState("");
     const [averageRating, setAverageRating] = useState("No ratings yet");
     const [recentFeedback, setRecentFeedback] = useState(null);
-    const [isProcessing, setIsProcessing] = useState(false); // For locking the button
     const navigate = useNavigate();
 
     // Function to format the current time as hh:mm:ss AM/PM
@@ -60,8 +57,6 @@ const StaffQueue = () => {
     // Call the next person in the queue
     const callNextPerson = () => {
         if (queueCount - leftQueue > 0) {
-            setCurrentCall(leftQueue + 1); // Set the currently serving call
-            setCallStarted(true); // Indicate that a call has started
             setLastUpdatedTime(getCurrentTime());
             navigate('/webcall');
         } else {

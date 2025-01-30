@@ -146,25 +146,25 @@ const BookingForm: React.FC = () => {
 
   const steps: Step[] = [
     {
-      target: '.category-select', // CSS class for the category dropdown
+      target: '.category-select', 
       content: 'Select a category for your booking.',
     },
     {
-      target: '.reason-textarea', // CSS class for the reason textarea
+      target: '.reason-textarea', 
       content: 'Please provide a reason for your booking.',
     },
     {
-      target: '.continue-btn', // CSS class for the continue button
+      target: '.continue-btn', 
       content: 'Click here to proceed with your booking.',
     }
   ];
 
   const handleStartTour = () => {
-    setIsTourOpen(true); // Open the tour
+    setIsTourOpen(true); 
   };
 
   const handleEndTour = () => {
-    setIsTourOpen(false); // Close the tour
+    setIsTourOpen(false); 
   };
 
   if (isStaff) {
