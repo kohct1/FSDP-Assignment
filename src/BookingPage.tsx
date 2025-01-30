@@ -347,7 +347,7 @@ const BookingForm: React.FC = () => {
         <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-semibold text-gray-800">Make a Booking</h1>
             <motion.button
-              className="bg-blue-500 text-white py-2 px-4 rounded-md"
+              className="bg-red-600 text-white py-2 px-4 rounded-md"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleStartTour}
