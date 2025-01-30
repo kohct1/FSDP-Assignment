@@ -6,6 +6,7 @@ import queue from "./routes/queue.js";
 import enquiry from "./routes/enquiry.js";
 import email from "./routes/email.js";
 import branches from "./routes/branches.js";
+import user from "./routes/user.js";
 
 const app = express();
 const PORT = process.env.PORT || 5050;
@@ -19,6 +20,7 @@ app.use("/", queue);
 app.use("/enquiries", enquiry);
 app.use("/", email);
 app.use("/", branches);
+app.use("/", user);
 
 
 app.listen(PORT, () => {

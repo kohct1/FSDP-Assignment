@@ -8,6 +8,7 @@ import OCBCsignup from './OCBCsignup';
 import HomePage from './HomePage';
 import Ticketing from "./Ticketing";
 import Queue from "./Queue";
+import StaffQueue from "./StaffQueue";
 import MakeEnquiry from "./MakeEnquiry";
 import CustomerEnquiries from "./ActiveEnquiriesCustomer";
 import EnquiriesResponse from "./EnquiriesResponse";
@@ -26,6 +27,7 @@ function App() {
       <Route path="homepage" element={<HomePage />} />
       <Route path="ticketing" element={<Ticketing />} />
       <Route path="queue" element={<Queue />} />
+      <Route path="staff/queue" element={<StaffQueue />} />
       <Route path="user/enquiries/make" element={<MakeEnquiry />} />
       <Route path="user/enquiries/view" element={<CustomerEnquiries/>} />
       <Route path="enquiries/response" element={<EnquiriesResponse />} />

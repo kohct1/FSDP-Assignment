@@ -17,6 +17,7 @@ import {
 
 
 
+
 function Login() {
     const [email, setEmail] = useState<string>("");
     const [pin, setPin] = useState<string>("");
@@ -25,6 +26,8 @@ function Login() {
     const [registerSuccess, setRegisterSuccess] = useState<boolean>(false);
     const navigate = useNavigate();
     localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("role");
 
     async function login(): Promise<void> {
         const response = await fetch("http://localhost:5050/login", {
@@ -39,11 +42,40 @@ function Login() {
         });
 
         const result = await response.json();
+     
 
         if (result.token)  {
             localStorage.setItem("token", result.token);
+            getUserRole(email);
+            const tempArray = email.split('@');
+            const username = tempArray[0].charAt(0).toUpperCase() + tempArray[0].slice(1);
+            localStorage.setItem('username', username);
             navigate("/homepage");
+           
         }
+    }
+    async function getUserRole(email : String) {
+        
+        const response = await fetch(`http://localhost:5050/user`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+       
+        const result = await response.json();
+        console.log(result.user);
+        let keys = Object.keys(result.user);
+        for(let i = 0; i < keys.length; i++) {
+            if(result.user[i]["email"] == email) {
+               
+                localStorage.setItem("role", result.user[i]["role"]);
+                console.log(result.user[i]["email"]);
+            }  
+        }
+       
+        
+       
     }
 
     async function register(): Promise<void> {
@@ -56,6 +88,7 @@ function Login() {
                 email: email,
                 pin: pin
             })
+
         });
     }
     

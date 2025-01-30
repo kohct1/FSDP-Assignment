@@ -5,9 +5,8 @@ const router = express.Router();
 import mongoose from "mongoose";
 const {ObjectId} = mongoose.Types;
 
-
 //Gets all enquiry data
-router.get("/staff", async (req, res) => {
+router.get("/", async (req, res) => {
     try {
         const enquiriesCollection = db.collection("Enquiries");
         const enquiries = await enquiriesCollection.find().toArray();
@@ -30,16 +29,6 @@ router.get("/staff/open", async (req, res) => {
 
 });
 
-router.get("/user", async (req, res) => {
-    try {
-        const enquiriesCollection = db.collection("Enquiries");
-        const enquiries = await enquiriesCollection.find().toArray();
-        res.status(200).json({enquiries});
-    } catch (err) {
-        res.status(500).json({error : "Internal Server Error"});
-    }
-});
-
 //Posts new enquiry from user
 router.post("/make", async (req, res) => {
     const {id, type, message} = req.body;
@@ -54,6 +43,7 @@ router.post("/make", async (req, res) => {
             "status" : "Open",
             "postedBy": id, 
             "responseBy" : "None",
+            "messages" : [],
         }
         const enquiries = await enquiriesCollection.insertOne(doc);
 
