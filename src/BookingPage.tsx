@@ -11,6 +11,7 @@ import {
   DialogTrigger,
   DialogFooter
 } from "@/components/ui/dialog";
+import Joyride from 'react-joyride';
 
 const BookingForm: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -29,6 +30,7 @@ const BookingForm: React.FC = () => {
   const [category, setCategory] = useState<string>("OCBC Mobile App");
 
   const [showModal, setShowModal] = useState(false);
+  const [isTourOpen, setIsTourOpen] = useState(false); // New state for tour
   const navigate = useNavigate();
   const currentDate: Date = new Date();
   const months: string[] = [
@@ -142,25 +144,27 @@ const BookingForm: React.FC = () => {
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const steps: Step[] = [
+    {
+      target: '.category-select', 
+      content: 'Select a category for your booking.',
+    },
+    {
+      target: '.reason-textarea', 
+      content: 'Please provide a reason for your booking.',
+    },
+    {
+      target: '.continue-btn', 
+      content: 'Click here to proceed with your booking.',
+    }
+  ];
+
+  const handleStartTour = () => {
+    setIsTourOpen(true); 
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setShowModal(true);
-  };
-
-  const handleConfirm = () => {
-    setShowModal(false);
-    navigate('/homepage'); // Redirect to the homepage
-  };
-
-  const handleCancel = () => {
-    setShowModal(false); // Close the modal and allow editing
+  const handleEndTour = () => {
+    setIsTourOpen(false); 
   };
 
   if (isStaff) {
@@ -338,19 +342,27 @@ const BookingForm: React.FC = () => {
       <Navbar />
 
       <div className="h-full flex justify-center items-center py-12 mt-16">
-        <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-8 mb-20">
-          <h1 className="text-3xl font-semibold text-gray-800 mb-2">Make a Booking</h1>
-          <p className="text-gray-600 text-sm mb-8">
-            For urgent matters, please call us directly at <span className="font-semibold">6535 7677</span>
-          </p>
 
-          <form onSubmit={handleSubmit}>
+        <div className="w-full max-w-4xl bg-white shadow-md rounded-lg p-8">
+        <div className="flex justify-between items-center mb-6">
+            <h1 className="text-3xl font-semibold text-gray-800">Make a Booking</h1>
+            <motion.button
+              className="bg-red-600 text-white py-2 px-4 rounded-md"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleStartTour}
+            >
+              Start Walkthrough
+            </motion.button>
+          </div>
+
+          <form>
             <div className="grid grid-cols-1 gap-6">
               <div>
                 <label className="block text-left mb-2">
                   Booking category <span className="text-red-500">*</span>
                 </label>
-                <select id="types" name="types" className="p-2 border mb-4 w-full rounded" required onChange={(e) => setCategory(e.target.value)}>
+                <select id="types" name="types" className="p-2 border mb-4 w-full rounded category-select">
                     <option value="OCBC Mobile App">OCBC Mobile App</option>
                     <option value="Loans">Loans/Collections</option>
                     <option value="Banking Card">Credit/Debit Card</option>
@@ -365,9 +377,9 @@ const BookingForm: React.FC = () => {
                 <textarea
                   name="reason"
                   value={formData.reason}
-                  onChange={handleChange}
+                  onChange={(e) => setFormData({...formData, reason: e.target.value})}
                   required
-                  className="block w-full border border-gray-300 rounded p-2 focus:ring-red-500 focus:border-red-500 resize-none"
+                  className="block w-full border border-gray-300 rounded p-2 focus:ring-red-500 focus:border-red-500 resize-none reason-textarea"
                   placeholder="Enter the reason for your booking"
                   maxLength={500}
                   rows={5}
@@ -387,7 +399,7 @@ const BookingForm: React.FC = () => {
                   </Link> :
                   <button
                     type="submit"
-                    className="w-full flex justify-center items-center bg-red-500 text-white py-3 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                    className="w-full flex justify-center items-center bg-red-500 text-white py-3 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 continue-btn"
                   >
                     Continue
                   </button>}
@@ -395,34 +407,26 @@ const BookingForm: React.FC = () => {
               </div>
             </div>
           </form>
+          
         </div>
       </div>
-    {/* Confirmation Modal */}
-    {showModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-96">
-            <h2 className="text-xl font-semibold mb-4">Confirm Your Details</h2>
-            <p className="text-gray-700 mb-6">Are you sure you want to submit this information?</p>
-            <div className="flex justify-end space-x-4">
-              <motion.button
-                onClick={handleCancel}
-                className="px-4 py-2 bg-gray-300 rounded-md hover:bg-gray-400"
-                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-              >
-                No
-              </motion.button>
-              <motion.button
-                onClick={handleConfirm}
-                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
-                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-              >
-                Yes
-              </motion.button>
-            </div>
-          </div>
-        </div>
+
+      {/* Joyride Walkthrough */}
+      {isTourOpen && (
+        <Joyride
+          steps={steps}
+          run={isTourOpen}
+          continuous={true}
+          showProgress={true}
+          showSkipButton={true}
+          callback={(data) => {
+            if (data.status === 'finished' || data.status === 'skipped') {
+              handleEndTour(); 
+            }
+          }}
+        />
       )}
-    </div> 
+    </div>
   );
 };
 

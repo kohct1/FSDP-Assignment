@@ -1,15 +1,24 @@
+import React, { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
-import { useState, useEffect } from "react";
+import FeedbackForm from "./components/FeedbackForm"; 
 import useWebSocket from "react-use-websocket";
 import {decodeToken} from "react-jwt";
 
 function HomePage() {
     const [userId, setUserId] = useState(null);
-  
+    const [showFeedbackForm, setShowFeedbackForm] = useState(false);
    
     useEffect(() => {
+      const feedbackFlag = localStorage.getItem("showFeedbackForm");
+      if (feedbackFlag === "true") {
+        setShowFeedbackForm(true);
+        localStorage.removeItem("showFeedbackForm"); // Remove the flag after setting it
+      }
+    }, []);
+
+    useEffect(() => {
         getUser();
-      }, []);
+    }, []);
     
     async function getUser(): Promise<void> {
         const response = await fetch(`http://localhost:5050/decode/`, {
@@ -38,35 +47,80 @@ function HomePage() {
         />
       </section>
 
-       <div className="relative max-w-7xl mx-auto -mt-24 p-8 bg-white shadow-lg rounded-lg">
+      <div className="relative max-w-7xl mx-auto -mt-24 p-8 bg-white shadow-lg rounded-lg">
         <div className="flex justify-around text-left space-x-4">
           <div className="flex-1">
             <h2 className="text-3xl font-bold mb-4">Banking for individuals</h2>
             <ul className="space-y-2 text-blue-600 text-lg">
-              <li><a href="#frank" className="hover:underline">FRANK by OCBC</a></li>
-              <li><a href="#personal" className="hover:underline">Personal Banking</a></li>
-              <li><a href="#premier" className="hover:underline">Premier Banking</a></li>
-              <li><a href="#private" className="hover:underline">Premier Private Client</a></li>
+              <li>
+                <a href="#frank" className="hover:underline">
+                  FRANK by OCBC
+                </a>
+              </li>
+              <li>
+                <a href="#personal" className="hover:underline">
+                  Personal Banking
+                </a>
+              </li>
+              <li>
+                <a href="#premier" className="hover:underline">
+                  Premier Banking
+                </a>
+              </li>
+              <li>
+                <a href="#private" className="hover:underline">
+                  Premier Private Client
+                </a>
+              </li>
             </ul>
           </div>
           <div className="flex-1">
             <h2 className="text-3xl font-bold mb-4">Banking for businesses</h2>
             <ul className="space-y-2 text-blue-600 text-lg">
-              <li><a href="#business" className="hover:underline">Business Banking</a></li>
-              <li><a href="#corporates" className="hover:underline">Large Corporates</a></li>
+              <li>
+                <a href="#business" className="hover:underline">
+                  Business Banking
+                </a>
+              </li>
+              <li>
+                <a href="#corporates" className="hover:underline">
+                  Large Corporates
+                </a>
+              </li>
             </ul>
           </div>
           <div className="flex-1">
             <h2 className="text-3xl font-bold mb-4">OCBC Group</h2>
             <ul className="space-y-2 text-blue-600 text-lg">
-              <li><a href="#about" className="hover:underline">About us</a></li>
-              <li><a href="#sustainability" className="hover:underline">Sustainability</a></li>
-              <li><a href="#careers" className="hover:underline">Careers</a></li>
-              <li><a href="#investors" className="hover:underline">Investors</a></li>
+              <li>
+                <a href="#about" className="hover:underline">
+                  About us
+                </a>
+              </li>
+              <li>
+                <a href="#sustainability" className="hover:underline">
+                  Sustainability
+                </a>
+              </li>
+              <li>
+                <a href="#careers" className="hover:underline">
+                  Careers
+                </a>
+              </li>
+              <li>
+                <a href="#investors" className="hover:underline">
+                  Investors
+                </a>
+              </li>
             </ul>
           </div>
         </div>
       </div>
+
+      {/* Feedback form */}
+      {showFeedbackForm && (
+        <FeedbackForm />
+      )}
 
       <section className="max-w mx-auto my-16 p-12 bg-white shadow-lg rounded-lg">
         <div className="text-2xl font-semibold text-red-500 mb-4">HIGHLIGHTS</div>

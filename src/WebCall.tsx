@@ -17,6 +17,32 @@ const WebRTCAudioPage: React.FC = () => {
   const speakingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const navigate = useNavigate();
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    getRole();
+  }, []);
+
+  async function getRole(): Promise<void> {
+    const response = await fetch(`http://localhost:5050/role/`, {
+      method: "POST",
+      headers: {
+          "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+          token: localStorage.getItem("token")
+      })
+    });
+    
+    const result = await response.json();
+
+    if (result.role === "Staff") {
+      setRole("Staff");
+    } else {
+      setRole("Customer")
+    }
+  }
+  
 
   const SIGNALING_SERVER_URL = 'ws://localhost:8080';
   const iceServers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
@@ -133,17 +159,51 @@ const WebRTCAudioPage: React.FC = () => {
     }
   };
 
-  const endCall = () => {
-    peerConnectionRef.current?.close();
-    signalingSocketRef.current?.close();
-    setIsCallStarted(false);
-    setIsUserSpeaking(false);
-    setIsRemoteSpeaking(false);
-    setCallDuration(0);
-    clearInterval(timerIntervalRef.current!);
-    localStream?.getTracks().forEach(track => track.stop());
-    navigate('/homepage');
+  const endCall = async () => {
+    try {
+      // Complete the call if necessary (for processing the queue, etc.)
+      await completeCall();
+  
+      // Close peer connection and signaling socket
+      peerConnectionRef.current?.close();
+      signalingSocketRef.current?.close();
+      setIsCallStarted(false);
+      setIsUserSpeaking(false);
+      setIsRemoteSpeaking(false);
+      setCallDuration(0);
+      clearInterval(timerIntervalRef.current!);
+      localStream?.getTracks().forEach((track) => track.stop());
+      
+      // Navigate based on the role
+      if (role === "Staff") {
+        navigate("/staff/queue");
+      } else {
+        localStorage.setItem("showFeedbackForm", "true");
+        navigate("/homepage");
+      }
+    } catch (error) {
+      console.error("Error ending the call:", error);
+    }
   };
+  
+  const completeCall = async () => {
+    if (isCallStarted) {  
+      try {
+        const response = await fetch("http://localhost:5050/dequeue", {
+          method: "POST",
+        });
+  
+        if (!response.ok) {
+          console.error("Failed to update left queue");
+        }
+      } catch (error) {
+        console.error("Error completing the call:", error);
+      } 
+    } else {
+      alert("You need to call the next person before completing a call!");
+    }
+  };
+  
 
   const monitorSpeaking = (stream: MediaStream, setSpeaking: React.Dispatch<React.SetStateAction<boolean>>) => {
     const audioContext = new (window.AudioContext || window.AudioContext)();
@@ -246,7 +306,7 @@ const WebRTCAudioPage: React.FC = () => {
       <audio ref={remoteAudioRef} autoPlay className="hidden" />
 
       <div className="flex gap-8 items-center mt-6">
-      <button
+        <button
           onClick={toggleMute}
           className={`w-16 h-16 flex items-center justify-center rounded-full ${
             isMuted ? 'bg-red-500' : 'bg-green-500'
