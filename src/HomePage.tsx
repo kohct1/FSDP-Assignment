@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import FeedbackForm from "./components/FeedbackForm"; 
-
-import { useState, useEffect } from "react";
 import useWebSocket from "react-use-websocket";
 import {decodeToken} from "react-jwt";
 
@@ -11,13 +9,15 @@ function HomePage() {
     const [showFeedbackForm, setShowFeedbackForm] = useState(false);
    
     useEffect(() => {
+      const feedbackFlag = localStorage.getItem("showFeedbackForm");
+      if (feedbackFlag === "true") {
+        setShowFeedbackForm(true);
+        localStorage.removeItem("showFeedbackForm"); // Remove the flag after setting it
+      }
+    }, []);
+
+    useEffect(() => {
         getUser();
-        const feedbackFlag = localStorage.getItem("showFeedbackForm");
-        if (feedbackFlag === "true") {
-          setShowFeedbackForm(true);
-          localStorage.removeItem("showFeedbackForm"); // Remove the flag after setting it
-        }
-      }, []);
     }, []);
     
     async function getUser(): Promise<void> {
