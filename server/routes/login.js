@@ -10,10 +10,9 @@ router.post("/login", async (req, res) => {
     try {
         const users = db.collection("Users");
         const user = await users.findOne({ email });
-
         if (!user) return res.status(400).json({ message: "Invalid credentials" });
         if (pin !== user.pin) return res.status(400).json({ message: "Invalid pin" });
-
+    
         const token = jwt.sign({ userId: user._id, role: user.role, email: user.email }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
         res.status(200).json({ token });
