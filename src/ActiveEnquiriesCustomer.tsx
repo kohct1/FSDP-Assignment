@@ -119,6 +119,25 @@ const ChatbotPopup = ({ isOpen, toggleChat, messages, setMessages, clearChat }) 
             setNewMessage("");
             setIsTyping(true); 
 
+            // Check if the user is requesting a live agent
+        const liveAgentKeywords = ["live agent", "real person", "human", "customer support", "real person", "person", "enquiry", "make enquiry"];
+        if (liveAgentKeywords.some(keyword => currentMessage.toLowerCase().includes(keyword))) {
+            const botMessage = {
+                text: "You can speak to a live agent by making a new enquiry.",
+                isUser: false,
+                button: { text: "Make a New Enquiry", link: "/user/enquiries/make" }
+            };
+
+            setMessages((prevMessages) => {
+                const updatedMessages = [...prevMessages, botMessage];
+                localStorage.setItem("chatMessages", JSON.stringify(updatedMessages));
+                return updatedMessages;
+            });
+
+            setIsTyping(false);
+            return;
+        }
+
             try {
                 const response = await fetch("http://localhost:3000/generate-text", {
                     method: "POST",
@@ -219,15 +238,17 @@ const ChatbotPopup = ({ isOpen, toggleChat, messages, setMessages, clearChat }) 
                                     message.isUser ? "justify-end" : "justify-start"
                                 }`}
                             >
-                                <p
-                                    className={`p-2 rounded-lg max-w-xs ${
-                                        message.isUser
-                                            ? "bg-red-500 text-white text-right"
-                                            : "bg-gray-200 text-gray-700 text-left"
-                                    }`}
-                                >
-                                    {message.text}
-                                </p>
+                                <div className={`p-2 rounded-lg max-w-xs ${message.isUser ? "bg-red-500 text-white text-right" : "bg-gray-200 text-gray-700 text-left"}`}>
+                                    <p>{message.text}</p>
+                                    {message.button && (
+                                        <button
+                                            className="mt-2 px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-blue-600 transition-all"
+                                            onClick={() => window.location.href = message.button.link}
+                                        >
+                                            {message.button.text}
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         ))}
                         {isTyping && (
