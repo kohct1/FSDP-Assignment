@@ -144,27 +144,6 @@ const BookingForm: React.FC = () => {
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setShowModal(true);
-  };
-
-  const handleConfirm = () => {
-    setShowModal(false);
-    navigate('/homepage'); // Redirect to the homepage
-  };
-
-  const handleCancel = () => {
-    setShowModal(false); // Close the modal and allow editing
-  };
-
   const steps: Step[] = [
     {
       target: '.category-select', // CSS class for the category dropdown
