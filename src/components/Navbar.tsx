@@ -17,17 +17,17 @@ function PopulateLinks({ role, handleLogout }: { role: string, handleLogout: () 
     if(role == "Customer") {
         return (  
             <div className="flex items-center gap-8">
-                <Link to="/bookingpage" className="text-gray-600 text-lg font-semibold">Booking</Link>
-                <Link to="/ticketing" className="text-gray-600 text-lg font-semibold">Queue</Link>
-                <Link to="/user/enquiries/view" className="text-gray-600 text-lg font-semibold">Enquiry Portal</Link>
+                <Link to="/bookingpage" className="text-gray-600 md:text-lg font-semibold text-sm hover:text-gray-900">Booking</Link>
+                <Link to="/ticketing" className="text-gray-600 md:text-lg font-semibold text-sm hover:text-gray-900">Queue</Link>
+                <Link to="/user/enquiries/view" className="text-gray-600 md:text-lg font-semibold text-sm hover:text-gray-900">Enquiries</Link>
                 <Link to="/branches" className="text-gray-600 text-lg font-semibold">Branches</Link>
                 <Dialog>
                     <DialogTrigger>
-                        <motion.button className="bg-red-600 rounded text-lg text-white font-semibold px-3 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>Log out</motion.button>
+                        <motion.button className="bg-red-600 rounded md:text-lg text-sm text-white font-semibold px-3 py-2 sm:ml-4 m-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>Log out</motion.button>
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>Are you absolutely sure?</DialogTitle>
+                            <DialogTitle className="mb-2">Are you absolutely sure?</DialogTitle>
                             <DialogDescription>
                                 You are logging out of your account. You can log in again in the login page.
                             </DialogDescription>
@@ -43,16 +43,16 @@ function PopulateLinks({ role, handleLogout }: { role: string, handleLogout: () 
     else if (role == "Staff") {
         return (
             <div className="flex items-center gap-8">
-                <Link to="/bookingpage" className="text-gray-600 font-semibold">Booking</Link>
-                <Link to="/staff/queue" className="text-gray-600 font-semibold"> Queue</Link>
-                <Link to="/staff/enquiries" className="text-gray-600 font-semibold">Enquiry Portal</Link>
+                <Link to="/bookingpage" className="text-gray-600 md:text-lg font-semibold text-sm hover:text-gray-900">Booking</Link>
+                <Link to="/staff/queue" className="text-gray-600 md:text-lg font-semibold text-sm hover:text-gray-900"> Queue</Link>
+                <Link to="/staff/enquiries" className="text-gray-600 md:text-lg font-semibold text-sm hover:text-gray-900">Enquiries</Link>
                 <Dialog>
                     <DialogTrigger>
-                        <motion.button className="bg-red-600 rounded text-lg text-white font-semibold px-3 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>Log out</motion.button>
+                        <motion.button className="bg-red-600 rounded sm:text-lg text-white font-semibold px-3 py-2 ml-4 " whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>Log out</motion.button>
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>Are you absolutely sure?</DialogTitle>
+                            <DialogTitle className="mb-2">Are you absolutely sure?</DialogTitle>
                             <DialogDescription>
                                 You are logging out of your account. You can log in again in the login page.
                             </DialogDescription>
@@ -128,7 +128,7 @@ function Navbar() {
                         <img
                             src='/images/OCBC-Bank-Logo.png' // OCBC logo link
                             alt="OCBC Logo"
-                            className="h-12"
+                            className="h-12 opacity-0 sm:opacity-100 sm:w-full w-0"
                         />
                     </Link>
                     <PopulateLinks

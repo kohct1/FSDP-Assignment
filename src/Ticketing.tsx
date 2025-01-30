@@ -117,7 +117,7 @@ const Ticketing = () => {
                         </motion.button>
                     </form>
 
-                    <p className="text-lg">
+                    <p className="text-lg mt-6">
                         Estimated Waiting Time: <strong>{waitingTime} minutes</strong>
                     </p>
                     <p className="text-sm text-gray-500 mt-2">
