@@ -380,9 +380,9 @@ function EnquiryDetail() {
             </div>
 
         {enquiry?.status === "Closed" ? (
-            <p className="text-center text-gray-500 mt-6">This enquiry is closed. No further messages can be sent.</p>
+            <p className="text-center text-black mt-6">This enquiry is closed. No further messages can be sent.</p>
         ) : (userId !== enquiry.postedBy && userId !== enquiry.responseBy) ? (
-            <p className="text-center text-gray-500 mt-6">You do not have permission to send messages for this enquiry.</p>
+            <p className="text-center text-black mt-6">You do not have permission to send messages for this enquiry.</p>
         ) : (
             //Text bubble could use eventlistener on key down and up to send messages back from the websocket
             <form className="p-12" onSubmit={handleSendMessage}>
