@@ -6,11 +6,14 @@ import { useState, useEffect } from "react";
 import "leaflet/dist/leaflet.css";
 import { Marker, Popup, useMap } from "react-leaflet";
 import { Button } from "./ui/button";
+import L from "leaflet";
+import marker from "../../public/location.svg";
 
 function BranchMarkers({ branches, selectedBranch, nearest }: { branches: object[], selectedBranch: object, nearest: boolean }) {
     const [userLocation, setUserLocation] = useState([0, 0]);
     const [nearestBranch, setNearestBranch] = useState({});
     const map = useMap();
+    const icon = new L.Icon({ iconUrl: marker, iconAnchor: [18, 36], popupAnchor: [0, -18] });
     let distance = Number.MAX_SAFE_INTEGER;
 
     useEffect(() => {
@@ -66,7 +69,7 @@ function BranchMarkers({ branches, selectedBranch, nearest }: { branches: object
         <>
             {branches.map((branch: object, index: number) => {
                 return (
-                    <Marker key={index} position={[branch.latitude, branch.longitude]}>
+                    <Marker key={index} position={[branch.latitude, branch.longitude]} icon={icon}>
                         <Popup>
                             <h1 className="text-xl font-semibold">{branch.landmark}</h1>
                             <p>{branch.address}, {branch.postalCode}</p>
