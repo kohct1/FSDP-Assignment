@@ -950,7 +950,7 @@ function Branches() {
                         </div>
                         {branches.map((branch: object, index: number) => {
                             return (
-                                <BranchButton key={index} branch={branch} setSelectedBranch={setSelectedBranch} />
+                                <BranchButton key={index} branch={branch} setSelectedBranch={setSelectedBranch}/>
                             );
                         })}
                     </div>

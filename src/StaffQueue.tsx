@@ -110,9 +110,9 @@ const StaffQueue = () => {
     }, []);
 
     return (
-        <div className="relative flex flex-col min-h-screen bg-cover bg-center bg-[url('staff_bg.jpg')]">
+        <div className="relative flex flex-col min-h-screen bg-cover bg-center bg-[url(/images/OCBCQueueBackground.jpg)]">
             {/* Overlay for background fade */}
-            <div className="absolute inset-0 bg-white opacity-50"></div>
+            <div className="absolute inset-0 bg-white opacity-20"></div>
 
             {/* Header positioned over the background */}
             <Navbar />

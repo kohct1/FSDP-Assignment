@@ -330,15 +330,15 @@ function EnquiryDetail() {
     }
 
     return (
-        <div className="w-full min-h-screen bg-gray-50">
+        <div className="w-full min-h-screen bg-gray-50 bg-[url(/images/OCBCEnquiryBackground.jpg)] bg-cover bg-blend-darken">
             <Navbar />
-
-            <h1 className="text-2xl font-semibold text-gray-800 py-4 p-12 mb-9 mt-9 flex justify-between">
-                <div className="ml-4">
+            
+            <h1 className="text-2xl font-semibold text-black py-4 p-12 mb-9 mt-12 flex justify-between">
+                <div className="ml-4 mt-1">
                     {enquiry?.type} - {enquiry?.message}
                 </div>
                 <DropdownMenu>
-                        <DropdownMenuTrigger className="border-2 p-2 rounded-md mr-14 bg-red-600 text-white text-base">User Status</DropdownMenuTrigger>
+                        <DropdownMenuTrigger className="p-2 rounded-md mr-14 bg-red-600 text-white text-base">User Status</DropdownMenuTrigger>
                         <DropdownMenuContent className="mt-2 flex flex-col pb-2">
                             <DropdownMenuLabel className="text-base pb-0 mt-2">Online Staff ({onlineStaff.length -1})</DropdownMenuLabel>
                             <DropdownMenuSeparator/>
@@ -355,7 +355,7 @@ function EnquiryDetail() {
             </h1>
             
 
-            <div className="bg-gray-100 p-6 rounded-lg shadow-md h-76 overflow-y-auto mx-12 mb-0" id="messageBox">
+            <div className="bg-gray-100 p-6 rounded-lg shadow-md h-76 overflow-y-auto mx-12 mb-0 pt-12 pb-12" id="messageBox">
                 {messages?.length === 0 ? (
                     <p className="text-gray-600 text-center mb-4">
                         Create a message to begin the conversation.
@@ -403,7 +403,7 @@ function EnquiryDetail() {
                         placeholder="Type your message..."
                         className="flex-grow p-2 border border-gray-300 rounded-l w-full mb-4 mt-0"
                     />
-                    <button type="submit" className="bg-blue-500 text-white p-2 rounded w-1/4 mt-4">Send</button>
+                    <button type="submit" className="bg-red-600 text-white p-2 rounded w-1/6 mt-4">Send</button>
                 </div>
             </form>
         )}

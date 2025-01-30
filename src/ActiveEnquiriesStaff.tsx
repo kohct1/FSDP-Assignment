@@ -149,7 +149,7 @@ function ActiveEnquiriesStaff() {
         let enquiryElement = enquiryTypedData.map((enquiry: {status: String; message: String; type: String, postedBy: String, _id: ObjectId, responseBy: String}) => {
             let status = enquiry.status;
             let opacity = "";
-            let hover = "hover:bg-gray-200";
+            let hover = "hover:opacity-20";
             let cursor = "hover:cursor-pointer";
     
             if (status == "Responding") {
@@ -172,7 +172,7 @@ function ActiveEnquiriesStaff() {
             else {
                 return null;
             }
-            let classes = "bg-white w-9/12 p-3 shadow-lg rounded ml-12 mt-5 mb-6 enquiry flex sm:w-11/12"
+            let classes = "bg-white w-9/12 p-3 shadow-lg rounded ml-12 mt-5 mb-6 enquiry flex sm:w-11/12 border-2"
             classes += " " + hover + " " + opacity + " " + cursor;
             let enquiryId = enquiry._id.toString();
 
@@ -232,11 +232,13 @@ function ActiveEnquiriesStaff() {
     return (
         <>
             <Navbar />
-            <div className="w-full h-screen">
-                <div className="flex flex-row items-center justify-between mt-8">
-                    <h1 className="lg:text-3xl md:text-xl sm:text-l font-semibold sm:ml-40 ml-32">Open Enquiries</h1>
+            <div className="w-full h-screen bg-[url(/images/OCBCEnquiryBackground.jpg)] bg-contain pt-12 bg-cover">
+                <div className="flex flex-row items-center mt-2">
+                <div className="bg-gray-100 shadow-lg rounded-lg opacity-90 lg:w-[220px] pb-3 flex align-center pt-3 md:w-[180px] w-[140px] flex md:mr-10 mr-20 md:ml-40 ml-20">
+                    <h1 className="lg:text-2xl md:text-xl sm:text-l font-semibold md:ml-6 ml-2 text-center">Open Enquiries</h1>
+                </div>
                     <DropdownMenu>
-                        <DropdownMenuTrigger className="border-2 p-2 rounded-md mr-14 bg-red-600 hover:bg-red-800 text-white text-base sm:mr-52 mr-20">User Status</DropdownMenuTrigger>
+                        <DropdownMenuTrigger className=" p-2 rounded-md mr-14 bg-red-600 hover:bg-red-800 text-white md:text-base sm:mr-52 mr-20 drop-shadow-lg text-sm">User Status</DropdownMenuTrigger>
                             <DropdownMenuContent className="mt-2 flex flex-col pb-2 justify-center">
                                 <DropdownMenuLabel className="text-base pb-0 mt-2">Online Staff ({onlineStaff.length -1})</DropdownMenuLabel>
                                 <DropdownMenuSeparator/>
@@ -251,8 +253,8 @@ function ActiveEnquiriesStaff() {
                             </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
-                <div className="drop-shadow-lg w-4/5 bg-slate-100 h-3/4 m-auto mt-8 rounded-lg flex-col justify-around overflow-auto pb-10 pt-2" id="enquiries-container">
-                    <div className="w-1/5 text-gray-200 h-0">2</div>
+                <div className="drop-shadow-lg w-4/5 bg-white h-3/4 m-auto mt-8 rounded-lg flex-col justify-around overflow-auto pb-10 pt-2" id="enquiries-container">
+                    <div className="w-1/5 text-white h-0">2</div>
                     {enquiryElements}
                 </div>
             </div>
