@@ -12,6 +12,7 @@ import {
     DialogFooter
 } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
+import GoogleTranslate from '../GoogleTranslate';
 
 function PopulateLinks({ role, handleLogout }: { role: string, handleLogout: () => void }) {
     if(role == "Customer") {
@@ -21,6 +22,7 @@ function PopulateLinks({ role, handleLogout }: { role: string, handleLogout: () 
                 <Link to="/ticketing" className="text-gray-600 md:text-lg font-semibold text-sm hover:text-gray-900">Queue</Link>
                 <Link to="/user/enquiries/view" className="text-gray-600 md:text-lg font-semibold text-sm hover:text-gray-900">Enquiries</Link>
                 <Link to="/branches" className="text-gray-600 md:text-lg font-semibold text-sm hover:text-gray-900">Branches</Link>
+                <GoogleTranslate />
                 <Dialog>
                     <DialogTrigger>
                         <motion.button className="bg-red-600 rounded md:text-lg text-sm text-white font-semibold px-3 py-2 sm:ml-4 m-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>Log out</motion.button>
