@@ -12,7 +12,6 @@ import {
     DialogFooter
 } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
-import GoogleTranslate from '../GoogleTranslate';
 
 function PopulateLinks({ role, handleLogout }: { role: string, handleLogout: () => void }) {
     if(role == "Customer") {
