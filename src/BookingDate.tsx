@@ -60,8 +60,6 @@ function BookingDate() {
                 category: state.category
             })
         });
-
-        navigate("/homepage");
     }
     
     async function updateBooking(time: number, slot: number[]): Promise<void> {
