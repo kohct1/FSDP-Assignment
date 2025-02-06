@@ -313,7 +313,7 @@ function BookingDate() {
                             <DialogContent>
                                 <DialogHeader>
                                     <DialogTitle>Are you absolutely sure?</DialogTitle>
-                                    <DialogDescription>
+                                    <DialogDescription className="pb-4">
                                         {`You are creating a booking for ${months[currentDate.getMonth()]} ${selectedDate} ${String(currentDate.getFullYear())}, ${displayTime[0]} - ${displayTime[1]}`}
                                     </DialogDescription>
                                     <DialogFooter>
@@ -321,13 +321,14 @@ function BookingDate() {
                                             <DialogTrigger>
                                                 <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => createUserBooking(selectedTime, selectedSlot)}>Confirm</motion.button>
                                             </DialogTrigger>
-                                            <DialogContent>
+                                            <DialogContent className="bg-none">
                                                 <DialogHeader>
                                                     <DialogTitle>Do you want to add this to your Google Calendar?</DialogTitle>
-                                                    <DialogDescription>
+                                                    <DialogDescription className="pb-4">
                                                         We will add this booking to your Google Calendar
                                                     </DialogDescription>
                                                     <DialogFooter>
+                                                        <motion.button className="text-s rounded px-4 py-2 hover:underline" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => navigate("/homepage")}>No Thanks</motion.button>
                                                         <motion.button className="bg-red-600 text-sm text-white rounded px-4 py-2" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => handleLogin()}>Confirm</motion.button>
                                                     </DialogFooter>
                                                 </DialogHeader>
